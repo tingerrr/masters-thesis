@@ -1,6 +1,7 @@
 # Notes
 - title: **Dynamische Datenstrukturen unter Echtzeitbedinungen**
 - some proprietary code is given, but not relevant for the thesis, anyhing else may be included for clarity where needed
+- template must be finished according to the FHE style guide [^1]
 
 ## Basics
 ### Core issues
@@ -32,7 +33,7 @@
 - readonly wrapper which makes clones more explicit
   - does not reduce clones or help mitigate their costs
 - chink-based backing storage to avoid clones of the whole structure on mutations
-  - similar to rrb-tree paper [^1]
+  - similar to rrb-tree paper [^2]
 - linked list storage for sorted chunks
 - stricter readonly modifier
   - does not help existing code
@@ -54,4 +55,5 @@
 - **end of thesis writing**
 - presentation
 
-[^1]: https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf
+[^1]: https://ai.fh-erfurt.de/fileadmin/ai_daten/download-bereich/studiendokumente/ba-und-ma-arbeiten/03_AI-Hinweise-BA-MA-Arbeiten_2019-04.pdf
+[^2]: https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf
