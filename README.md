@@ -1,5 +1,5 @@
-# Masters Thesis: Containers under real time constraints
-This repository hosts the thesis and supplementary poster for my masters thesis in applied computer science at the [University of Applied Sciences Erfurt (FHE)][FHE]. The title of this thesis is **Container unter Echtzeitbedingungen** (**Contianers under real time constraints**). At the time of writing this, the thesis is only available in German with an English abstract. After finishing the thesis (sucessfully), a translated version will be provided as I find the time for it.
+# Masters Thesis: Dynamic data structures under real time constraints
+This repository hosts the thesis and supplementary poster for my masters thesis in applied computer science at the [University of Applied Sciences Erfurt (FHE)][FHE]. The title of this thesis is **Dynamische Datenstrukturen unter Echtzeitbedingungen** (**Dynamic data structures under real time constraints**). At the time of writing this, the thesis is only available in German with an English abstract. After finishing the thesis (sucessfully), a translated version will be provided as I find the time for it.
 
 ## Copyright and Licensing
 TODO: add this before releasing the sourcing code
