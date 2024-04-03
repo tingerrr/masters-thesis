@@ -1,5 +1,4 @@
 # Notes
-- title: **Dynamische Datenstrukturen unter Echtzeitbedinungen**
 - some proprietary code is given, but not relevant for the thesis, anyhing else may be included for clarity where needed
 - template must be finished according to the FHE style guide [^1]
 
