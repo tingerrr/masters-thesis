@@ -1,6 +1,10 @@
 #import "@local/chiral-thesis-fhe:0.1.0" as ctf
 #import ctf.prelude: *
 
+#import "/src/util.typ"
+
+#show "C++": util.cpp
+
 #show: doc(
   kind: masters-thesis(
     id: [AI-1970-MA-999],
