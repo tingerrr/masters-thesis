@@ -24,17 +24,17 @@
   // bibliography: bibliography("/bibliography.yaml"),
 )
 
-#chapter[Intro] <chap:intro>
+#chapter[Einleitung] <chap:intro>
 #include "chapters/1 - intro.typ"
 
-#chapter[Basics] <chap:basics>
+#chapter[Grundlagen] <chap:basics>
 #include "chapters/2 - basics.typ"
 
-#chapter[Concept] <chap:concept>
+#chapter[Konzept] <chap:concept>
 #include "chapters/3 - concept.typ"
 
-#chapter[Implementation] <chap:impl>
+#chapter[Implementierung] <chap:impl>
 #include "chapters/4 - impl.typ"
 
-#chapter[Conculsion] <chap:conclusion>
+#chapter[Fazit] <chap:conclusion>
 #include "chapters/5 - conclusion.typ"
