@@ -46,8 +46,8 @@ Wie in @tbl:stat-dyn zu sehen ist, werden in der Praxis vorwiegend dynamische St
 Das hat Folgen für die Zeit- und Speicherkomplexität der Operationen auf diesen Strukturen.
 Während bei Datenstrukturen mit statisch bekannter Größe wie `std::array<int, 10>` die Größe der Struktur bereits bekannt ist -- und somit Obergrenzen für Zeit- und Speicherkomplexitäten -- so können bei den Komplexitäten von `std::vector<int>` nicht ohne weiteres Obergrenzen für Komplexitäten festgelegt werden.
 
-Diese Obergrenzen und das asymptotische Verhalten der Datenstrukturen sind wichtige Charakteristiken nach welchen diese ausgewählt werden.
-Wird eine Datenstruktur benötigt welche vorwiegend dazu benutzt nach dem LIFO (Last-In-First-Out) Prinzip Elemente zu verwalten, werden Datenstrukturen gewählt welche für `push` und `pop` Operationen geringe Zeitkomplexität aufweisen, z.B. einen Stack.
+Diese Obergrenzen und das asymptotische Verhalten der Datenstrukturen sind wichtige Charakteristiken für die korrekte Wahl der Datenstruktur.
+Wird eine Datenstruktur benötigt welche vorwiegend dazu benutzt nach dem LIFO (Last-In-First-Out) Prinzip Elemente zu verwalten, dann werden Datenstrukturen gewählt, welche für `push` und `pop` Operationen geringe Zeitkomplexität aufweisen, z.B. einen Stack.
 
 // TODO: go further into complexity and how static knowledge is important for assumptions under real time constraints, as well as how these can be better optimized for
 // TODO: mention how memory management itself is part of the time complexity too because of reallocs
