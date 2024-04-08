@@ -31,8 +31,8 @@
 ## Brain storming results
 - readonly wrapper which makes clones more explicit
   - does not reduce clones or help mitigate their costs
-- chink-based backing storage to avoid clones of the whole structure on mutations
-  - similar to rrb-tree paper [^2]
+- chunk-based backing storage to avoid clones of the whole structure on mutations
+  - similar to rrb-vector paper [^2], see also chunked sequences [^3]
 - linked list storage for sorted chunks
 - stricter readonly modifier
   - does not help existing code
@@ -51,8 +51,10 @@
 - chosing solution
 - work on the theoretical basis of the solution
 - implementing the solution
+- review & revisions
 - **end of thesis writing**
 - presentation
 
 [^1]: https://ai.fh-erfurt.de/fileadmin/ai_daten/download-bereich/studiendokumente/ba-und-ma-arbeiten/03_AI-Hinweise-BA-MA-Arbeiten_2019-04.pdf
 [^2]: https://infoscience.epfl.ch/record/213452/files/rrbvector.pdf
+[^3]: https://inria.hal.science/hal-01087245/document
