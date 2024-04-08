@@ -23,8 +23,6 @@
     (target: raw,   title: [Listingverzeichnis]),
   ),
   listings-position: start,
-  // glossary: import "/appendices/glossary.typ",
-  // acronyms: import "/appendices/acronyms.typ",
   bibliography: bibliography("/bibliography.yaml", title: "Literatur") + pagebreak(weak: true),
 )
 
