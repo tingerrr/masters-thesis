@@ -11,14 +11,10 @@ Once installed, run the following within this directory from a sh compatible she
 ```bash
 export TYPST_ROOT="$(pwd)/src"
 export TYPST_FONT_PATHS="$(pwd)/assets/fonts"
-lang="de" # or "en"
+lang="de"     # or "en"
+type="thesis" # or "poster"
 
-typst compile src/$lang/thesis.typ out/thesis-$lang.pdf
-```
-
-The poster can likewise be compiled using:
-```
-typst compile src/$lang/poster.typ out/poster-$lang.pdf
+typst compile "src/${lang}/${type}.typ" "out/${type}-${lang}.pdf"
 ```
 
 To compile either of the two aforementioned documents, an internet connection is required once per document to download and cache the packges. Once all the packages in use are cached the documents can be compiled offline.
