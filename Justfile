@@ -13,7 +13,7 @@ default:
 
 # invoke typst with the given command and output type
 typst cmd type:
-	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ type + '-' + lang + '.pdf' }}
+	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }}
 
 
 # invoke typst-preview with the given output type
