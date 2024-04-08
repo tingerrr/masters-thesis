@@ -1,7 +1,7 @@
 #import "@local/chiral-thesis-fhe:0.1.0" as ctf
 #import ctf.prelude: *
 
-#import "/src/util.typ"
+#import "/util.typ"
 
 #show "C++": util.cpp
 
@@ -25,7 +25,7 @@
   listings-position: start,
   // glossary: import "/appendices/glossary.typ",
   // acronyms: import "/appendices/acronyms.typ",
-  // bibliography: bibliography("/bibliography.yaml"),
+  bibliography: bibliography("/bibliography.yaml", title: "Literatur") + pagebreak(weak: true),
 )
 
 #chapter[Einleitung] <chap:intro>
@@ -42,3 +42,6 @@
 
 #chapter[Fazit] <chap:conclusion>
 #include "chapters/5 - conclusion.typ"
+
+#chapter[Dummy]
+Das ist ein Testkapitel welches vor Fertigstellung der Arbeit gelöscht wird. Es dient dazu Literaturerweise und anderes zu testen. @bib:chunked-seq

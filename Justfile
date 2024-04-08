@@ -1,4 +1,10 @@
-LANG := 'de'
+lang := 'de'
+root := justfile_directory() / 'src'
+assets := justfile_directory() / 'assets'
+
+# typst variables
+export TYPST_ROOT := root
+export TYPST_FONT_PATHS := assets / 'fonts'
 
 # list recipes by default
 [private]
@@ -7,12 +13,12 @@ default:
 
 # invoke typst with the given command and output type
 typst cmd type:
-	typst {{ cmd }} {{ 'src' / LANG / type + '.typ' }} {{ type + '-' + LANG + '.pdf' }}
+	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ type + '-' + lang + '.pdf' }}
 
 
 # invoke typst-preview with the given output type
 preview type:
-	typst-preview {{ 'src' / LANG / type + '.typ' }}
+	typst-preview --root {{ root }} {{ 'src' / lang / type + '.typ' }}
 
 
 # compile the thesis once

@@ -1,0 +1,38 @@
+bib:chunked-seq:
+  type: article
+  title: Theory and Practice of Chunked Sequences
+  author:
+    - Acar, Umut A.
+    - Charguéraud, Arthur
+    - Rainey, Mike
+  page-range: 25-36
+  volume: 8737
+  serial:
+    doi: 10.1007/978-3-662-44777-2_3
+    isbn: 978-3-662-44777-2
+  url:
+    value: https://link.springer.com/chapter/10.1007/978-3-662-44777-2_3
+    date: 2024-04-08
+  parent:
+    type: proceedings
+    title: Algorithms - ESA 2014
+    subtitle: 22th Annual European Symposium, Wrocław, Poland, September 8-10, 2014. Proceedings
+    editor:
+      - Schulz, Andreas S.
+      - Wagner, Dorothea
+    edition: 1
+    date: 2014-08-16
+    url:
+      value: https://link.springer.com/book/10.1007/978-3-662-44777-2
+      date: 2024-04-08
+    serial:
+      isbn: 978-3-662-44777-2
+    publisher: Springer
+    location: Berlin, Heidelberg
+    parent:
+      type: anthology
+      title: Lecture Notes in Computer Science
+      serial:
+        issn: 0302-9743
+        e-issn: 1611-3349
+
