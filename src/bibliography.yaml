@@ -42,3 +42,20 @@ bib:cppref-vector:
   url:
     value: https://en.cppreference.com/w/cpp/container/vector
     date: 2024-04-09
+
+bib:intro-to-algo:
+  type: book
+  title: Introduction to Algorithms
+  author:
+    - Cormen, Thomas H.
+    - Leiserson, Charles E.
+    - Rivest, Ronald L.
+    - Stein, Clifford
+  edition: 3
+  date: 2009
+  publisher: MIT Press
+    # see: https://github.com/typst/hayagriva/issues/151
+    # - MIT Press
+    # - McGraw-Hill
+  serial:
+    isbn: 0-262-03384-4

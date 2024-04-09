@@ -3,37 +3,35 @@
 // TODO: see various notes about structure, the order doesn't quite make sense yet
 
 = Grundlagen
-== Komplexität und Landau-Symbol
-Für den Verlauf dieser Arbeit sind Verständnis von Zeit- und Speicherkomplexität und der verwendeten Landau-Notation unabdingbar.
+== Komplexität und Landau-Symbole
+Für den Verlauf dieser Arbeit sind Verständnis von Zeit- und Speicherkomplexität und der verwendeten Landau-Symbole unabdingbar.
 
 / Zeitkomplexität: Zeitverhalten einer Operation (oft simple Operationen oder Algorithmen) über ein Menge von Daten in Bezug auf die Anzahl dieser.
 / Speicherkomplexität: Speicherverhalten einer Menge an Daten in Bezug auf die Anzahl dieser.
 
 Landau-Symbole (nach Edmund Landau) sind eine Notation welche zur Klassifizierung der Komplexität von Funktionen und Algorithmen verwendet wird.
 #no-cite
-Im weiteren wird vorwiegend lediglich $O(f)$ verwendet um die Komplexität von Speicher oder Laufeit bestimmter Operationen im Bezug auf die Anzahl der Elemente bestimmter Datenstrukturen zu beschreiben.
+Im Weiteren wird vorwiegend lediglich $O(f)$ verwendet um die Komplexität von Speicher oder Laufeit bestimmter Operationen im Bezug auf die Anzahl der Elemente bestimmter Datenstrukturen zu beschreiben.
 Sprich, $O(n)$ beschreibt lineare zeitliche Komplexität einer Operation, oder den linearen Speicherverbauch im Bezug der Anzahl der Elemente $n$ der Datenstruktur.
 
-/ amortisierte Komplexität: #todo[
-  cite: https://archive.org/details/introduction-to-algorithms-by-thomas-h.-cormen-charles-e.-leiserson-ronald.pdf/page/451/mode/2up
-]
+/ amortisierte Komplexität: Unter Bezug einer Sequenz von $n$ Operationen mit einer Höchstdauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an. @bib:intro-to-algo[s. 451]
 
-== Echtzetisysteme
-Unter Echtzeitsystemen versteht man diese, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit erledigen könnnen müssen. Ist ein System nicht in der Lage eine Aufgabe in der vorgegebenen Zeit vollständig abzuarbeiten, so spricht man von Verletzung der Echtzeitbedinungen welche an das System gestellt wurden.
+== Echtzeitsysteme
+Unter Echtzeitsystemen versteht man diese Systeme, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit abarbeiten. Ist ein System nicht in der Lage eine Aufgabe in der vorgegebenen Zeit vollständig abzuarbeiten, so spricht man von Verletzung der Echtzeitbedinungen welche an das System gestellt wurden.
 
 Für die verifizierbare Einhaltung der Echtzeitbedingungen eines Systems ist unter anderem auch das Zeit- und Speicherverhalten der verwendeten Datenstrukturen relevant.
-Unter Verwendung von Datenstrukturen wie `std::array`, können für Iterationen die Höchstwerte zur Kompilierzeit Höchstwerte definiert werden.
+Unter Verwendung von Datenstrukturen wie `std::array`, können für Iterationen die Höchstwerte zur Kompilierzeit definiert werden.
 
 #figure(
   ```cpp
-  std::array<int, 3> arr = { 1, 2, 3 };
-
-  for (const int& value : arr) {
-    std::cout << value << std::endl;
+  void print_array(std::array<int, 3>& arr) {
+    for (const int& value : arr) {
+      std::cout << value << std::endl;
+    }
   }
   ```,
   caption: [
-    Ein `std::array` der Länge 3 wird angelegt und die Werte werden in einer Schleife ausgegeben.
+    Ein `std::array` der Länge 3 wird an die Funktion übergeben und dessen Werte werden in einer Schleife ausgegeben.
   ],
 ) <lst:array-ex>
 
@@ -52,10 +50,25 @@ Für das Programm in @lst:array-ex ist die Obergrenze der Schleife über `arr` b
   ],
 ) <lst:array-ex-unrolled>
 
-Es folgt aus der Substitution, dass das Programm keine Schleifen enthält deren Höchstiterationszahl nicht bekannt sind.
+Es folgt aus der Substitution, dass das Programm keine Schleifen enthält deren Höchstiterationszahl nicht bekannt ist.
 Die Analyse zur Einhaltung der Echtzeitbedingungen dieses Programms ist dann trivial.
+Man vergleiche dies mit dem Program in @lst:vector-ex, das Aufrollen der Schleife ist nicht mehr trivial aufrollbar, da über die Anzahl der Elemente in `vec` keine Annahme gemacht werden kann.
 
-// TODO: show counter example with vector + explain that vector is not inherently impossible to use here, rather that analysis is harder
+#figure(
+  ```cpp
+  void print_vector(std::vector<int>& vec) {
+    for (const int& value : vec) {
+      std::cout << value << std::endl;
+    }
+  }
+  ```,
+  caption: [
+    Ähnlich wie bei @lst:array-ex, mit einem `std::vector`, statt einem `std::array`.
+  ],
+) <lst:vector-ex>
+
+Es ist nicht unmöglich fundierte Vermutungen über die Anzahl von Elementen in einer Datenstruktur anzustellen, dennoch fällt es mit dynamisches Datenstrukturen schwerer alle Invarianzen eines Programms bei der Analyse zu berücksichtigen.
+Je nach Operation und Nutzungsfall können Datenstrukturen in Ihrer Programmierschnittstelle erweitert oder verringert werden, um diese Invarianzen auszunutzen oder sicherzustellen.
 
 // TODO: this doesn't feel right here, and ought to be moved into another section
 
