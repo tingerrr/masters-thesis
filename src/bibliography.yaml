@@ -36,3 +36,9 @@ bib:chunked-seq:
         issn: 0302-9743
         e-issn: 1611-3349
 
+bib:cppref-vector:
+  type: web
+  title: std::vector
+  url:
+    value: https://en.cppreference.com/w/cpp/container/vector
+    date: 2024-04-09

@@ -29,9 +29,6 @@
 #chapter[Einleitung] <chap:intro>
 #include "chapters/1 - intro.typ"
 
-#chapter[Grundlagen] <chap:basics>
-#include "chapters/2 - basics.typ"
-
 #chapter[Konzept] <chap:concept>
 #include "chapters/3 - concept.typ"
 
