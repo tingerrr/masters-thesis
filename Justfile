@@ -12,8 +12,17 @@ default:
 	@just --list --unsorted
 
 # invoke typst with the given command and output type
-typst cmd type:
+typst *args:
+	typst {{ args }}
+
+# invoke typst for building with the given command and output type
+build cmd type:
 	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }}
+
+
+# query the document for todos
+lint type:
+	typst query {{ 'src' / lang / type + '.typ' }} '<todo>'
 
 
 # invoke typst-preview with the given output type
@@ -22,17 +31,17 @@ preview type:
 
 
 # compile the thesis once
-thesis: (typst 'compile' 'thesis')
+thesis: (build 'compile' 'thesis')
 
 # compile the poster once
-poster: (typst 'compile' 'poster')
+poster: (build 'compile' 'poster')
 
 
 # compile the thesis incrementally
-watch-thesis: (typst 'watch' 'thesis')
+watch-thesis: (build 'watch' 'thesis')
 
 # compile the poster incrementally
-watch-poster: (typst 'watch' 'poster')
+watch-poster: (build 'watch' 'poster')
 
 
 # preview the thesis
