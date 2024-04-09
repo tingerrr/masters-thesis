@@ -7,7 +7,7 @@
 
 #show: doc(
   kind: masters-thesis(
-    id: [AI-1970-MA-999],
+    id: [AI-2024-MA-005],
     title: [Dynamische Datenstrukturen unter Echtzeitbedingungen],
     author: "B. Sc. Erik Bünnig",
     supervisors: (
