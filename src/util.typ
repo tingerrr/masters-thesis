@@ -3,8 +3,10 @@
 #let todo(body) = {
   if body == [] { body = [todo] }
   "["
+  h(0pt, weak: true)
   text(red, body)
   [#metadata(body) <todo>]
+  h(0pt, weak: true)
   "]"
 }
 
