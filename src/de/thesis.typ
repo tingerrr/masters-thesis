@@ -27,16 +27,16 @@
 )
 
 #chapter[Einleitung] <chap:intro>
-#include "chapters/1 - intro.typ"
+#include "chapters/1-intro.typ"
 
 #chapter[Konzept] <chap:concept>
-#include "chapters/3 - concept.typ"
+#include "chapters/2-concept.typ"
 
 #chapter[Implementierung] <chap:impl>
-#include "chapters/4 - impl.typ"
+#include "chapters/3-impl.typ"
 
 #chapter[Fazit] <chap:conclusion>
-#include "chapters/5 - conclusion.typ"
+#include "chapters/4-conclusion.typ"
 
 #chapter[Dummy]
 Das ist ein Testkapitel welches vor Fertigstellung der Arbeit gelöscht wird. Es dient dazu Literaturerweise und anderes zu testen. @bib:chunked-seq
