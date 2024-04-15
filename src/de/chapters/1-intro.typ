@@ -8,16 +8,16 @@ Dabei sind folgende Begriffe relevant:
 
 / Zeitkomplexität: Zeitverhalten einer Operation (oft simple Operationen oder Algorithmen) über ein Menge von Daten in Bezug auf die Anzahl dieser.
 / Speicherkomplexität: Speicherverhalten einer Menge an Daten in Bezug auf die Anzahl dieser.
-/ amortisierte Komplexität: Unter Bezug einer Sequenz von $n$ Operationen mit einer Höchstdauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an @bib:intro-to-algo[S. 451].
+/ amortisierte Komplexität: Unter Bezug einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an @bib:intro-to-algo[S. 451].
 
 Landau-Symbole (nach Edmund Landau) sind eine Notation welche zur Klassifizierung der Komplexität von Funktionen und Algorithmen verwendet wird.
 #no-cite
 Im Weiteren wird vorwiegend $O(f)$ verwendet um die Komplexität des Speicherverbrauchs oder die Laufzeit bestimmter Operationen im Bezug auf die Anzahl der Elemente einer Datenstruktur zu beschreiben.
-Tabelle @tbl:landau zeigt weitere Komplexitäten.
 Sprich, $O(n)$ beschreibt lineare zeitliche Komplexität einer Operation über $n$ Elemente, oder den linearen Speicherverbauch einer Datenstruktur mit $n$ Elementen.
+@tbl:landau zeigt weitere Komplexitäten.
 
 Dabei werden für die Klassifizerung mit Landau-Symbolen meist das asymptotische Verhalten betrachtet.
-Ein Algorithmus $f(n) in O(2n)$ ist einem Algorithmus $g(n) in O(3n)$ gleichzustellen, während $h(n) in O(n^2)$ als komplexer gilt, da die unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen ve vernachlässigen sind.
+Ein Algorithmus $f in O(2n)$ ist einem Algorithmus $g in O(3n)$ gleichzustellen, während $h in O(n^2)$ als komplexer gilt, da die unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen zu vernachlässigen sind.
 Sprich, aus sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für große $n$.
 
 #figure(
@@ -25,18 +25,18 @@ Sprich, aus sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für
     table.header[Komplexität][Beschriebung],
     $O(k)$, [Komplexität unabhängig der Menge der Daten $n$, oft mit $O(n)$ gleichzusetzen],
     $O(log_k n)$, [Logarithmische Komplexität über die Menge der Daten $n$ zur Basis $k$],
-    $O(n)$, [Lineare Komplexität über die Menge der Daten $n$],
+    $O(k n)$, [Lineare Komplexität über die Menge der Daten $n$ und einem Koeffizienten $k$],
     $O(n^k)$, [Polynomialkomplexität des grades $k$ über die Menge der Daten $n$],
     $O(k^n)$, [Exponentialkomplexität über die Menge der Daten $n$ zur Basis $k$],
   ),
   caption: [
-    Unvollständige Liste verschiedener Komplexitäten in aufsteigender Reihenfolge.
+    Unvollständige Liste verschiedener Komplexitäten in aufsteigender Reihenfolge. Dabei ist $k$ eine beliebige Konstante.
   ],
 ) <tbl:landau>
 
 == Dynamische Datenstrukturen
 Datenstrukturen sind eine Organisierungsstruktur der Daten in Speicher eines Rechensystems welches das Speicher- und/oder Zeitverhalten für bestimmte Operationen verbessern soll.
-Dabei spricht man bei Datenstrukturen oft von geordneten oder ungeordneten Mengen, eine Datenstrukture kann aber auch nur dazu verwendet werden ein einziges Element zu verwalten (z.B. `std::optional` oder `std::atomic` in der C++ Standardbibliothek).
+Bei Datenstrukturen spricht man oft von geordneten oder ungeordneten Mengen, eine Datenstruktur kann aber auch dazu verwendet werden nur ein einziges Element zu verwalten (z.B. `std::optional` oder `std::atomic` in der C++ Standardbibliothek).
 
 Dynamische Datenstrukturen sind Datenstrukturen welche vor allem dann Verwendung finden, wenn die Anzahl der in der Struktur verwalteten Elemente nicht vorraussehbar ist.
 Je nach Programmiersprache kann eine Datenstruktur interne Operationen durch dessen Programmierschnittstelle abstrahieren um dessen Invarianzen zu wahren.
@@ -86,7 +86,7 @@ Dieser Zerfall von nicht konstanter zu konstanter Zeitkomplexität propagiert du
 Sei ein Programm gegeben, welches auf einer dyanmischen Länge von Elementen $n$ operiert, so könnnen durch die Substitution von $n$ durch eine Konstante $k$ für alle Opertionen auf $n$ die Zeitkomplexität evaluiert werden.
 Trivialerweise gilt, ist $x$ eine Konstante, so ist $y = f(x)$ eine Konstante, unter der Annahme das $f(x)$ wirkungsfrei ist.
 #footnote[
-  Eine Funktion $f(x)$ gilt als wirkungsfrei, wenn diese für jeden Aufruf mit $x$ die gleiche Ausgabe $y$ ergibt und der Aufruf keinen Einfluss auf diese Eigenschaft anderer Funktionen hat.
+  Eine Funktion $f(x)$ gilt als wirkungsfrei, wenn diese für jeden Aufruf mit $x_n$ die gleiche Ausgabe $y_n$ ergibt und der Aufruf keinen Einfluss auf diese Eigenschaft anderer Funktionen hat.
 ]
 
 === Speicheroperationen
