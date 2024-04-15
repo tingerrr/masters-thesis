@@ -14,7 +14,7 @@
       "Prof. Dr. Kay Gürtzig",
       "Dipl-Ing. Peter Brückner",
     ),
-    date: datetime(year: 2024, month: 01, day: 01),
+    date: datetime(year: 2024, month: 10, day: 09),
     field: [Angewandte Informatik],
   ),
   listings: (
@@ -23,7 +23,7 @@
     (target: raw,   title: [Listingverzeichnis]),
   ),
   listings-position: start,
-  bibliography: bibliography("/bibliography.yaml", title: "Literatur") + pagebreak(weak: true),
+  bibliography: bibliography("/bibliography.yaml", title: "Literatur"),
 )
 
 #chapter[Einleitung] <chap:intro>
@@ -38,5 +38,6 @@
 #chapter[Fazit] <chap:conclusion>
 #include "chapters/4-conclusion.typ"
 
-#chapter[Dummy]
-Das ist ein Testkapitel welches vor Fertigstellung der Arbeit gelöscht wird. Es dient dazu Literaturerweise und anderes zu testen. @bib:chunked-seq
+#chapter[Platzhalter]
+Das ist ein Testkapitel welches vor Fertigstellung der Arbeit gelöscht wird.
+Es dient dazu Literaturverweise und anderes zu testen, wie zum Beispiel @bib:chunked-seq[S. 10].
