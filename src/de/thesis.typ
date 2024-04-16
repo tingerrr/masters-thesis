@@ -26,6 +26,8 @@
   bibliography: bibliography("/src/bibliography.yaml", title: "Literatur"),
 )
 
+#set raw(syntaxes: "/assets/t4gl.sublime-syntax")
+
 #chapter[Einleitung] <chap:intro>
 #include "chapters/1-intro.typ"
 
@@ -39,5 +41,5 @@
 #include "chapters/4-conclusion.typ"
 
 #chapter[Platzhalter]
-Das ist ein Testkapitel welches vor Fertigstellung der Arbeit gelöscht wird.
+Das ist ein Testkapitel, welches vor Fertigstellung der Arbeit gelöscht wird.
 Es dient dazu Literaturverweise und anderes zu testen, wie zum Beispiel @bib:chunked-seq[S. 10].
