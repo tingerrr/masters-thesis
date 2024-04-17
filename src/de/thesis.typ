@@ -1,7 +1,7 @@
 #import "@local/chiral-thesis-fhe:0.1.0" as ctf
 #import ctf.prelude: *
 
-#import "/util.typ"
+#import "/src/util.typ"
 
 #show "C++": util.cpp
 
@@ -23,7 +23,7 @@
     (target: raw,   title: [Listingverzeichnis]),
   ),
   listings-position: start,
-  bibliography: bibliography("/bibliography.yaml", title: "Literatur"),
+  bibliography: bibliography("/src/bibliography.yaml", title: "Literatur"),
 )
 
 #chapter[Einleitung] <chap:intro>

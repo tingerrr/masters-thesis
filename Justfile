@@ -1,6 +1,6 @@
 lang := 'de'
-root := justfile_directory() / 'src'
-assets := justfile_directory() / 'assets'
+root := justfile_directory()
+assets := root / 'assets'
 
 # typst variables
 export TYPST_ROOT := root

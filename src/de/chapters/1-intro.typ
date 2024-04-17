@@ -1,4 +1,4 @@
-#import "/util.typ": *
+#import "/src/util.typ": *
 
 = Grundlagen
 == Komplexität und Landau-Symbole <sec:complexity>

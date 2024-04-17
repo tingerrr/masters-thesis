@@ -9,7 +9,7 @@ This thesis is written in [Typst], to compile it, you need the Typst compiler. Y
 
 Once installed, run the following within this directory from a sh compatible shell:
 ```bash
-export TYPST_ROOT="$(pwd)/src"
+export TYPST_ROOT="$(pwd)"
 export TYPST_FONT_PATHS="$(pwd)/assets/fonts"
 lang="de"     # or "en"
 type="thesis" # or "poster"
