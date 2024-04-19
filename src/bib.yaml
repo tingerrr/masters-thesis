@@ -1,0 +1,180 @@
+bib:acr-14:
+  type: article
+  title: Theory and Practice of Chunked Sequences
+  author:
+    - Acar, Umut A.
+    - Charguéraud, Arthur
+    - Rainey, Mike
+  date: 2014-08-16
+  page-range: 25-36
+  volume: 8737
+  serial:
+    doi: 10.1007/978-3-662-44777-2_3
+    isbn: 978-3-662-44777-2
+  url:
+    value: https://link.springer.com/chapter/10.1007/978-3-662-44777-2_3
+    date: 2024-04-08
+  parent:
+    type: proceedings
+    title: Algorithms - ESA 2014
+    subtitle: 22th Annual European Symposium, Wrocław, Poland, September 8-10, 2014. Proceedings
+    editor:
+      - Schulz, Andreas S.
+      - Wagner, Dorothea
+    edition: 1
+    date: 2014-08-16
+    url:
+      value: https://link.springer.com/book/10.1007/978-3-662-44777-2
+      date: 2024-04-08
+    serial:
+      isbn: 978-3-662-44777-2
+    publisher: Springer
+    location: Berlin, Heidelberg
+    parent:
+      - type: conference
+        title: Annual European Symposium
+        # 2014-09-08 - 2014-09-10
+        date: 2014-09
+        location: Wrocław, Poland
+      - type: anthology
+        title: Theoretical Computer Science and General Issues
+        serial:
+          issn: 2512-2010
+        parent:
+          type: anthology
+          title: Lecture Notes in Computer Science
+          serial:
+            issn: 0302-9743
+            e-issn: 1611-3349
+
+# TODO: location and date
+bib:clrs-09:
+  type: book
+  title: Introduction to Algorithms
+  author:
+    - Cormen, Thomas H.
+    - Leiserson, Charles E.
+    - Rivest, Ronald L.
+    - Stein, Clifford
+  edition: 3
+  date: 2009
+  publisher: MIT Press
+    # see: https://github.com/typst/hayagriva/issues/151
+    # - MIT Press
+    # - McGraw-Hill
+  serial:
+    isbn: 0-262-03384-4
+
+bib:kt-96:
+  type: article
+  title: Purely Functional Representations of Catenable Sorted Lists
+  author:
+    - Kaplan, Haim
+    - Tarjan, Robert E.
+  date: 1996-06-01
+  page-range: 202–211
+  serial:
+    doi: 10.1145/237814.237865
+  parent:
+    type: proceedings
+    title: "STOC '96: Proceedings of the twenty-eighth annual ACM symposium on Theory of Computing"
+    date: 1996-06-01
+    publisher:
+      value: Association for Computing Machinery
+      short: ACM
+    location: New York, NY, United States
+    serial:
+      isbn: 978-0-89791-785-8
+    parent:
+      type: conference
+      title: 'STOC96: ACM Symposium on Theory of Computing'
+      # 1996-05-22 - 1996-05-24
+      date: 1996-05
+      location: Philadelphia, Pennsylvania, United States
+
+bib:brsu-15:
+  type: article
+  title: 'RRB Vector: A Practical General Purpose Immutable Sequence'
+  author:
+    - Bagwell, Philip Sidney
+    - Rompf, Tiark
+    - Stucki, Nicolas
+    - Ureche, Vlad
+  date: 2015-08-29
+  page-range: 342–354
+  serial:
+    doi: 10.1145/2784731.2784739
+  parent:
+    type: proceedings
+    title: 'ICFP 2015: Proceedings of the 20th ACM SIGPLAN International Conference on Functional Programming'
+    date: 2015-08-29
+    publisher:
+      value: Association for Computing Machinery
+      short: ACM
+    location: New York, NY, United States
+    serial:
+      isbn: 978-1-4503-3669-7
+    parent:
+      type: conference
+      title: "ICFP'15: 20th ACM SIGPLAN International Conference on Functional Programming"
+      # 2015-08-31 - 2015-9-02
+      date: 2015-08
+      location: Vancouver, BC, Canada
+
+bib:stu-15:
+  type: thesis
+  title: Turning Relaxed Radix Balanced Vector from Theory into Practice for Scala Collections
+  author: Stucki, Nicolas
+  date: 2015
+  url:
+    value: https://api.semanticscholar.org/CorpusID:60518521
+    date: 2024-04-23
+  organization:
+    value: École polytechnique fédérale de Luasanne
+    short: EPFL
+  location: Écublens, Canton of Vaud, Switzerland
+
+bib:br-11:
+  type: article
+  title: 'RRB-Trees: Efficient Immutable Vectors'
+  author:
+    - Bagwell, Philip Sidney
+    - Rompf, Tiark
+  date: 2011
+  url:
+    value: https://api.semanticscholar.org/CorpusID:15763144
+    date: 2024-04-23
+
+bib:hp-06:
+  type: article
+  title: 'Finger trees: a simple general-purpose data structure'
+  author:
+    - Hinze, Ralf
+    - Paterson, Ross
+  date: 2006-03-01
+  page-range: 197–217
+  serial:
+    doi: https://doi.org/10.1017/S0956796805005769
+  parent:
+    type: periodical
+    title: Journal of Functional Programming
+    volume: 16
+    issue: 2
+    date: 2006-03
+
+# TODO: get ahold of the actual standard without paying 200 swiss francs lmao
+bib:iso-cpp-20:
+  type: manuscript
+  title: Working Draft, Standard for Programming Language C++
+  author: JTC1/SC22/WG21 - The C++ Standards Committee - ISOCPP
+  organization:
+    value: International Organization for Standardization - International Electrotechnical Commission
+    short: ISO/IEC
+  edition: 6
+  date: 2020-01-14
+  serial:
+    iso-iec: 14882:2020
+    serial: N4849
+  url:
+    value: https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/n4849.pdf
+    date: 2024-04-23

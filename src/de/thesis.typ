@@ -5,6 +5,8 @@
 
 #show "C++": util.cpp
 
+#let bib = "/src/bib.yaml"
+
 #show: doc(
   kind: masters-thesis(
     id: [AI-2024-MA-005],
@@ -23,7 +25,7 @@
     (target: raw,   title: [Listingverzeichnis]),
   ),
   listings-position: start,
-  bibliography: bibliography("/src/bibliography.yaml", title: "Literatur"),
+  bibliography: bibliography(bib, title: "Literatur"),
 )
 
 #set raw(syntaxes: "/assets/t4gl.sublime-syntax")
@@ -41,5 +43,10 @@
 #include "chapters/4-conclusion.typ"
 
 #chapter[Platzhalter]
-Das ist ein Testkapitel, welches vor Fertigstellung der Arbeit gelöscht wird.
-Es dient dazu Literaturverweise und anderes zu testen, wie zum Beispiel @bib:chunked-seq[S. 10].
+Dieses Kapitel wird vor der Publikation gelöscht.
+
+// BUG: bibliography(full: true) will not give us the correct references, since this is only for testing this is fine
+// see: https://github.com/typst/typst/issues/3986
+#for (key, _) in yaml(bib) {
+  cite(label(key))
+}
