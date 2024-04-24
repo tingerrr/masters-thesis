@@ -20,6 +20,10 @@ typst *args:
 prep:
 	mkdir -p out
 
+# compile the notes and supplementary material
+notes: prep
+	typst compile {{ 'etc' / 'notes.typ' }} {{ 'out' / 'notes.pdf' }}
+
 # invoke typst for building with the given command and output type
 build cmd type *args: prep
 	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }} {{ args }}

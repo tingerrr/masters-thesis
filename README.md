@@ -1,6 +1,13 @@
 # Masters Thesis: Dynamic data structures under real time constraints
 This repository hosts the thesis and supplementary poster for my masters thesis in applied computer science at the [University of Applied Sciences Erfurt (FHE)][FHE]. The title of this thesis is **Dynamische Datenstrukturen unter Echtzeitbedingungen** (**Dynamic data structures under real time constraints**). At the time of writing this, the thesis is only available in German with an English abstract. After finishing the thesis (sucessfully), a translated version will be provided as I find the time for it.
 
+## Folder Structure
+- `etc`: hosts notes I have taken while working on the thesis and project at large
+- `out`: ignored by git, hosts the transient compilation artifacts
+- `src`: hosts the source files for the thesis and supplementary poster, as well as common assets between them like bibliographies
+  - `de`: contains the german source files of the thesis and poster
+  - `en`: does not exist at the time of writing, will contian translated version of the thesis
+
 ## Copyright and Licensing
 TODO: add this before releasing the sourcing code
 
