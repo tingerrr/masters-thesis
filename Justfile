@@ -16,36 +16,19 @@ typst *args:
 	typst {{ args }}
 
 # invoke typst for building with the given command and output type
-build cmd type:
-	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }}
+build cmd type *args:
+	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }} {{ args }}
 
+# invoke typst compile for the given output type
+compile type: (build 'compile' type)
+
+#invoke typst watch for the given output type
+watch type: (build 'watch' type)
+
+# invoke typst-preview with the given output type
+preview type *args:
+	typst-preview --root {{ root }} {{ 'src' / lang / type + '.typ' }} {{ args }}
 
 # query the document for todos
 lint type:
 	typst query {{ 'src' / lang / type + '.typ' }} '<todo>'
-
-
-# invoke typst-preview with the given output type
-preview type:
-	typst-preview --root {{ root }} {{ 'src' / lang / type + '.typ' }}
-
-
-# compile the thesis once
-thesis: (build 'compile' 'thesis')
-
-# compile the poster once
-poster: (build 'compile' 'poster')
-
-
-# compile the thesis incrementally
-watch-thesis: (build 'watch' 'thesis')
-
-# compile the poster incrementally
-watch-poster: (build 'watch' 'poster')
-
-
-# preview the thesis
-preview-thesis: (preview 'thesis')
-
-# preview the poster
-preview-poster: (preview 'poster')
