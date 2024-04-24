@@ -14,6 +14,7 @@ export TYPST_FONT_PATHS="$(pwd)/assets/fonts"
 lang="de"     # or "en"
 type="thesis" # or "poster"
 
+mkdir -p out
 typst compile "src/${lang}/${type}.typ" "out/${type}-${lang}.pdf"
 ```
 

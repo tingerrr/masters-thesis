@@ -15,8 +15,13 @@ default:
 typst *args:
 	typst {{ args }}
 
+# create the temporary and gitignored directories or files
+[private]
+prep:
+	mkdir -p out
+
 # invoke typst for building with the given command and output type
-build cmd type *args:
+build cmd type *args: prep
 	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }} {{ args }}
 
 # invoke typst compile for the given output type
