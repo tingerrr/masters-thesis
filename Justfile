@@ -1,10 +1,9 @@
 lang := 'de'
 root := justfile_directory()
-assets := root / 'assets'
 
 # typst variables
 export TYPST_ROOT := root
-export TYPST_FONT_PATHS := assets / 'fonts'
+export TYPST_FONT_PATHS := root / 'assets' / 'fonts'
 
 # list recipes by default
 [private]
