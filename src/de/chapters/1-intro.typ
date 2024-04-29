@@ -160,17 +160,14 @@ Die Schleife ist nicht mehr trivial aufrollbar, da über die Anzahl der Elemente
 Es ist nicht unmöglich fundierte Vermutungen über die Anzahl von Elementen in einer Datenstruktur anzustellen, dennoch fällt es mit dynamischen Datenstrukturen schwerer alle Invarianzen eines Programms bei der Analyse zu berücksichtigen.
 Je nach Operation und Nutzungsfall können Datenstrukturen in Ihrer Programmierschnittstelle erweitert oder verringert werden, um diese Invarianzen auszunutzen oder sicherzustellen.
 
-= Stand der Technik
-// TODO: talk about optimized general purpose implementations of such as rrb vectors, chunked sequnces and finger trees
-
-= T4gl
-T4gl (#strong[T]esting *4GL* #footnote[4th Generation Language]) ist eine proprietäre Programmiersprache, sowie ein gleichnamiger Compiler und Laufzeitsystem, welche von der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) entwickelt und verwendet werden.
+== T4gl
+T4gl (#strong[T]esting *4GL* #footnote[4th Generation Language]) ist eine proprietäre Programmiersprache, sowie ein gleichnamiger Compiler und Laufzeitsystem, welche von der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) entwickelt wird.
 Die in T4gl geschriebenen Skripte werden vom Compiler analysiert und kompiliert, woraufhin sie vom Laufzeitsystem ausgeführt werden.
 Dabei werden an das System in manchen Fällen Echtzeitanforderungen gestellt.
 
 // TODO: elaborate on the requirements and the general mechanisms and terminology of t4gl
 
-== T4gl-Arrays
+=== T4gl-Arrays
 Bei T4gl-Arrays handelt es sich nicht nur um gewöhnliche lineare Sequenzen, sondern um assoziative Multischlüssel-Arrays.
 Um ein Array in T4gl zu Deklarierung wird mindestens ein Schlüssel und ein Wertetyp benötigt.
 Auf den Wertetyp folgt in eckigen Klammern eine kommaseparierte Liste von Schlüsseltypen.
@@ -205,9 +202,9 @@ Allerdings gibt es dabei gewisse Unterschiede.
   table(columns: 2, align: left,
     table.header[Signatur][C++ Analogie],
     `T[N] name`, `std::array<T, N>`,
-    `T[U] name`, `std::unordered_map<U, T> name`,
-    `T[U, N] name`, `std::unordered_map<U, std::array<T, N>> name`,
-    `T[N, U] name`, `std::array<std::unordered_map<U, T>, N> name`,
+    `T[U] name`, `std::map<U, T> name`,
+    `T[U, N] name`, `std::map<U, std::array<T, N>> name`,
+    `T[N, U] name`, `std::array<std::map<U, T>, N> name`,
     align(center)[...], align(center)[...],
   ),
   caption: [
@@ -216,7 +213,36 @@ Allerdings gibt es dabei gewisse Unterschiede.
 ) <tbl:t4gl-array-analogies>
 
 Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird, sondern in Instruktionen welche vom Laufzeitsystem interpretiert werden.
-Außerdem werden bei komplexen Datentypen oder potenziellen Kontextwechseln noch weitere Speicherabstraktionen hinzugefügt.
-Für manche Schlüsseltypen können auch Binärbäume statt Hashtabellen zum Einsatz kommen, wenn das Laufzeitsystem davon ausgeht, dass dies angebrachter ist #no-cite.
+Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
+
+// TODO: elaborate more clearly on the internal current representation of arrays
 
 // TODO: talk about the array problems here or in the concept chapter?
+
+= Stand der Technik
+// TODO: talk about optimized general purpose implementations of such as rrb vectors, chunked sequnces and finger trees
+
+// NOTE: QMaps use std::maps by default, which "usually" use red-black-trees, seems to be an implementaiton detail again
+// NOTE: QMaps only do top level sharing, unmodified branches are not shared across copies
+// NOTE: As far as I am aware, t4gl arrays are really just either vectors or maps (depeniding on key type) exactly as the analogies show
+
+= Motivation
+Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsystems.
+Dabei werden die bis dato verwendeten Datenstrukuren der T4gl-Arrays untersucht und für deren Nutzungsfälle optimiert.
+
+== Häufige Schreibzugriffe & Datenteilung
+Ein Hauptnutzungsfall dieser Arrays ist das Speichern von geordneten Wertereihen als Historie einer Variable.
+Beim Erfassen der Historie wird das Array dauerhaft mit neuen Werten belegt welche am Ende der Wertereihe liegen.
+Wird das Array an ein Skript übergeben, kommt es zu einer flachen Kopie, welche lediglich die Referenzzahl der Daten erhöht.
+Beim nächsten Schreibzugriff durch das Anhaften neuer Werte, kommt es zur tiefen Kopie, da die unterliegenden Daten nicht mehr nur einen Referenten haben.
+
+== Multithreading
+Wird eine Array an eine Funktion übergeben welche auf einem einderen Thread ausgeführt wird, wird eine tiefe Kopie angelegt.
+
+In beiden Fällen werden tiefe Kopien von Datenmengen angelegt welche dem Scheduler unbekannt sind.
+Dabei entstehen Latenzen welche das Laufzeitsystem verlangsamen und dessen Echtzeiteinhaltung beeinflussen.
+
+= Rahmenbedingungen
+Bei der Entwicklung dieser verbesserten Datenstruktur werden folgenden Einschränkungen gestellt:
+- Schlüsseltypen sind numerisch oder können numerisch dargestellt werden, Arrays mit Schlüsseltypen wie `String` sind von der Verbesserung zunächst ausgeschlossen.
+- Viele geringe Latenzen sind wenigen hohen Latenzen vorzuziehen. Armortisierung muss teure Operationen gleich verteilen.

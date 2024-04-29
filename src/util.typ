@@ -1,3 +1,6 @@
+#import "@local/chiral-thesis-fhe:0.1.0" as ctf
+#import ctf.prelude: *
+
 #let cpp = [C] + text(0.75em, baseline: -0.175em)[++]
 
 #let todo(body) = {
