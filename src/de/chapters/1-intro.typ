@@ -1,4 +1,17 @@
 #import "/src/util.typ": *
+#import "/src/figures.typ"
+
+= Motivation
+Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsystems durch Analyse und gezielte Verbesserung der Datenspeicherung von T4gl-Arrays.
+Die in T4gl verwendeten assoziativen Arrays sind in ihrer jetzigen Form für manche Nutzungsfälle unzurreichend optimiert.
+Häufige Schreibzugriffe und unzureichend granulare Datenteilung verursachen unnötig tiefe Kopien der Daten und darausfolgende Latenzen.
+
+// TODO: in short terms:
+// - [x] expensive deep copies for writes on shared data
+// - [ ] expensive deep copies for context switches
+// - [ ] other not yet identified problems?
+
+// TODO: reduce basics to what is actually required
 
 = Grundlagen
 == Komplexität und Landau-Symbole <sec:complexity>
@@ -89,6 +102,49 @@ Trivialerweise gilt, ist $x$ eine Konstante, so ist $y = f(x)$ eine Konstante, u
   Eine Funktion $f(x)$ gilt als wirkungsfrei, wenn diese für jeden Aufruf mit $x_n$ die gleiche Ausgabe $y_n$ ergibt und der Aufruf keinen Einfluss auf diese Eigenschaft anderer Funktionen hat.
 ]
 
+=== Persistenz und Kurzlebigkeit
+Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert gilt diese als _persistent_.
+Im Gegensatz dazu stehen Datenstrukturen welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als _kurzlebig_.
+Persistente Datenstruturen erstellen meist neue Instanzen für jeden Schreibzugriff welche die Daten der vorherigen Instanz teilen.
+Ein gutes Beispiel bietet die einfach verknüpfte Liste, @fig:linked-sharing zeigt presistente verknüpfte Listen.
+
+#subpar.grid(
+  figure(figures.list.new, caption: [
+    // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
+    Eine Liste `l` wird über die Sequenz `['A', 'B', 'C']` angelegt. \ \
+  ]),
+  figure(figures.list.copy, caption: [
+    Eine Kopie von `l` muss lediglich eine neue Instanz `m` mit den gleichen Daten Anlegen.
+  ]),
+  figure(figures.list.pop, caption: [
+    // NOTE: as above
+    Soll der Kopf von `m` gelöscht werden, zeigt `m` stattdessen auf den Rest. \ \
+  ]),
+  figure(figures.list.push, caption: [
+    Soll ein neuer Kopf an `n` angefügt werden, kann dieser einfach auf den vorherigen Kopf als Rest zeigen.
+  ]),
+  columns: 2,
+  caption: [
+    Durch die Wiederverwendung der gemeinsamen Daten können persistente Datenstrukturen ihre Effizienz erhöhen.
+  ],
+  label: <fig:linked-sharing>,
+)
+
+In der Literatur werden bei verknüpften Listen oft der Kopf selbst als Instanz betrachtet #no-cite.
+Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im folgenden klarere Terminologie.
+
+/ Buffer:
+  Der Speicherbereich einer Datenstruktur welche die eigentlichen Datenenthält, in @fig:linked-sharing beschreibt das die Knoten mit einfachem Strich. Während die doppelgestrichenen Knoten die Instanzen sind.
+  Bei einer Copy-on-Write Datenstruktur können sich viele Instanzen einen einzigen Buffer teilen.
+/ Schreibfähigkeit:
+  Möglichkeit von Schreibzugriffen ohne die vorherigen Datenintakt zu lassen.
+  Das steht im Gegensatz zu persistenten Datenstrukturen, welche bei jedem Schreibzugriff.
+  Die Listen in @fig:linked-sharing sind Teilweise schreibfähig, da eine Instanz selbst schreibfähig ist, aber geteilte Daten nicht von einer Instanz allein verändert werden können.
+/ Copy-on-Write (CoW):
+  Memchanismus zur Bufferteilung + Schreibfähigkeit, viele Instanzen teilen sich einen Buffer.
+  Eine Instanz gilt als Referent des Buffers auf welchen sie zeigt.
+  Ist diese Instanz der einzige Referent, könnne die Daten direkt beschrieben werden, ansonsten wird der geteilte Buffer kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen buffer ist.
+
 === Speicheroperationen
 Die in @lst:vec-ex zu sehenden Methoden auf `std::vector` abstrahieren potentiell teure Operationen:
 
@@ -160,89 +216,5 @@ Die Schleife ist nicht mehr trivial aufrollbar, da über die Anzahl der Elemente
 Es ist nicht unmöglich fundierte Vermutungen über die Anzahl von Elementen in einer Datenstruktur anzustellen, dennoch fällt es mit dynamischen Datenstrukturen schwerer alle Invarianzen eines Programms bei der Analyse zu berücksichtigen.
 Je nach Operation und Nutzungsfall können Datenstrukturen in Ihrer Programmierschnittstelle erweitert oder verringert werden, um diese Invarianzen auszunutzen oder sicherzustellen.
 
-== T4gl
-T4gl (#strong[T]esting *4GL* #footnote[4th Generation Language]) ist eine proprietäre Programmiersprache, sowie ein gleichnamiger Compiler und Laufzeitsystem, welche von der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) entwickelt wird.
-Die in T4gl geschriebenen Skripte werden vom Compiler analysiert und kompiliert, woraufhin sie vom Laufzeitsystem ausgeführt werden.
-Dabei werden an das System in manchen Fällen Echtzeitanforderungen gestellt.
-
-// TODO: elaborate on the requirements and the general mechanisms and terminology of t4gl
-
-=== T4gl-Arrays
-Bei T4gl-Arrays handelt es sich nicht nur um gewöhnliche lineare Sequenzen, sondern um assoziative Multischlüssel-Arrays.
-Um ein Array in T4gl zu Deklarierung wird mindestens ein Schlüssel und ein Wertetyp benötigt.
-Auf den Wertetyp folgt in eckigen Klammern eine kommaseparierte Liste von Schlüsseltypen.
-Indezierung erfolgt wie in der Deklaration durch eckige Klammern, es müssen aber nicht für alle Schlüssel ein Wert angegeben werden.
-Bei Angabe von weniger Schlüsseln als in der Deklaration, wird eine Referenz auf einen Teil des Arrays zurückgegben.
-Sprich, ein Array des Typs `T[U, V, W]` welches mit `[u]` indeziert wird, gibt ein Unter-Array des Typs `T[V, W]` zurück.
-Wird in der Deklaration des Arrays ein Ganzahlwert statt einem Typen angegeben (z.B. `T[10]`), wird das Array mit fester Größe und vorgefüllten Werten angelegt.
-Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werden.
-
-#figure(
-  ```t4gl
-  String[Integer] map
-  map[42] = "Hello World!"
-
-  String[Integer, Integer] nested
-  nested[0] = map
-  nested[1, 37] = "first item in second sub array"
-
-  String[10] static
-  static[9] = "last item"
-  ```,
-  caption: [
-    Beispiele für Deklaration und Indezierung von T4gl-Arrays.
-    Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9.
-  ],
-) <lst:t4gl-ex>
-
-Bei den in @lst:t4gl-ex gegebenen Deklarationen werden je nach den angegebenen Typen verschiedene Datenstrukturen vom Laufzeitsystem gewählt, diese ähneln den analogen C++ Varianten in @tbl:t4gl-array-analogies.
-Allerdings gibt es dabei gewisse Unterschiede.
-
-#figure(
-  table(columns: 2, align: left,
-    table.header[Signatur][C++ Analogie],
-    `T[N] name`, `std::array<T, N>`,
-    `T[U] name`, `std::map<U, T> name`,
-    `T[U, N] name`, `std::map<U, std::array<T, N>> name`,
-    `T[N, U] name`, `std::array<std::map<U, T>, N> name`,
-    align(center)[...], align(center)[...],
-  ),
-  caption: [
-    Semantische Analogien in C++ zu spezifischen Varianten von T4gl-Arrays. `T` und `U` sind Typen und `N` ist eine Zahl aus $NN^+$.
-  ],
-) <tbl:t4gl-array-analogies>
-
-Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird, sondern in Instruktionen welche vom Laufzeitsystem interpretiert werden.
-Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
-
-// TODO: elaborate more clearly on the internal current representation of arrays
-
-// TODO: talk about the array problems here or in the concept chapter?
-
-= Stand der Technik
-// TODO: talk about optimized general purpose implementations of such as rrb vectors, chunked sequnces and finger trees
-
-// NOTE: QMaps use std::maps by default, which "usually" use red-black-trees, seems to be an implementaiton detail again
-// NOTE: QMaps only do top level sharing, unmodified branches are not shared across copies
-// NOTE: As far as I am aware, t4gl arrays are really just either vectors or maps (depeniding on key type) exactly as the analogies show
-
-= Motivation
-Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsystems.
-Dabei werden die bis dato verwendeten Datenstrukuren der T4gl-Arrays untersucht und für deren Nutzungsfälle optimiert.
-
-== Häufige Schreibzugriffe & Datenteilung
-Ein Hauptnutzungsfall dieser Arrays ist das Speichern von geordneten Wertereihen als Historie einer Variable.
-Beim Erfassen der Historie wird das Array dauerhaft mit neuen Werten belegt welche am Ende der Wertereihe liegen.
-Wird das Array an ein Skript übergeben, kommt es zu einer flachen Kopie, welche lediglich die Referenzzahl der Daten erhöht.
-Beim nächsten Schreibzugriff durch das Anhaften neuer Werte, kommt es zur tiefen Kopie, da die unterliegenden Daten nicht mehr nur einen Referenten haben.
-
-== Multithreading
-Wird eine Array an eine Funktion übergeben welche auf einem einderen Thread ausgeführt wird, wird eine tiefe Kopie angelegt.
-
-In beiden Fällen werden tiefe Kopien von Datenmengen angelegt welche dem Scheduler unbekannt sind.
-Dabei entstehen Latenzen welche das Laufzeitsystem verlangsamen und dessen Echtzeiteinhaltung beeinflussen.
-
-= Rahmenbedingungen
-Bei der Entwicklung dieser verbesserten Datenstruktur werden folgenden Einschränkungen gestellt:
-- Schlüsseltypen sind numerisch oder können numerisch dargestellt werden, Arrays mit Schlüsseltypen wie `String` sind von der Verbesserung zunächst ausgeschlossen.
-- Viele geringe Latenzen sind wenigen hohen Latenzen vorzuziehen. Armortisierung muss teure Operationen gleich verteilen.
+// TODO: short explanation of general idea to solve these problems
+// TODO: reading guide explaining chapters
