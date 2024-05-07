@@ -34,8 +34,10 @@ compile type: (build 'compile' type)
 watch type: (build 'watch' type)
 
 # invoke typst-preview with the given output type
-preview type *args:
-	typst-preview --root {{ root }} {{ 'src' / lang / type + '.typ' }} {{ args }}
+preview type *args: (build 'compile' type) && (build 'watch' type)
+	# see: https://github.com/Enter-tainer/typst-preview/issues/289
+	# typst-preview --root {{ root }} {{ 'src' / lang / type + '.typ' }} {{ args }}
+	xdg-open {{ 'out' / type + '-' + lang + '.pdf' }} &
 
 # query the document for todos
 lint type:
