@@ -92,50 +92,11 @@ Trivialerweise gilt, ist $x$ eine Konstante, so ist $y = f(x)$ eine Konstante, u
   Eine Funktion $f(x)$ gilt als wirkungsfrei, wenn diese für jeden Aufruf mit $x_n$ die gleiche Ausgabe $y_n$ ergibt und der Aufruf keinen Einfluss auf diese Eigenschaft anderer Funktionen hat.
 ]
 
-=== Persistenz und Kurzlebigkeit
-Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert gilt diese als _persistent_.
-Im Gegensatz dazu stehen Datenstrukturen welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als _kurzlebig_.
-Persistente Datenstruturen erstellen meist neue Instanzen für jeden Schreibzugriff welche die Daten der vorherigen Instanz teilen.
-Ein gutes Beispiel bietet die einfach verknüpfte Liste, @fig:linked-sharing zeigt presistente verknüpfte Listen.
-
-#subpar.grid(
-  figure(figures.list.new, caption: [
-    // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
-    Eine Liste `l` wird über die Sequenz `['A', 'B', 'C']` angelegt. \ \
-  ]),
-  figure(figures.list.copy, caption: [
-    Eine Kopie von `l` muss lediglich eine neue Instanz `m` mit den gleichen Daten Anlegen.
-  ]),
-  figure(figures.list.pop, caption: [
-    // NOTE: as above
-    Soll der Kopf von `m` gelöscht werden, zeigt `m` stattdessen auf den Rest. \ \
-  ]),
-  figure(figures.list.push, caption: [
-    Soll ein neuer Kopf an `n` angefügt werden, kann dieser einfach auf den vorherigen Kopf als Rest zeigen.
-  ]),
-  columns: 2,
-  caption: [
-    Durch die Wiederverwendung der gemeinsamen Daten können persistente Datenstrukturen ihre Effizienz erhöhen.
-  ],
-  label: <fig:linked-sharing>,
-)
-
-In der Literatur werden bei verknüpften Listen oft der Kopf selbst als Instanz betrachtet #no-cite.
-Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im folgenden klarere Terminologie.
-
-/ Buffer:
-  Der Speicherbereich einer Datenstruktur welche die eigentlichen Datenenthält, in @fig:linked-sharing beschreibt das die Knoten mit einfachem Strich. Während die doppelgestrichenen Knoten die Instanzen sind.
-  Bei einer Copy-on-Write Datenstruktur können sich viele Instanzen einen einzigen Buffer teilen.
-/ Schreibfähigkeit:
-  Möglichkeit von Schreibzugriffen ohne die vorherigen Daten intakt zu lassen.
-  Das steht im Gegensatz zu persistenten Datenstrukturen, welche bei jedem Schreibzugriff.
-  Die Listen in @fig:linked-sharing sind Teilweise schreibfähig, da eine Instanz selbst schreibfähig ist, aber geteilte Daten nicht von einer Instanz allein verändert werden können.
-/ Copy-on-Write (CoW):
-  Memchanismus zur Bufferteilung + Schreibfähigkeit, viele Instanzen teilen sich einen Buffer.
-  Eine Instanz gilt als Referent des Buffers auf welchen sie zeigt.
-  Ist diese Instanz der einzige Referent, könnne die Daten direkt beschrieben werden, ansonsten wird der geteilte Buffer kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen buffer ist.
-
 === Speicheroperationen
+#todo[
+  This section seems out of place, rewrite or remove this.
+]
+
 Die in @lst:vec-ex zu sehenden Methoden auf `std::vector` abstrahieren potentiell teure Operationen:
 
 / Speicheranlegung: Neue Speicherregion wird angelegt.
@@ -150,6 +111,50 @@ Bei der Implementierung des `std::vector` wird vorallem die Speicherverschiebung
   Unter bestimmten Bedingungen ist amortisiert Konstant allerdings nicht ausreichend.
 ]
 Sprich, wenn Speicherverschiebung nötig ist, weil der Speicher nicht erweitert werden kann, müssen alle Elemente in die neue Speicherregion kopiert werden.
+
+=== Persistenz und Kurzlebigkeit <sec:per-eph>
+Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert gilt diese als @gls:per[_persistent/langlebig_].
+Im Gegensatz dazu stehen Datenstrukturen welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als @gls:eph[_kurzlebig_].
+@gls:per[Persistente] Datenstruturen erstellen meist neue Instanzen für jeden Schreibzugriff welche die Daten der vorherigen Instanz teilen.
+Ein gutes Beispiel bietet die einfach verknüpfte Liste, @fig:linked-sharing zeigt presistente verknüpfte Listen.
+
+#set grid.cell(breakable: false)
+#subpar.grid(
+  figure(figures.list.new, caption: [
+    // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
+    Eine Liste `l` wird über die Sequenz `[A, B, C]` angelegt. \ \
+  ]),
+  figure(figures.list.copy, caption: [
+    Eine Kopie von `l` muss lediglich eine neue Instanz `m` mit den gleichen Daten Anlegen.
+  ]),
+  figure(figures.list.pop, caption: [
+    // NOTE: as above
+    Soll der Kopf von `m` gelöscht werden, zeigt `m` stattdessen auf den Rest. \ \
+  ]),
+  figure(figures.list.push, caption: [
+    Soll ein neuer Kopf an `n` angefügt werden, kann dieser einfach auf den vorherigen Kopf als Rest zeigen.
+  ]),
+  columns: 2,
+  caption: [
+    Durch die Wiederverwendung der gemeinsamen Daten können @gls:per[persistente] Datenstrukturen ihre Effizienz erhöhen.
+  ],
+  label: <fig:linked-sharing>,
+)
+
+Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im folgenden klarere Terminologie.
+Die Knoten mit einfachem Strich in @fig:linked-sharing sind der @gls:buf der Listen, während die Knoten mit Doppelstrich die einzelnenInstanzen sind.
+
+/ @gls:buf:
+  Der Speicherbereich einer Datenstruktur welche die eigentlichen Datenenthält in @fig:linked-sharing beschreibt das die Knoten mit einfachem Strich. Während die doppelgestrichenen Knoten die Instanzen sind.
+  Bei einer @gls:cow Datenstruktur können sich viele Instanzen einen einzigen @gls:buf teilen.
+/ @gls:mut:
+  Möglichkeit von Schreibzugriffen ohne die vorherigen Daten intakt zu lassen.
+  Das steht im Gegensatz zu @gls:per[persistenten] Datenstrukturen, welche bei jedem Schreibzugriff.
+  Die Listen in @fig:linked-sharing sind Teilweise schreibfähig, da eine Instanz selbst schreibfähig ist, aber geteilte Daten nicht von einer Instanz allein verändert werden können.
+/ #gls("gls:cow", long: true):
+  Mechanismus zur @gls:buf[Bufferteilung] + @gls:mut[Schreibfähigkeit], viele Instanzen teilen sich einen Buffer.
+  Eine Instanz gilt als Referent des @gls:buf[Buffers] auf welchen sie zeigt.
+  Ist diese Instanz der einzige Referent, könnne die Daten direkt beschrieben werden, ansonsten wird der geteilte @gls:buf kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen @gls:buf ist.
 
 == Echtzeitsysteme
 Unter Echtzeitsystemen versteht man diese Systeme, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit abarbeiten. Ist ein System nicht in der Lage eine Aufgabe in der vorgegebenen Zeit vollständig abzuarbeiten, so spricht man von Verletzung der Echtzeitbedinungen, welche an das System gestellt wurden.
@@ -262,9 +267,9 @@ Allerdings gibt es dabei gewisse Unterschiede.
 
 Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird, sondern in Instruktionen welche vom Laufzeitsystem interpretiert werden.
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
-T4gl-Arrays werden intern durch Qt-Klassen verwaltet, diese implementieren einen Copy-on-Write Mechanismus, Kopien der Instanzen teilen sich den gleichen Buffer.
-Im Gegensatz zu persistenten verknüpften Listen werden die Buffer nicht partiell geteilt, eine Modifikation am Buffer benötigt eine komplette Kopie des Buffers.
-T4gl-Arrays sind daher nur zu einem gewissen grad _persistent_.
+T4gl-Arrays werden intern durch Qt-Klassen verwaltet, diese implementieren einen Copy-on-Write Mechanismus, Kopien der Instanzen teilen sich den gleichen @gls:buf.
+Im Gegensatz zu @gls:per[persistenten] verknüpften Listen werden die @gls:buf nicht partiell geteilt, eine Modifikation am @gls:buf benötigt eine komplette Kopie des @gls:buf[s].
+T4gl-Arrays sind daher nur zu einem gewissen grad @gls:per[persistent].
 
 #todo[
   Elaborate more precisely on the writing problems as explained shortly in intro
@@ -287,5 +292,5 @@ T4gl-Arrays sind daher nur zu einem gewissen grad _persistent_.
 
 = Partielle Persistenz
 Ein Hauptproblem von T4gl-Arrays ist, dass Modifikationen der Arrays bei nicht-einzigartigem Referenten eine Kopie des gesamten Buffers benötigt.
-Obwohl es bereits persistent Sequenzdatenstrukturen @bib:br-11 @bib:brsu-15 @bib:stu-15 und assoziative Array Datenstrukturen #no-cite gibt welche bei Modifikationen nur die Teile der Buffer kopieren welche modifiziert werden müssen.
-Diese partielle Persistenz welche sich durch Baumstrukturen dieser Datenstrukturen zieht soll als Grundlage der neuen T4gl-Arrays dienen.
+Obwohl es bereits @gls:per[persistent] Sequenzdatenstrukturen @bib:br-11 @bib:brsu-15 @bib:stu-15 und assoziative Array Datenstrukturen @bib:hp-06 #no-cite gibt welche bei Modifikationen nur die Teile der @gls:buf kopieren welche modifiziert werden müssen.
+Diese partielle Persistenz welche sich durch Bäume dieser Datenstrukturen zieht soll als Grundlage der neuen T4gl-Arrays dienen.

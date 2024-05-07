@@ -6,6 +6,38 @@
 #show "C++": util.cpp
 
 #let bib = "/src/bib.yaml"
+#let glossary = (
+  (
+    key: "gls:cow",
+    short: "CoW",
+    long: "Copy-on-Write",
+    desc: [Kopie-bei-Schreibzugriff (_engl._), Mechanismus für @gls:per.],
+  ),
+  (
+    key: "gls:buf",
+    short: "Buffer",
+    desc: [Der Speicherbereich einer Datenstruktur welche die eigentlichen Datenenthält.],
+  ),
+  (
+    key: "gls:mut",
+    short: "Schreibfähigkeit",
+    desc: [Möglichkeit von Schreibzugriffen auf eine Instanz ohne Rückgabe neuer Instanz.],
+  ),
+  (
+    key: "gls:per",
+    short: "Langlebigkeit",
+    desc: [
+      Auch Persistenz, Intakthaltung früherer Versionen von Daten bei Schreibzugriffen (Gegenteil zu @gls:eph).
+    ],
+  ),
+  (
+    key: "gls:eph",
+    short: "Kurzlebgikeit",
+    desc: [
+      Keine Intakthaltung früherer versionen von Daten bei Schreibzugriffen (Gegenteil zu @gls:per).
+    ],
+  ),
+)
 
 #show: doc(
   kind: masters-thesis(
@@ -26,6 +58,7 @@
   ),
   outlines-position: start,
   bibliography: bibliography(bib, title: "Literatur"),
+  glossary: glossary,
 )
 
 #set raw(syntaxes: "/assets/t4gl.sublime-syntax")
@@ -41,12 +74,3 @@
 
 #chapter[Fazit] <chap:conclusion>
 #include "chapters/4-conclusion.typ"
-
-#chapter[Platzhalter]
-Dieses Kapitel wird vor der Publikation gelöscht.
-
-// BUG: bibliography(full: true) will not give us the correct references, since this is only for testing this is fine
-// see: https://github.com/typst/typst/issues/3986
-#for (key, _) in yaml(bib) {
-  cite(label(key))
-}
