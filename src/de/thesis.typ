@@ -19,12 +19,12 @@
     date: datetime(year: 2024, month: 10, day: 09),
     field: [Angewandte Informatik],
   ),
-  listings: (
+  outlines: (
     (target: image, title: [Abbildungsverzeichnis]),
     (target: table, title: [Tabellenverzeichnis]),
     (target: raw,   title: [Listingverzeichnis]),
   ),
-  listings-position: start,
+  outlines-position: start,
   bibliography: bibliography(bib, title: "Literatur"),
 )
 
