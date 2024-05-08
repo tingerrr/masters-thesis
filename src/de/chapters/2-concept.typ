@@ -212,17 +212,33 @@ Es ist nicht unmöglich fundierte Vermutungen über die Anzahl von Elementen in 
 Je nach Operation und Nutzungsfall können Datenstrukturen in Ihrer Programmierschnittstelle erweitert oder verringert werden, um diese Invarianzen auszunutzen oder sicherzustellen.
 
 = T4gl
-T4gl (#strong[T]esting *4GL* #footnote[4th Generation Language]) ist eine proprietäre Programmiersprache, sowie ein gleichnamiger Compiler und Laufzeitsystem, welche von der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) entwickelt wurde und instandgehalten wird.
-Die in T4gl geschriebenen Skripte werden vom Compiler analysiert und kompiliert, woraufhin sie vom Laufzeitsystem ausgeführt werden.
-Dabei werden an das System in manchen Fällen Echtzeitanforderungen gestellt.
+Besonders Relevant für die weiteren Kapitel dieser Arbeit ist Verständnis von @gls:t4gl und dessen Zweck.
+@gls:t4gl und umfasst die folgenden Komponenten:
+- Programmiersprache
+  - Formale Grammatik
+  - Anwendungsspezifische Features
+- Compiler
+  - Statische Anaylse
+  - Typanalyse
+  - Übersetzung in Instruktionen
+- Laufzeitsystem
+  - Ausführung der Instruktionen
+  - Scheudling von Green Threads
+
+@gls:t4gl steht unter Entwicklung bei der @gls:bjig und ist ein propräiteres Produkt.
+Wird ein T4gl-Script dem Compiler übergeben startet dieser zunächst mit der statischen Analyse.
+Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die statische Länge bestimmter Arrays, die Typsicherheit und die syntaktische Korrektheit des Scripts.
+Nach der Analyse wird das Script in eine Sequenz von @gls:microstep[_Microsteps_] kompiliert.
+Im Anschluss führt des Laufzeitsystem die kompilierten Microsteps aus, verwaltet Speicher und Kontextwechsel der @gls:microstep[s] und stellt die benöigten Systemschnittstellen zur Verfügung.
+Je nach Anwendungsfall werden an das Laufzeitsystem Echtzeitanforderungen gestellt.
 
 #todo[
-  Elaborate on the requirements and the general mechanisms and terminology of t4gl more thouroughly.
+  Maybe include the figure from the wiki explaining the execution model und how latencies introduced by longrunning instructions can break the real time constraints.
 ]
 
 == T4gl-Arrays
 Bei T4gl-Arrays handelt es sich um assoziative Arrays, sprich eine Datenstruktur welche Schlüsseln Werte zuordnet.
-Um ein Array in T4gl zu deklarieren wird mindestens ein Schlüssel und ein Wertetyp benötigt.
+Um ein Array in @gls:t4gl zu deklarieren wird mindestens ein Schlüssel und ein Wertetyp benötigt.
 Auf den Wertetyp folgt in eckigen Klammern eine Komma-separierte Liste von Schlüsseltypen.
 Indezierung erfolgt wie in der Deklaration durch eckige Klammern, es müssen aber nicht für alle Schlüssel ein Wert angegeben werden.
 Bei Angabe von weniger Schlüsseln als in der Deklaration, wird eine Referenz auf einen Teil des Arrays zurückgegben.
@@ -265,7 +281,7 @@ Allerdings gibt es dabei gewisse Unterschiede.
   ],
 ) <tbl:t4gl-array-analogies>
 
-Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird, sondern in Instruktionen welche vom Laufzeitsystem interpretiert werden.
+Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da @gls:t4gl nicht direkt in C++ übersetzt und kompiliert wird.
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
 T4gl-Arrays werden intern durch Qt-Klassen verwaltet, diese implementieren einen Copy-on-Write Mechanismus, Kopien der Instanzen teilen sich den gleichen @gls:buf.
 Im Gegensatz zu @gls:per[persistenten] verknüpften Listen werden die @gls:buf nicht partiell geteilt, eine Modifikation am @gls:buf benötigt eine komplette Kopie des @gls:buf[s].

@@ -37,6 +37,24 @@
       Keine Intakthaltung früherer versionen von Daten bei Schreibzugriffen (Gegenteil zu @gls:per).
     ],
   ),
+  (
+    key: "gls:t4gl",
+    short: "T4gl",
+    long: "Testing 4GL",
+    desc: [Programmiersprache, Compiler und Laufzeitsystem unter Entwicklung bei @gls:bjig.],
+  ),
+  (
+    key: "gls:bjig",
+    short: "BJ-IG",
+    long: "Brückner und Jarosch Ingeneurgesellschaft mbH",
+    desc: [Dienstleister für Soft- und Hardwareentwicklung.],
+  ),
+  (
+    key: "gls:microstep",
+    short: "Microstep",
+    long: "Microstep",
+    desc: [Atomare Instruktion im Kontext des @gls:t4gl[T4gl-Laufzeitsystems].],
+  ),
 )
 
 #show: doc(
