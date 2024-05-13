@@ -38,12 +38,12 @@ Sprich, aus Sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für
 ) <tbl:landau>
 
 == Dynamische Datenstrukturen
-Datenstrukturen sind eine Organisierungsstruktur der Daten in Speicher eines Rechensystems welches das Speicher- und/oder Zeitverhalten für bestimmte Operationen verbessern soll.
-Bei Datenstrukturen spricht man oft von geordneten oder ungeordneten Mengen, eine Datenstruktur kann aber auch dazu verwendet werden nur ein einziges Element zu verwalten (z.B. `std::optional` oder `std::atomic` in der C++ Standardbibliothek).
+Datenstrukturen sind Organisierungsstrukturen der Daten in Speicher eines Rechensystems.
+Verschiedene Datenstrukturen weisen verschiedenes Speicher- und/oder Zeitverhalten auf.
+Je nach Anwendungsfall gibt es Datenstrukturen welche besser oder schlechter geeignet sind.
+Obwohl bei Datenstrukturen oft von geordneten oder ungeordneten Mengen von Elementen die Rede ist, kann eine Datenstruktur auch dazu verwendet werden nur ein einziges Element zu verwalten (z.B. `std::optional` oder `std::atomic` in der C++ Standardbibliothek).
 
 Dynamische Datenstrukturen sind Datenstrukturen welche vor allem dann Verwendung finden, wenn die Anzahl der in der Struktur verwalteten Elemente nicht vorraussehbar ist.
-Je nach Programmiersprache kann eine Datenstruktur interne Operationen durch dessen Programmierschnittstelle abstrahieren, um dessen Invarianzen zu wahren.
-So muss zum Beispiel eine Binärbaumimplementierung in C vom Konsument der Datenstruktur selbst ausbalanciert werden, während eine Implementierung in C++ diese Operation "hinter den Kulissen" durchführt.
 Ein klassisches Beispiel für eine dynamische Datenstruktur ist ein dynamisches Array.
 
 #figure(
@@ -69,21 +69,20 @@ Ein klassisches Beispiel für eine dynamische Datenstruktur ist ein dynamisches 
 Die C++ Standardbibliothek stellt unter der Header-Datei `<vector>` die gleichnamige Template-Klasse bereit.
 `std::vector` verfügt über Methoden, welche eigenhändig den Speicher erweitern oder verringern, insofern das für die gegebene Operation nötig oder möglich ist.
 So wird zum Beispiel bei der Verwendung von `push_back()` der Speicher erweitert, wenn die jetzige Kapazität des Vektors unzureichend ist.
-Eine restriktivere Variante des Vektors ist das Array (`int arr[10]` oder `std::array<int, 10>`).
-Die bekannte Größe der Datenstruktur bringt verschiedene Vor- und Nachteile mit sich.
+Ein Vektor bringt über dem herkömmlichen Array verschiedene Vor- und Nachteile mit sich.
 
 *Vorteile*
-- Der Speicher der Datenstruktur kann ohne Indirektion angelegt werden.
-  - Die Elemente von Arrays können direkt auf dem Stack oder in einer Klasse gespeichert werden.
-    Das fördert räumliche Lokalität und kann damit die Verwendung der CPU-Cache erhöhen.
-  - Der Speicher der Datenstruktur muss nicht zur Laufzeit angelegt werden. Das verringert die Anzahl potenziell teurer Allokationsaufrufe.
-- Durch die bekannte Größe können Iterationen über die Struktur aufgerollt oder anderweitig optimiert werden.
+- Die Kapazität nicht fest definiert, es kann zur Lafuzeit entschieden werden wie viele Objekte gespeichert werden.
+- Nichtverwendete Speicherplätze müssen nicht initalisiert werden.
 
 *Nachteile*
-- Die Kapazität ist fest definiert, es können nicht weniger oder mehr Objekte gespeichert werden.
-- Gelten Teile des Arrays als uninitialisiert müssen Informationen darüber separat verwaltet werden.
+- Der Speicher der Datenstruktur kann meist nicht ohne Indirektion angelegt werden.
+  - Die Elemente von gewöhnlichen Arrays können direkt auf dem Stack oder in einer Klasse gespeichert werden.
+    Das fördert räumliche Lokalität und kann damit die Verwendung der CPU-Cache erhöhen.
+  - Dynamische Speicherverwaltung bringt geringere Performance mit sich.
+- Durch die unbekannte Größe können Iterationen über die Struktur seltener aufgerollt oder anderweitig optimiert werden.
 
-Die bekannte Größe des Arrays hat nicht nur Einfluss auf die Optimierungsmöglichkeiten eines Programms, sondern auch auf die Komplexitätsanalyse.
+Die bekannte Größe des statischen Arrays hat nicht nur Einfluss auf die Optimierungsmöglichkeiten eines Programms, sondern auch auf die Komplexitätsanalyse.
 Iteration auf bekannter Größe sind, wie in @sec:complexity bereits beschrieben, effektiv konstant.
 Dieser Zerfall von nicht konstanter zu konstanter Zeitkomplexität propagiert durch alle Operationen, welche nur auf den Elementen dieser Datenstrukturen operieren oder anderweitig konstante Operationen ausführen.
 Sei ein Programm gegeben, welches auf einer dynamischen Länge von Elementen $n$ operiert, so könnnen durch die Substitution von $n$ durch eine Konstante $k$ für alle Opertionen auf $n$ die Zeitkomplexität evaluiert werden.
@@ -91,26 +90,12 @@ Trivialerweise gilt, ist $x$ eine Konstante, so ist $y = f(x)$ eine Konstante, u
 #footnote[
   Eine Funktion $f(x)$ gilt als wirkungsfrei, wenn diese für jeden Aufruf mit $x_n$ die gleiche Ausgabe $y_n$ ergibt und der Aufruf keinen Einfluss auf diese Eigenschaft anderer Funktionen hat.
 ]
-
-=== Speicheroperationen
-#todo[
-  This section seems out of place, rewrite or remove this.
-]
-
-Die in @lst:vec-ex zu sehenden Methoden auf `std::vector` abstrahieren potentiell teure Operationen:
-
-/ Speicheranlegung: Neue Speicherregion wird angelegt.
-/ Speicherlöschung: Bestehende Speicherregion wird gelöscht.
-/ Speichererweiterung: Bestehende Speicherregion wird erweitert.
-/ Speicherverringerung: Bestehender Speicherregion wird verkleinert.
-/ Speicherverschiebung: Kombination aus Speicheranlegung, Kopie der Daten und Speicherlöschung.
-
-Bei der Implementierung des `std::vector` wird vorallem die Speicherverschiebung wenn möglich, vermieden, da diese selbst eine wort-case Zeitkomplexität von $O(n)$ (mit $n = $ Anhzal der Element im Vektor) aufweist.
+Bei Operationen wie `push_back` in @lst:vec-ex kommt es durch die dynamische Größe auch zu Speicheroperationen.
+Muss der Speicher zum Erweitern verschoben werden, ergibt sich einen wort-case Zeitkomplexität von $O(n)$ (mit $n = $ Anhzal der Element im Vektor) aufweist.
 #footnote[
   Die Zeitkomplexität von `push_back` über die gesamte Lebenszeit eines Vektors ist durch den Wachstumsfaktor amortisiert Konstant @bib:iso-cpp-20[S. 834].
-  Unter bestimmten Bedingungen ist amortisiert Konstant allerdings nicht ausreichend.
+  Wird die Kapazität vorher reserviert und nicht überschritten, ist die Komplexität $O(1)$.
 ]
-Sprich, wenn Speicherverschiebung nötig ist, weil der Speicher nicht erweitert werden kann, müssen alle Elemente in die neue Speicherregion kopiert werden.
 
 === Persistenz und Kurzlebigkeit <sec:per-eph>
 Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert gilt diese als @gls:per[_persistent/langlebig_].
