@@ -295,7 +295,7 @@ T4gl-Arrays sind daher nur zu einem gewissen grad @gls:per[persistent].
 
 = Partielle Persistenz
 Ein Hauptproblem von T4gl-Arrays ist, dass Modifikationen der Arrays bei nicht-einzigartigem Referenten eine Kopie des gesamten Buffers benötigt.
-Obwohl es bereits @gls:per[persistent] Sequenzdatenstrukturen @bib:br-11 @bib:brsu-15 @bib:stu-15 und assoziative Array Datenstrukturen @bib:hp-06 #no-cite gibt welche bei Modifikationen nur die Teile der @gls:buf kopieren welche modifiziert werden müssen.
+Obwohl es bereits @gls:per[persistent] Sequenzdatenstrukturen @bib:br-11 @bib:brsu-15 @bib:stu-15 und assoziative Array Datenstrukturen @bib:hp-06 @bib:bm-70 @bib:bay-71 gibt welche bei Modifikationen nur die Teile der @gls:buf kopieren welche modifiziert werden müssen.
 Partielle @gls:per[Persistenz] kann durch verschiedene Implementierungen umgesetzt werden, semantisch handelt es sich aber fast immer um Baumstrukturen.
 Sie soll als Grundlage der neuen T4gl-Arrays dienen.
 
@@ -321,4 +321,3 @@ Für einen perfekt balancierten @gls:per[persistenten] Binärbaum mit $n$ Elemen
 #todo[
   Elaborate on how combination of the right branching factor and balancing constraints ensures known logarithmic upper bounds, as shown by the various rrb papers.
 ]
-

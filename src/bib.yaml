@@ -133,6 +133,8 @@ bib:stu-15:
     value: École polytechnique fédérale de Luasanne
     short: EPFL
   location: Écublens, Canton of Vaud, Switzerland
+  serial:
+    s2cid: 6881581
 
 bib:br-11:
   type: article
@@ -144,6 +146,8 @@ bib:br-11:
   url:
     value: https://api.semanticscholar.org/CorpusID:15763144
     date: 2024-04-23
+  serial:
+    s2cid: 6881581
 
 bib:hp-06:
   type: article
@@ -153,8 +157,12 @@ bib:hp-06:
     - Paterson, Ross
   date: 2006-03-01
   page-range: 197–217
+  url:
+    value: https://dl.acm.org/doi/10.1017/S0956796805005769
+    date: 2024-05-14
   serial:
-    doi: https://doi.org/10.1017/S0956796805005769
+    doi: 10.1017/S0956796805005769
+    s2cid: 6881581
   parent:
     type: periodical
     title: Journal of Functional Programming
@@ -178,3 +186,61 @@ bib:iso-cpp-20:
   url:
     value: https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/n4849.pdf
     date: 2024-04-23
+
+bib:bm-70:
+  type: article
+  title: Organization and maintenance of large ordered indices
+  author:
+    - Bayer, Rudolf
+    - McCreight, Edward Meyers
+  date: 1970
+  page-range: 107–141
+  url:
+    value: https://dl.acm.org/doi/10.1145/1734663.1734671
+    date: 2024-05-14
+  serial:
+    doi: 10.1145/1734663.1734671
+  parent:
+    type: proceedings
+    title: "SIGFIDET '70: Proceedings of the 1970 ACM SIGFIDET Workshop on Data Description, Access and Control"
+    publisher:
+      value: Association for Computing Machinery
+      short: ACM
+    location: New York, NY, United States
+    date: 1970-11-15
+    serial:
+      isbn: 978-1-4503-7941-0
+    parent:
+      type: conference
+      title: 1970 ACM SICFIDET Workshop on Data Description and Access
+      # 1970-11-15 - 1970-11-16
+      date: 1970-11
+      location: Houston, Texas, United States
+
+bib:bay-71:
+  type: article
+  title: Binary B-trees for virtual memory
+  author:
+    - Bayer, Rudolf
+  date: 1971-11
+  page-range: 219–235
+  url:
+    value: https://dl.acm.org/doi/abs/10.1145/1734714.1734731
+    date: 2024-05-14
+  serial:
+    doi: 10.1145/1734714.1734731
+  parent:
+    type: proceedings
+    title: "SIGFIDET '71: Proceedings of the 1971 ACM SIGFIDET Workshop on Data Description, Access and Control"
+    publisher:
+      value: Association for Computing Machinery
+      short: ACM
+    location: New York, NY, United States
+    serial:
+      isbn: 978-1-4503-7300-5
+    parent:
+      type: conference
+      title: 1971 ACM SICFIDET Workshop on Data Description and Access,
+      # 1971-11-11 - 1971-11-12
+      date: 1971-11
+      location: San Diego, California, United States
