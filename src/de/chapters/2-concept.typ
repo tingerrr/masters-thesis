@@ -20,20 +20,21 @@ Sprich, $O(n)$ beschreibt lineare zeitliche Komplexität einer Operation über $
 @tbl:landau zeigt weitere Komplexitäten.
 
 Dabei werden für die Klassifizierung mit Landau-Symbolen meist das asymptotische Verhalten betrachtet.
-Ein Algorithmus $f in O(2n)$ ist einem Algorithmus $g in O(3n)$ gleichzustellen, während $h in O(n^2)$ als komplexer gilt, da die Unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen zu vernachlässigen sind.
+Ein Algorithmus $f in O(2n)$ ist einem Algorithmus $g in O(3n)$ asymptotisch gleichzustellen, während $h in O(n^2)$ als komplexer gilt, da die Unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen zu vernachlässigen sind.
 Sprich, aus Sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für große $n$.
 
 #figure(
   table(columns: 2, align: left,
     table.header[Komplexität][Beschreibung],
-    $O(k)$, [Komplexität unabhängig der Menge der Daten $n$, oft mit $O(n)$ gleichzusetzen],
+    $O(k)$, [Komplexität unabhängig der Menge der Daten $n$, oft mit $O(1)$ gleichzusetzen],
     $O(log_k n)$, [Logarithmische Komplexität über die Menge der Daten $n$ zur Basis $k$],
     $O(k n)$, [Lineare Komplexität über die Menge der Daten $n$ und einem Koeffizienten $k$],
     $O(n^k)$, [Polynomialkomplexität des Grades $k$ über die Menge der Daten $n$],
     $O(k^n)$, [Exponentialkomplexität über die Menge der Daten $n$ zur Basis $k$],
   ),
   caption: [
-    Unvollständige Liste verschiedener Komplexitäten in aufsteigender Reihenfolge. Dabei ist $k$ eine beliebige Konstante.
+    Unvollständige Liste verschiedener Komplexitäten in aufsteigender Reihenfolge.
+    Dabei ist $k$ eine beliebige Konstante.
   ],
 ) <tbl:landau>
 
@@ -130,7 +131,7 @@ Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im
 Die Knoten mit einfachem Strich in @fig:linked-sharing sind der @gls:buf der Listen, während die Knoten mit Doppelstrich die einzelnenInstanzen sind.
 
 / @gls:buf:
-  Der Speicherbereich einer Datenstruktur welche die eigentlichen Datenenthält in @fig:linked-sharing beschreibt das die Knoten mit einfachem Strich. Während die doppelgestrichenen Knoten die Instanzen sind.
+  Der Speicherbereich einer Datenstruktur welche die eigentlichen Daten enthält in @fig:linked-sharing beschreibt das die Knoten mit einfachem Strich. Während die doppelgestrichenen Knoten die Instanzen sind.
   Bei einer @gls:cow Datenstruktur können sich viele Instanzen einen einzigen @gls:buf teilen.
 / @gls:mut:
   Möglichkeit von Schreibzugriffen ohne die vorherigen Daten intakt zu lassen.
@@ -142,7 +143,8 @@ Die Knoten mit einfachem Strich in @fig:linked-sharing sind der @gls:buf der Lis
   Ist diese Instanz der einzige Referent, könnne die Daten direkt beschrieben werden, ansonsten wird der geteilte @gls:buf kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen @gls:buf ist.
 
 == Echtzeitsysteme
-Unter Echtzeitsystemen versteht man diese Systeme, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit abarbeiten. Ist ein System nicht in der Lage eine Aufgabe in der vorgegebenen Zeit vollständig abzuarbeiten, so spricht man von Verletzung der Echtzeitbedinungen, welche an das System gestellt wurden.
+Unter Echtzeitsystemen versteht man diese Systeme, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit abarbeiten.
+Ist ein System nicht in der Lage eine Aufgabe in der vorgegebenen Zeit vollständig abzuarbeiten, so spricht man von Verletzung der Echtzeitbedinungen, welche an das System gestellt wurden.
 
 Für die verifizierbare Einhaltung der Echtzeitbedingungen eines Systems ist unter anderem auch das Zeit- und Speicherverhalten der verwendeten Datenstrukturen relevant.
 Unter Verwendung von Datenstrukturen wie `std::array`, können für Iterationen die Höchstwerte zur Kompilierzeit definiert werden.
@@ -213,8 +215,8 @@ Besonders Relevant für die weiteren Kapitel dieser Arbeit ist Verständnis von 
 @gls:t4gl steht unter Entwicklung bei der @gls:bjig und ist ein propräiteres Produkt.
 Wird ein T4gl-Script dem Compiler übergeben startet dieser zunächst mit der statischen Analyse.
 Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die statische Länge bestimmter Arrays, die Typsicherheit und die syntaktische Korrektheit des Scripts.
-Nach der Analyse wird das Script in eine Sequenz von @gls:microstep[_Microsteps_] kompiliert.
-Im Anschluss führt des Laufzeitsystem die kompilierten Microsteps aus, verwaltet Speicher und Kontextwechsel der @gls:microstep[s] und stellt die benöigten Systemschnittstellen zur Verfügung.
+Nach der Analyse wird das Script in eine Sequenz von @gls:instr[_Microsteps_] kompiliert.
+Im Anschluss führt des Laufzeitsystem die kompilierten Microsteps aus, verwaltet Speicher und Kontextwechsel der @gls:instr[s] und stellt die benöigten Systemschnittstellen zur Verfügung.
 Je nach Anwendungsfall werden an das Laufzeitsystem Echtzeitanforderungen gestellt.
 
 #todo[

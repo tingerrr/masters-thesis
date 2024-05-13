@@ -50,7 +50,7 @@
     desc: [Dienstleister für Soft- und Hardwareentwicklung.],
   ),
   (
-    key: "gls:microstep",
+    key: "gls:instr",
     short: "Microstep",
     long: "Microstep",
     desc: [Atomare Instruktion im Kontext des @gls:t4gl[T4gl-Laufzeitsystems].],
