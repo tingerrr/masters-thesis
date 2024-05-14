@@ -124,4 +124,4 @@
 #(
   (2024, 04, 25),
   (2024, 05, 16),
-).map(log).join()
+).map(log).join(pagebreak(weak: true))

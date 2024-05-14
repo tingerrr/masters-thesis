@@ -1,4 +1,9 @@
 = QnA
+- rrb-trees are suitable for sequenze data structures, but not so much for ordered key-value data structures where key distribution may be sparse (i.e. non-contiguous)
+  - the problem is that radix search only works on integer keys
+- b-trees such as 2-4-trees may be more appropriate for non-contiguous keys
+- 2-3-finger trees further improve on those by allowing amortized constant time access to the ends
+  - they are purely functional and use lazyness (for the spine) and shallow eagerness for the digits and measures
 
 = Research
 == Partial State
