@@ -16,3 +16,7 @@
 - it seems no special consideration other than index adjustment and no inplace mutation of the root are enough to make the tail optimization work
 - if I understood this right it should also be applicable at the head of the data structure
 - this resembles the finger tree approach of placing "fingers" the most often accessed nodes
+
+== B-Trees
+- very similar to rrb-trees (unsurprisingly)
+- storage utilization might be as low as 50% in extreme cases, rrb trees improve on this
