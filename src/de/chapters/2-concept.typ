@@ -92,7 +92,7 @@ Trivialerweise gilt, ist $x$ eine Konstante, so ist $y = f(x)$ eine Konstante, u
   Eine Funktion $f(x)$ gilt als wirkungsfrei, wenn diese für jeden Aufruf mit $x_n$ die gleiche Ausgabe $y_n$ ergibt und der Aufruf keinen Einfluss auf diese Eigenschaft anderer Funktionen hat.
 ]
 Bei Operationen wie `push_back` in @lst:vec-ex kommt es durch die dynamische Größe auch zu Speicheroperationen.
-Muss der Speicher zum Erweitern verschoben werden, ergibt sich einen wort-case Zeitkomplexität von $O(n)$ (mit $n = $ Anhzal der Element im Vektor) aufweist.
+Muss der Speicher zum Erweitern verschoben werden, ergibt sich einen wort-case Zeitkomplexität von $O(n)$ ($n = $ Anhzal der Element im Vektor) aufweist.
 #footnote[
   Die Zeitkomplexität von `push_back` über die gesamte Lebenszeit eines Vektors ist durch den Wachstumsfaktor amortisiert Konstant @bib:iso-cpp-20[S. 834].
   Wird die Kapazität vorher reserviert und nicht überschritten, ist die Komplexität $O(1)$.
@@ -295,7 +295,7 @@ T4gl-Arrays sind daher nur zu einem gewissen grad @gls:per[persistent].
 
 = Partielle Persistenz
 Ein Hauptproblem von T4gl-Arrays ist, dass Modifikationen der Arrays bei nicht-einzigartigem Referenten eine Kopie des gesamten Buffers benötigt.
-Obwohl es bereits @gls:per[persistent] Sequenzdatenstrukturen @bib:br-11 @bib:brsu-15 @bib:stu-15 und assoziative Array Datenstrukturen @bib:hp-06 @bib:bm-70 @bib:bay-71 gibt welche bei Modifikationen nur die Teile der @gls:buf kopieren welche modifiziert werden müssen.
+Obwohl es bereits @gls:per[persistent] Sequenzdatenstrukturen @bib:br-11 @bib:brsu-15 @bib:stu-15 und assoziative Array Datenstrukturen @bib:hp-06 @bib:bm-70 @bib:bay-71 gibt welche bei Modifikationen nur die Teile des @gls:buf[s] kopieren welche modifiziert werden müssen.
 Partielle @gls:per[Persistenz] kann durch verschiedene Implementierungen umgesetzt werden, semantisch handelt es sich aber fast immer um Baumstrukturen.
 Sie soll als Grundlage der neuen T4gl-Arrays dienen.
 
@@ -308,7 +308,7 @@ Sie soll als Grundlage der neuen T4gl-Arrays dienen.
   ]), <fig:tree-sharing:shared>,
   columns: 2,
   caption: [
-    Partielle Persistenz teilt zwischen mehreren Instanzen die Teile des Buffers welche sich nicht verändert haben, ähnlich der Persistenz in @fig:linked-sharing.
+    Partielle Persistenz teilt zwischen mehreren Instanzen die Teile des @gls:buf[s] welche sich nicht verändert haben, ähnlich der Persistenz in @fig:linked-sharing.
   ],
   label: <fig:tree-sharing>,
 )
@@ -316,7 +316,7 @@ Sie soll als Grundlage der neuen T4gl-Arrays dienen.
 @fig:tree-sharing zeigt partielle @gls:per[Persistenz] bei Bäumen, dabei sind #text(green)[grüne] Knoten diese, welche geteilt werden und #text(red)[rote] Knoten diese welche Kopiert wurden.
 Für unbalancierte Bäume lässt sich dabei aber noch keine verbesserte worst-case Zeitkomplexität gegenüber eines @gls:cow Vektors garantieren.
 Ein Binärbaum mit $n$ Kindern, welcher maximal unbalanciert ist (equivalent einer verknüpften Liste), hat beim Hinzufügen von Knoten am Ende eine best-case Zeitkomplexität von $O(n)$.
-Für einen perfekt balancierten @gls:per[persistenten] Binärbaum mit $n$ Elementen hingegen, ist die worst-case Zeitkomplexität für das Hinzufügen oder Löschen eines Blattknotens $O(d)$ (mit $t =$ Tiefe des Baums) oder $O(log_b n)$ (mit $b = 2 =$ Zweigfaktor).
+Für einen perfekt balancierten @gls:per[persistenten] Binärbaum mit $n$ Elementen hingegen, ist die worst-case Zeitkomplexität für das Hinzufügen oder Löschen eines Blattknotens $O(d)$  oder $O(log_b n)$ ($d =$ Tiefe des Baums und $b = 2 =$ Zweigfaktor).
 
 #todo[
   Elaborate on how combination of the right branching factor and balancing constraints ensures known logarithmic upper bounds, as shown by the various rrb papers.
