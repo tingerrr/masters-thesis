@@ -279,7 +279,38 @@ T4gl-Arrays sind daher nur zu einem gewissen grad @gls:per[persistent].
   - [ ] expensive deep copies for writes on shared data
   - [ ] expensive deep copies for context switches
   - [ ] other not yet identified problems?
+
+  Elaborate on the fact that these problems are largely with respect to the underlying data structure.
+  Correct the above section to reflect this.
 ]
+
+#subpar.grid(
+  figure(figures.t4gl.new, caption: [
+    Wird eine neues Array in T4gl erstellet wird eine C++ Instanz mit neuem @gls:buf angelegt. \ \ \
+  ]),
+  figure(figures.t4gl.shallow, caption: [
+    Wird in T4gl eine Array Instanz `a` in `b` kopiert, teilen diese Instanzen sich die gleiche C++ Instanz.
+    Schreibzugriffe auf `a` sind in `b` zu sehen und umgekehrt.
+  ]),
+  figure(figures.t4gl.deep-new, caption: [
+    Wird in T4gl stattdessen ein deep-clone der Instanz `a` in `b` angelegt, teilen sich diese keine `C++` Instanz, aber der @gls:buf wird weiterhin geteilt.
+  ]), <fig:t4gl-indireciton:deep>,
+  figure(figures.t4gl.deep-mut, caption: [
+    Nach einem Schreibzugriff greift der @gls:cow Mechanismus und die @gls:buf werden getrennt. \ \
+  ]), <fig:t4gl-indireciton:mut>,
+  columns: 2,
+  caption: [
+    Die hoch-level Instanzen in T4gl fügen der Persistenz eine weitere Indirektion hinzu.
+  ],
+  label: <fig:t4gl-indireciton>,
+)
+
+#todo[
+  Annotate the levels in the above figure to show which level manages which part of the system.
+]
+
+In @fig:t4gl-indireciton ist zu sehen, dass T4gl Arrays selbst kein @gls:cow auf der C++ ebene durchsetzen sondern sich C++ Instanzen @gls:mut[schreibfähig] teilen.
+Erst durch einen deep-clone wie in @fig:t4gl-indireciton:deep kommt es explizit @gls:cow beim nächsten Schreibzugriff in @fig:t4gl-indireciton:mut.
 
 // == Häufige Schreibzugriffe & Datenteilung
 // Ein Hauptnutzungsfall dieser Arrays ist das Speichern von geordneten Wertereihen als Historie einer Variable.
