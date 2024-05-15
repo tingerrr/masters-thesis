@@ -244,3 +244,14 @@ bib:bay-71:
       # 1971-11-11 - 1971-11-12
       date: 1971-11
       location: San Diego, California, United States
+
+bib:sip-06:
+  type: book
+  title: Introduction to the theory of computation
+  author:
+    - Sipser, Michael
+  date: 2006
+  edition: 2
+  publisher: Thomson Course Technology
+  serial:
+    isbn: 978-0-534-95097-2

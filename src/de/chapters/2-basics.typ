@@ -3,52 +3,61 @@
 
 #todo[Reduce basics to what is actually required to understand the thesis.]
 
-= Grundlagen
-== Komplexität und Landau-Symbole <sec:complexity>
+= Komplexität und Landau-Symbole <sec:complexity>
 Für den Verlauf dieser Arbeit sind Verständnis von Zeit- und Speicherkomplexität und der verwendeten Landau-Symbole unabdingbar.
 Komplexitätstheorie befasst sich mit der Komplexität von Algorithmen und algorithmischen Problemen, vor allem in Bezug auf Speicherverbrauch und Bearbeitungszeit.
 Dabei sind folgende Begriffe relevant:
 
-/ Zeitkomplexität: Zeitverhalten einer Operation (oft simple Operationen oder Algorithmen) über eine Menge von Daten in Bezug auf die Anzahl dieser.
-/ Speicherkomplexität: Speicherverhalten einer Menge an Daten in Bezug auf die Anzahl dieser.
-/ Amortisierte Komplexität: Unter Bezug einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an @bib:clrs-09[S. 451].
+/ Zeitkomplexität:
+  Zeitverhalten eines Algorithmus über eine Menge von Daten in Bezug auf die Anzahl dieser @bib:sip-06[S. 248].
+/ Speicherkomplexität:
+  Der Speicherbedarf eines Algorithmus zur Bewältigung eines Problems @bib:sip-06[S. 303].
+  Wird auch für den Speicherbedarf von Datenstrukturen verwendet.
+/ Amortisierte Komplexität:
+  Unter Bezug einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an @bib:clrs-09[S. 451].
 
-Landau-Symbole (nach Edmund Landau) sind eine Notation welche zur Klassifizierung der Komplexität von Funktionen und Algorithmen verwendet wird.
-#no-cite
-Im Weiteren wird vorwiegend $O(f)$ verwendet um die Komplexität des Speicherverbrauchs oder die Laufzeit bestimmter Operationen in Bezug auf die Anzahl der Elemente einer Datenstruktur zu beschreiben.
-Sprich, $O(n)$ beschreibt lineare zeitliche Komplexität einer Operation über $n$ Elemente, oder den linearen Speicherverbrauch einer Datenstruktur mit $n$ Elementen.
-@tbl:landau zeigt weitere Komplexitäten.
+#todo[
+  The following was simply noted as _sloppy_ by the professor, I will have to inquire what exactly I should change or drop.
 
-Dabei werden für die Klassifizierung mit Landau-Symbolen meist das asymptotische Verhalten betrachtet.
-Ein Algorithmus $f in O(2n)$ ist einem Algorithmus $g in O(3n)$ asymptotisch gleichzustellen, während $h in O(n^2)$ als komplexer gilt, da die Unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen zu vernachlässigen sind.
-Sprich, aus Sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für große $n$.
+  Either use the @bib:sip-06 like above or use the Knuth definitions.
+  The original Landau definitions are too cloesely tied to analytic number theory.
+][
+  Landau-Symbole (nach Edmund Landau) sind eine Notation welche zur Klassifizierung der Komplexität von Funktionen und Algorithmen verwendet wird.
+  #no-cite
+  Im Weiteren wird vorwiegend $O(f)$ verwendet um die Komplexität des Speicherbedarfs oder die Laufzeit bestimmter Operationen in Bezug auf die Anzahl der Elemente einer Datenstruktur zu beschreiben.
+  Sprich, $O(n)$ beschreibt lineare zeitliche Komplexität einer Operation über $n$ Elemente, oder den linearen Speicherverbrauch einer Datenstruktur mit $n$ Elementen.
+  @tbl:landau zeigt weitere Komplexitäten.
+
+  Dabei werden für die Klassifizierung mit Landau-Symbolen meist das asymptotische Verhalten betrachtet.
+  Ein Algorithmus $f in O(2n)$ ist einem Algorithmus $g in O(3n)$ asymptotisch gleichzustellen, während $h in O(n^2)$ als komplexer gilt, da die Unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen zu vernachlässigen sind.
+  Sprich, aus Sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für große $n$.
+]
 
 #figure(
   table(columns: 2, align: left,
     table.header[Komplexität][Beschreibung],
-    $O(k)$, [Komplexität unabhängig der Menge der Daten $n$, oft mit $O(1)$ gleichzusetzen],
+    $O(1)$, [Konstante Komplexität, unabhängig der Menge der Daten $n$],
     $O(log_k n)$, [Logarithmische Komplexität über die Menge der Daten $n$ zur Basis $k$],
-    $O(k n)$, [Lineare Komplexität über die Menge der Daten $n$ und einem Koeffizienten $k$],
+    $O(n)$, [Lineare Komplexität über die Menge der Daten $n$],
     $O(n^k)$, [Polynomialkomplexität des Grades $k$ über die Menge der Daten $n$],
     $O(k^n)$, [Exponentialkomplexität über die Menge der Daten $n$ zur Basis $k$],
   ),
   caption: [
     Unvollständige Liste verschiedener Komplexitäten in aufsteigender Reihenfolge.
-    Dabei ist $k$ eine beliebige Konstante.
   ],
 ) <tbl:landau>
 
-== Dynamische Datenstrukturen
-Datenstrukturen sind Organisierungsstrukturen der Daten in Speicher eines Rechensystems.
+= Dynamische Datenstrukturen
+Datenstrukturen sind Organisierungsstrukturen der Daten im Speicher eines Rechensystems.
 Verschiedene Datenstrukturen weisen verschiedenes Speicher- und/oder Zeitverhalten auf.
 Je nach Anwendungsfall gibt es Datenstrukturen welche besser oder schlechter geeignet sind.
-Obwohl bei Datenstrukturen oft von geordneten oder ungeordneten Mengen von Elementen die Rede ist, kann eine Datenstruktur auch dazu verwendet werden nur ein einziges Element zu verwalten (z.B. `std::optional` oder `std::atomic` in der C++ Standardbibliothek).
 
-Dynamische Datenstrukturen sind Datenstrukturen welche vor allem dann Verwendung finden, wenn die Anzahl der in der Struktur verwalteten Elemente nicht vorraussehbar ist.
+Dynamische Datenstrukturen sind Datenstrukturen welche vor allem dann Verwendung finden, wenn die Anzahl der verwalteten Elemente nicht vorraussehbar ist.
 Ein klassisches Beispiel für eine dynamische Datenstruktur ist ein dynamisches Array.
 
 #figure(
   ```cpp
+
   #import <vector>
 
   int main() {
@@ -62,29 +71,41 @@ Ein klassisches Beispiel für eine dynamische Datenstruktur ist ein dynamisches 
   }
   ```,
   caption: [
-    `std::vector` vergrößert die eigene Kapazität dynamisch zur Laufzeit des Programms.
-    Die Speicherverwaltung des Vektors ist hinter dessen Programmierschnittstelle abstrahiert.
+    Ein C++ Program welches einen `std::vector` anlegt und mit Werten befüllt.
   ],
 ) <lst:vec-ex>
 
 Die C++ Standardbibliothek stellt unter der Header-Datei `<vector>` die gleichnamige Template-Klasse bereit.
 `std::vector` verfügt über Methoden, welche eigenhändig den Speicher erweitern oder verringern, insofern das für die gegebene Operation nötig oder möglich ist.
-So wird zum Beispiel bei der Verwendung von `push_back()` der Speicher erweitert, wenn die jetzige Kapazität des Vektors unzureichend ist.
+So wird zum Beispiel bei der Verwendung von `push_back` der Speicher erweitert, wenn die jetzige Kapazität des Vektors unzureichend ist.
 Ein Vektor bringt über dem herkömmlichen Array verschiedene Vor- und Nachteile mit sich.
+@lst:vec-ex zeigt wie ein `std::vector` angelegt und stückweise befüllt werden kann, dabei wird bei dem ersten Aufruf von `push_back` der dynamische Speicher angelegt.
+Nach dem dritten Aufruf von `push_back` enthält der Vektor die Sequenz `[3, 2, 1]`.
 
 *Vorteile*
-- Die Kapazität nicht fest definiert, es kann zur Lafuzeit entschieden werden wie viele Objekte gespeichert werden.
-- Nichtverwendete Speicherplätze müssen nicht initalisiert werden.
+- Die Kapazität ist nicht fest definiert, es kann zur Laufzeit entschieden werden wie viele Objekte gespeichert werden.
 
 *Nachteile*
-- Der Speicher der Datenstruktur kann meist nicht ohne Indirektion angelegt werden.
-  - Die Elemente von gewöhnlichen Arrays können direkt auf dem Stack oder in einer Klasse gespeichert werden.
-    Das fördert räumliche Lokalität und kann damit die Verwendung der CPU-Cache erhöhen.
-  - Dynamische Speicherverwaltung bringt geringere Performance mit sich.
 - Durch die unbekannte Größe können Iterationen über die Struktur seltener aufgerollt oder anderweitig optimiert werden.
+- Der Speicher der Datenstruktur kann meist nicht ohne Indirektion angelegt werden.
+  - Da die Größe nicht bekannt ist müssen dynamische Datenstrukturen den eigentlichen Buffer meistens auf dem Heap anlegen.
+    #footnote[
+      Manche Programmiersprachen unterstüzen dynamische Speicheranlegung ohne Indirektion wie `alloca` oder "Variable-Sized Types".
+    ] <ft:indir>
+  - Die Elemente von gewöhnlichen Arrays können, dank der bekannten Größe, direkt auf dem Stack oder in einer Klasse gespeichert, das vermeidet unnötige Indirektion oder dynamische Speicherverwaltung. @ft:indir
+
+#todo[
+  The upper section isn't clear enough about the causality of dynamic size and indirection.
+]
 
 Die bekannte Größe des statischen Arrays hat nicht nur Einfluss auf die Optimierungsmöglichkeiten eines Programms, sondern auch auf die Komplexitätsanalyse.
-Iteration auf bekannter Größe sind, wie in @sec:complexity bereits beschrieben, effektiv konstant.
+Iteration auf bekannter Größe sind, wie in @sec:complexity bereits beschrieben, effektiv Konstant.
+
+#todo[
+  Apparently the upper claim is incorrect, but I fail to see how, given a known constant upper bound of iteration we do effectively have a constant time operation.
+  A least asymptotically.
+]
+
 Dieser Zerfall von nicht konstanter zu konstanter Zeitkomplexität propagiert durch alle Operationen, welche nur auf den Elementen dieser Datenstrukturen operieren oder anderweitig konstante Operationen ausführen.
 Sei ein Programm gegeben, welches auf einer dynamischen Länge von Elementen $n$ operiert, so könnnen durch die Substitution von $n$ durch eine Konstante $k$ für alle Opertionen auf $n$ die Zeitkomplexität evaluiert werden.
 Trivialerweise gilt, ist $x$ eine Konstante, so ist $y = f(x)$ eine Konstante, unter der Annahme das $f(x)$ wirkungsfrei ist.
@@ -98,31 +119,30 @@ Muss der Speicher zum Erweitern verschoben werden, ergibt sich einen wort-case Z
   Wird die Kapazität vorher reserviert und nicht überschritten, ist die Komplexität $O(1)$.
 ]
 
-=== Persistenz und Kurzlebigkeit <sec:per-eph>
-Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert gilt diese als @gls:per[_persistent/langlebig_].
-Im Gegensatz dazu stehen Datenstrukturen welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als @gls:eph[_kurzlebig_].
-@gls:per[Persistente] Datenstruturen erstellen meist neue Instanzen für jeden Schreibzugriff welche die Daten der vorherigen Instanz teilen.
+== Persistenz und Kurzlebigkeit <sec:per-eph>
+Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert gilt diese als @gls:per[_persistent/langlebig_]. #no-cite
+Im Gegensatz dazu stehen Datenstrukturen welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als @gls:eph[_kurzlebig_]. #no-cite
+@gls:per[Persistente] Datenstrukturen erstellen meist neue Instanzen für jeden Schreibzugriff welche die Daten der vorherigen Instanz teilen.
 Ein gutes Beispiel bietet die einfach verknüpfte Liste, @fig:linked-sharing zeigt presistente verknüpfte Listen.
 
 #set grid.cell(breakable: false)
 #subpar.grid(
   figure(figures.list.new, caption: [
-    // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
-    Eine Liste `l` wird über die Sequenz `[A, B, C]` angelegt. \ \
+    Eine Liste `l` wird über die Sequenz `[A, B, C]` angelegt.
   ]),
   figure(figures.list.copy, caption: [
-    Eine Kopie von `l` muss lediglich eine neue Instanz `m` mit den gleichen Daten Anlegen.
+    Eine Kopie `m` von `l` teilt sich den Kopf der Liste mit `l`.
   ]),
   figure(figures.list.pop, caption: [
-    // NOTE: as above
+    // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
     Soll der Kopf von `m` gelöscht werden, zeigt `m` stattdessen auf den Rest. \ \
   ]),
   figure(figures.list.push, caption: [
-    Soll ein neuer Kopf an `n` angefügt werden, kann dieser einfach auf den vorherigen Kopf als Rest zeigen.
+    Soll ein neuer Kopf an `n` angefügt werden, kann der Rest weiterhin geteilt werden.
   ]),
   columns: 2,
   caption: [
-    Durch die Wiederverwendung der gemeinsamen Daten können @gls:per[persistente] Datenstrukturen ihre Effizienz erhöhen.
+    Eine Abfolge von Operationen auf @gls:per[persistenten] verknüpften Listen.
   ],
   label: <fig:linked-sharing>,
 )
@@ -142,7 +162,12 @@ Die Knoten mit einfachem Strich in @fig:linked-sharing sind der @gls:buf der Lis
   Eine Instanz gilt als Referent des @gls:buf[Buffers] auf welchen sie zeigt.
   Ist diese Instanz der einzige Referent, könnne die Daten direkt beschrieben werden, ansonsten wird der geteilte @gls:buf kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen @gls:buf ist.
 
-== Echtzeitsysteme
+#todo[
+  Judging by the other feedback I will hav to cite here too, but only half of this is established knowledge, `Buffer` is more or less a convention for this work specifically.
+  I think it's fine if I make this clear.
+]
+
+= Echtzeitsysteme
 Unter Echtzeitsystemen versteht man diese Systeme, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit abarbeiten.
 Ist ein System nicht in der Lage eine Aufgabe in der vorgegebenen Zeit vollständig abzuarbeiten, so spricht man von Verletzung der Echtzeitbedinungen, welche an das System gestellt wurden.
 
@@ -158,7 +183,7 @@ Unter Verwendung von Datenstrukturen wie `std::array`, können für Iterationen 
   }
   ```,
   caption: [
-    Ein `std::array` der Länge 3 wird an die Funktion übergeben und dessen Werte werden in einer Schleife ausgegeben.
+    Eine Funktion welche über ein `std::array` der Länge 3 iteriert und desen werte ausgibt.
   ],
 ) <lst:array-ex>
 
@@ -191,7 +216,7 @@ Die Schleife ist nicht mehr trivial aufrollbar, da über die Anzahl der Elemente
   }
   ```,
   caption: [
-    Ähnlich wie bei @lst:array-ex, mit einem `std::vector`, statt einem `std::array`.
+    Eine Funktion ähnlich der aus @lst:array-ex, mit einem `std::vector`, statt einem `std::array`.
   ],
 ) <lst:vector-ex>
 
@@ -247,11 +272,12 @@ Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werd
   ```,
   caption: [
     Beispiele für Deklaration und Indezierung von T4gl-Arrays.
-    Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9.
   ],
 ) <lst:t4gl-ex>
 
-Bei den in @lst:t4gl-ex gegebenen Deklarationen werden je nach den angegebenen Typen verschiedene Datenstrukturen vom Laufzeitsystem gewählt, diese ähneln den analogen C++ Varianten in @tbl:t4gl-array-analogies.
+Bei den in @lst:t4gl-ex gegebenen Deklarationen werden je nach den angegebenen Typen verschiedene Datenstrukturen vom Laufzeitsystem gewählt, diese ähneln den analogen C++ Varianten in @tbl:t4gl-array-analogies, wobei `T` und `U` Typen sind und `N` eine Zahl aus $NN^+$.
+Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9.
+Es handelt sich um eine Sonderform des T4gl-Arrays welches eine dichte festgelegt Schlüsselverteilung hat.
 Allerdings gibt es dabei gewisse Unterschiede.
 
 #figure(
@@ -264,7 +290,7 @@ Allerdings gibt es dabei gewisse Unterschiede.
     align(center)[...], align(center)[...],
   ),
   caption: [
-    Semantische Analogien in C++ zu spezifischen Varianten von T4gl-Arrays. `T` und `U` sind Typen und `N` ist eine Zahl aus $NN^+$.
+    Semantische Analogien in C++ zu spezifischen Varianten von T4gl-Arrays.
   ],
 ) <tbl:t4gl-array-analogies>
 

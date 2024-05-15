@@ -84,11 +84,14 @@
 #chapter[Einleitung] <chap:intro>
 #include "chapters/1-intro.typ"
 
+#chapter[Grundlagen] <chap:basics>
+#include "chapters/2-basics.typ"
+
 #chapter[Konzept] <chap:concept>
-#include "chapters/2-concept.typ"
+#include "chapters/3-concept.typ"
 
 #chapter[Implementierung] <chap:impl>
-#include "chapters/3-impl.typ"
+#include "chapters/4-impl.typ"
 
 #chapter[Fazit] <chap:conclusion>
-#include "chapters/4-conclusion.typ"
+#include "chapters/5-conclusion.typ"

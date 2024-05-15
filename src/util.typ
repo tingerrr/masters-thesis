@@ -10,12 +10,18 @@
 
 #let _block = block
 
-#let todo(body, block: true) ={
-  if body == [] { body = [todo] }
+#let todo(..annotation, body, block: true) = {
+  if annotation.named().len() != 0 {
+    panic(oxifmt.strfmt("Unknown named args: {}", annotation.named()))
+  } else if annotation.pos().len() > 1 {
+    panic("Only one annotation may be used")
+  }
+
+  let annotation = annotation.pos().at(0, default: none)
 
   if block {
     showybox.showybox(
-      title: [TODO],
+      title: if annotation != none { annotation } else [TODO], 
       title-style: (
         weight: 900,
         color: red.darken(40%),
@@ -37,8 +43,15 @@
   } else {
     "["
     h(0pt, weak: true)
-    text(red, body)
-    [#metadata(body) <todo>]
+    if annotation != none {
+      text(red, annotation)
+      if body != [] [: #body]
+    } else if body != [] {
+      text(red, body)
+    } else {
+      text(red)[TODO]
+    }
+    [#metadata(annotation) <todo>]
     h(0pt, weak: true)
     "]"
   }
