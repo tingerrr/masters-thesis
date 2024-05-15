@@ -4,6 +4,10 @@
 - b-trees such as 2-4-trees may be more appropriate for non-contiguous keys
 - 2-3-finger trees further improve on those by allowing amortized constant time access to the ends
   - they are purely functional and use lazyness (for the spine) and shallow eagerness for the digits and measures
+  - they allow for arbitrary keys (as long as there exists a scheme for ordering)
+- it is ok and even encouraged to optimize for a very specific use case such as append only lists in the context of a scientific thesis
+  - chunked sequence data structures may be very appropriate there
+- main goal is reduction of count of operations even if single operations themselves become more costly
 
 = Research
 == Partial State

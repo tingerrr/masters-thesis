@@ -107,7 +107,7 @@
     align(center, [
       *Defense* \
       // TODO: defense date
-      #month(10, fmt: "[year]-[month]-??")
+      #month(10, fmt: "[month repr:short] ??")
     ])
   )
 })
