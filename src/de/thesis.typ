@@ -5,6 +5,9 @@
 
 #show "C++": util.cpp
 
+// convenient smallcaps for simple author names
+#show regex("\b[A-Z]{2,}\b"): it => smallcaps(it.text.slice(0, 1) + lower(it.text.slice(1)))
+
 #let bib = "/src/bib.yaml"
 #let glossary = (
   (

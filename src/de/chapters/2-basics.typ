@@ -4,43 +4,51 @@
 #todo[Reduce basics to what is actually required to understand the thesis.]
 
 = Komplexität und Landau-Symbole <sec:complexity>
-Für den Verlauf dieser Arbeit sind Verständnis von Zeit- und Speicherkomplexität und der verwendeten Landau-Symbole unabdingbar.
+Für den Verlauf dieser Arbeit sind Verständnis von Zeit- und Speicherkomplexität und der verwendeten LANDAU-Symbole unabdingbar.
 Komplexitätstheorie befasst sich mit der Komplexität von Algorithmen und algorithmischen Problemen, vor allem in Bezug auf Speicherverbrauch und Bearbeitungszeit.
 Dabei sind folgende Begriffe relevant:
 
+#todo[Ensure this is correct according to the citaitons at hand.]
+
 / Zeitkomplexität:
-  Zeitverhalten eines Algorithmus über eine Menge von Daten in Bezug auf die Anzahl dieser @bib:sip-06[S. 248].
+  Zeitverhalten eines Algorithmus über eine Menge von Daten in Bezug auf die Anzahl dieser. @bib:clrs-09[S. 44]
 / Speicherkomplexität:
-  Der Speicherbedarf eines Algorithmus zur Bewältigung eines Problems @bib:sip-06[S. 303].
+  Der Speicherbedarf eines Algorithmus zur Bewältigung eines Problems. @bib:clrs-09[S. 44]
   Wird auch für den Speicherbedarf von Datenstrukturen verwendet.
 / Amortisierte Komplexität:
-  Unter Bezug einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an @bib:clrs-09[S. 451].
+  Unter Bezug einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an. @bib:clrs-09[S. 451]
 
-#todo[
-  The following was simply noted as _sloppy_ by the professor, I will have to inquire what exactly I should change or drop.
+LANDAU-Symbole umfassen Symbole zur Klassifizierung der asymptotischen Komplexität von Funktionen und Algorithmen.
+Im folgenden werden die KNUTH'schen Definitionen @bib:knu-76[S. 19] der LANDAU-Symbol verwendet #footnote[
+  LANDAU-Symbole wurden erstmals von Edmund LANDAU bei der Analyse der Verteilung von Primzahlen @bib:lan-09 und Paul BACHMANN in analytischer Zahlentheorie @bib:bac-94 eingeführt.
+  Später wurden die gleichen Symbole aber auch in der Komplexitätstheorie verwendet, dort gibt es bestimmte Unterschiede für die Bedeutung von $Omega$, sowie die Inkulsion von $Theta$ als LANDAU-Symbol. @bib:knu-76[S. 19]
+], sprich:
 
-  Either use the @bib:sip-06 like above or use the Knuth definitions.
-  The original Landau definitions are too cloesely tied to analytic number theory.
-][
-  Landau-Symbole (nach Edmund Landau) sind eine Notation welche zur Klassifizierung der Komplexität von Funktionen und Algorithmen verwendet wird.
-  #no-cite
-  Im Weiteren wird vorwiegend $O(f)$ verwendet um die Komplexität des Speicherbedarfs oder die Laufzeit bestimmter Operationen in Bezug auf die Anzahl der Elemente einer Datenstruktur zu beschreiben.
-  Sprich, $O(n)$ beschreibt lineare zeitliche Komplexität einer Operation über $n$ Elemente, oder den linearen Speicherverbrauch einer Datenstruktur mit $n$ Elementen.
-  @tbl:landau zeigt weitere Komplexitäten.
+#figure(
+  kind: math.equation,
+  $
+        O(f(n)) &= exists n_0, c     &&forall n >= n_0 : { g(n) : |g(n)| <= c f(n) } \
+    Omega(f(n)) &= exists n_0, c     &&forall n >= n_0 : { g(n) : g(n) >= c f(n) } \
+    Theta(f(n)) &= exists n_0, c, c' &&forall n >= n_0 : { g(n) : c f(n) <= g(n) <= c' f(n) }
+  $,
+  caption: [Definition von $O(f(n))$, $Omega(f(n))$ und $Theta(f(n))$ nach KNUTH.],
+)
 
-  Dabei werden für die Klassifizierung mit Landau-Symbolen meist das asymptotische Verhalten betrachtet.
-  Ein Algorithmus $f in O(2n)$ ist einem Algorithmus $g in O(3n)$ asymptotisch gleichzustellen, während $h in O(n^2)$ als komplexer gilt, da die Unterschiede zwischen $f$ und $g$ im Vergleich zu $h$ bei großen Datenmengen zu vernachlässigen sind.
-  Sprich, aus Sicht der Komplexität gilt dann $f = g$, und $f < h and g < h$ für große $n$.
-]
+Man spricht von $g(f) = O(f(n))$ wenn $g(n)$ die obere asymptotische Grenze $f(n)$ hat, gleicherweise gibt $Omega(f(n))$ eine untere asymptotische Grenze an. Es gilt $g(n) = Theta(f(n))$ wenn sowohl $g(f) = O(f(n))$ als auch $g(f) = Omega(f(n))$ gilt @bib:clrs-09[S. 48, Theorem 3.1].
+Die Varianten $o(f(n))$ und $omega(f(n))$ werden im Weiteren nicht verwendet.
+@tbl:landau zeigt verschiedene Komplexitäten sortiert nach Ordnung der Funktion $f(n)$, dabei steht $alpha$ für ein Symbol aus ${O, Omega, Theta}$.
+Unter Betrachtung der asymptotischen Komplexität werden konstante Faktoren und Terme geringere Ordnung generell ignoriert, sprich $g(n) = 2n^2 + n = O(n^2)$.
+Die Richtung der Gleichung hat dabei Relevanz @bib:knu-76[S. 20] und ähnelt unter den KNUTH'schen Definitionen eher einer Mengenzuweisung $g(f) in O(f(n))$.
+KNUTH behält die Gleichungsnotation konventionshalber, CORMEN _et al._ ebenfalls und zeigen welche Vorteile das hat @bib:clrs-09[S. 49].
 
 #figure(
   table(columns: 2, align: left,
     table.header[Komplexität][Beschreibung],
-    $O(1)$, [Konstante Komplexität, unabhängig der Menge der Daten $n$],
-    $O(log_k n)$, [Logarithmische Komplexität über die Menge der Daten $n$ zur Basis $k$],
-    $O(n)$, [Lineare Komplexität über die Menge der Daten $n$],
-    $O(n^k)$, [Polynomialkomplexität des Grades $k$ über die Menge der Daten $n$],
-    $O(k^n)$, [Exponentialkomplexität über die Menge der Daten $n$ zur Basis $k$],
+    $alpha(1)$, [Konstante Komplexität, unabhängig der Menge der Daten $n$],
+    $alpha(log_k n)$, [Logarithmische Komplexität über die Menge der Daten $n$ zur Basis $k$],
+    $alpha(n)$, [Lineare Komplexität über die Menge der Daten $n$],
+    $alpha(n^k)$, [Polynomialkomplexität des Grades $k$ über die Menge der Daten $n$],
+    $alpha(k^n)$, [Exponentialkomplexität über die Menge der Daten $n$ zur Basis $k$],
   ),
   caption: [
     Unvollständige Liste verschiedener Komplexitäten in aufsteigender Reihenfolge.

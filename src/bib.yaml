@@ -5,7 +5,6 @@ bib:acr-14:
     - Acar, Umut A.
     - Charguéraud, Arthur
     - Rainey, Mike
-  date: 2014-08-16
   page-range: 25-36
   volume: 8737
   serial:
@@ -70,9 +69,8 @@ bib:kt-96:
   title: Purely Functional Representations of Catenable Sorted Lists
   author:
     - Kaplan, Haim
-    - Tarjan, Robert E.
-  date: 1996-06-01
-  page-range: 202–211
+    - Tarjan, Robert Endre
+  page-range: 202-211
   serial:
     doi: 10.1145/237814.237865
   parent:
@@ -100,8 +98,7 @@ bib:brsu-15:
     - Rompf, Tiark
     - Stucki, Nicolas
     - Ureche, Vlad
-  date: 2015-08-29
-  page-range: 342–354
+  page-range: 342-354
   serial:
     doi: 10.1145/2784731.2784739
   parent:
@@ -155,8 +152,7 @@ bib:hp-06:
   author:
     - Hinze, Ralf
     - Paterson, Ross
-  date: 2006-03-01
-  page-range: 197–217
+  page-range: 197-217
   url:
     value: https://dl.acm.org/doi/10.1017/S0956796805005769
     date: 2024-05-14
@@ -168,7 +164,7 @@ bib:hp-06:
     title: Journal of Functional Programming
     volume: 16
     issue: 2
-    date: 2006-03
+    date: 2006-03-01
 
 # TODO: get ahold of the actual standard without paying 200 swiss francs lmao
 bib:iso-cpp-20:
@@ -193,8 +189,7 @@ bib:bm-70:
   author:
     - Bayer, Rudolf
     - McCreight, Edward Meyers
-  date: 1970
-  page-range: 107–141
+  page-range: 107-141
   url:
     value: https://dl.acm.org/doi/10.1145/1734663.1734671
     date: 2024-05-14
@@ -222,8 +217,7 @@ bib:bay-71:
   title: Binary B-trees for virtual memory
   author:
     - Bayer, Rudolf
-  date: 1971-11
-  page-range: 219–235
+  page-range: 219-235
   url:
     value: https://dl.acm.org/doi/abs/10.1145/1734714.1734731
     date: 2024-05-14
@@ -232,6 +226,7 @@ bib:bay-71:
   parent:
     type: proceedings
     title: "SIGFIDET '71: Proceedings of the 1971 ACM SIGFIDET Workshop on Data Description, Access and Control"
+    date: 1971-11
     publisher:
       value: Association for Computing Machinery
       short: ACM
@@ -255,3 +250,69 @@ bib:sip-06:
   publisher: Thomson Course Technology
   serial:
     isbn: 978-0-534-95097-2
+
+bib:tar-85:
+  type: article
+  title: Amortized Computational Complexity
+  author:
+    - Tarjan, Robert Endre
+  pages-range: 306-318
+  url:
+    value: https://dl.acm.org/doi/10.1137/0606031
+    date: 2024-05-17
+  serial:
+    doi: 10.1137/0606031
+    issn: 0196-5212
+    s2cid: 120846494
+  parent:
+    type: periodical
+    title: SIAM J. Algebraic Discrete Methods
+    publisher:
+      value: Society for Industrial and Applied Mathematics
+      short: SIAM
+    volume: 6
+    issue: 2
+    date: 1985-04-1
+    location: 3600 University City Science Center Philadelphia, PA, United States
+
+bib:lan-09:
+  type: manuscript
+  title: Handbuch der Lehre von der Verteilung der Primzahlen
+  author:
+    - Landau, Edmund
+  date: 1909
+  publisher: B.G. Teubner
+  location: Leipzig, Saxony, Germany
+  volume: 1
+
+bib:bac-94:
+  type: manuscript
+  title: Die Analytische Zahlentheorie
+  author:
+    - Bachmann, Paul
+  date: 1894
+  publisher: B. G. Teubner
+  part: 2
+  location: Leipzig, Saxony, Germany
+
+bib:knu-76:
+  type: article
+  title: Big Omicron and big Omega and big Theta
+  author:
+    - Knuth, Donald Ervin
+  page-range: 18-24
+  serial:
+    doi: 10.1145/1008328.1008329
+    s2cid: 523024
+  url:
+    value: https://web.archive.org/web/20220314030120/https://www.phil.uu.nl/datastructuren/10-11/knuth_big_omicron.pdf
+    date: 2024-05-17
+  parent:
+    type: periodical
+    title: ACM SIGACT News
+    volume: 8
+    issue: 2
+    date: 1976-04-01
+    publisher:
+      value: Association for Computing Machinery
+      short: ACM
