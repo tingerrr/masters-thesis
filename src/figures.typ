@@ -1,4 +1,5 @@
 #let (
+  big-o,
   list,
   t4gl,
   tree,
@@ -49,6 +50,27 @@
   }
 
   //
+  // big-o
+  //
+  let big-o-def = $
+    O(f) &= {
+      g : NN -> NN | exists n_0, c > 0
+      quad &&forall n >= n_0
+      quad 0 <= g(n) <= c f(n)
+    } \
+    Omega(f) &= {
+      g : NN -> NN | exists n_0, c > 0
+      quad &&forall n >= n_0
+      quad 0 <= c f(n) <= g(n)
+    } \
+    Theta(f) &= {
+      g : NN -> NN | exists n_0, c_1, c_2 > 0
+      quad &&forall n >= n_0
+      quad c_1 f(n) <= g(n) <= c_2 f(n)
+    }
+  $
+
+  //
   // linked lists
   //
   let list-new = fdiag({
@@ -64,11 +86,11 @@
   let list-copy = fdiag({
     instance((0, 0), `l`)
     edge("-|>")
-    node((0.5, 0), `A`)
+    node((0.5, 0), `A`, stroke: green)
     edge("-|>")
-    node((1, 0), `B`)
+    node((1, 0), `B`, stroke: green)
     edge("-|>")
-    node((1.5, 0), `C`)
+    node((1.5, 0), `C`, stroke: green)
     instance((0, 0.5), `m`)
     edge((0.5, 0), "-|>")
   })
@@ -78,9 +100,9 @@
     edge("-|>")
     node((0.5, 0), `A`)
     edge("-|>")
-    node((1, 0), `B`)
+    node((1, 0), `B`, stroke: green)
     edge("-|>")
-    node((1.5, 0), `C`)
+    node((1.5, 0), `C`, stroke: green)
     instance((0, 0.5), `m`)
     edge((1, 0), "-|>")
   })
@@ -90,9 +112,9 @@
     edge("-|>")
     node((0.5, 0), `A`)
     edge("-|>")
-    node((1, 0), `B`)
+    node((1, 0), `B`, stroke: green)
     edge("-|>")
-    node((1.5, 0), `C`)
+    node((1.5, 0), `C`, stroke: green)
     instance((0, 0.5), `m`)
     edge("-|>")
     node((0.5, 0.5), `D`)
@@ -173,12 +195,12 @@
     node((0, 1.5), `E`, name: <E>)
     node((1, 1.5), `X`, name: <X>, stroke: dstroke(gray))
 
-    edge(<root>, <A>, "->")
-    edge(<A>, <B>, "->")
-    edge(<A>, <C>, "->")
-    edge(<B>, <D>, "->")
-    edge(<B>, <E>, "->")
-    edge(<C>, <X>, "->", stroke: dstroke(gray))
+    edge(<root>, <A>, "-|>")
+    edge(<A>, <B>, "-|>")
+    edge(<A>, <C>, "-|>")
+    edge(<B>, <D>, "-|>")
+    edge(<B>, <E>, "-|>")
+    edge(<C>, <X>, "-|>", stroke: dstroke(gray))
   })
 
   let tree-shared = fdiag({
@@ -189,39 +211,40 @@
     node((-1, 1.5), `D`, name: <D>, stroke: green)
     node((0, 1.5), `E`, name: <E>, stroke: green)
 
-    edge(<t-root>, <t-A>, "->")
-    edge(<t-A>, <B>, "->")
-    edge(<t-A>, <t-C>, "->")
+    edge(<t-root>, <t-A>, "-|>")
+    edge(<t-A>, <B>, "-|>")
+    edge(<t-A>, <t-C>, "-|>")
 
-    edge(<B>, <D>, "->")
-    edge(<B>, <E>, "->")
+    edge(<B>, <D>, "-|>")
+    edge(<B>, <E>, "-|>")
 
     instance((1, 0), `u`, name: <u-root>)
     node((1, 0.5), `A`, name: <u-A>, stroke: red)
     node((1.5, 1), `C`, name: <u-C>, stroke: red)
     node((2, 1.5), `X`, name: <X>)
 
-    edge(<u-A>, <B>, "->")
+    edge(<u-A>, <B>, "-|>")
 
-    edge(<u-root>, <u-A>, "->")
-    edge(<u-A>, <u-C>, "->")
-    edge(<u-C>, <X>, "->")
+    edge(<u-root>, <u-A>, "-|>")
+    edge(<u-A>, <u-C>, "-|>")
+    edge(<u-C>, <X>, "-|>")
   })
 
   (
-    list: (
+    big-o-def,
+    (
       new: list-new,
       copy: list-copy,
       pop: list-pop,
       push: list-push,
     ),
-    t4gl: (
+    (
       new: t4gl-new,
       shallow: t4gl-shallow,
       deep-new: t4gl-deep-new,
       deep-mut: t4gl-deep-mut,
     ),
-    tree: (
+    (
       new: tree-new,
       shared: tree-shared,
     )

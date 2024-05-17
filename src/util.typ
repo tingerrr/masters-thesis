@@ -10,7 +10,7 @@
 
 #let _block = block
 
-#let todo(..annotation, body, block: true) = {
+#let todo(..annotation, body) = {
   if annotation.named().len() != 0 {
     panic(oxifmt.strfmt("Unknown named args: {}", annotation.named()))
   } else if annotation.pos().len() > 1 {
@@ -19,42 +19,33 @@
 
   let annotation = annotation.pos().at(0, default: none)
 
-  if block {
-    showybox.showybox(
-      title: if annotation != none { annotation } else [TODO], 
-      title-style: (
-        weight: 900,
-        color: red.darken(40%),
-        sep-thickness: 0pt,
-      ),
-      frame: (
-        title-color: red.transparentize(80%),
-        border-color: red.darken(40%),
-        body-color: white.transparentize(100%),
-        thickness: (left: 1pt),
-        radius: 0pt,
-      ),
-      {
-        show: cheq.checklist
-        [#metadata(body) <todo>]
-        body
-      },
-    )
-  } else {
-    "["
-    h(0pt, weak: true)
-    if annotation != none {
-      text(red, annotation)
-      if body != [] [: #body]
-    } else if body != [] {
-      text(red, body)
-    } else {
-      text(red)[TODO]
-    }
-    [#metadata(annotation) <todo>]
-    h(0pt, weak: true)
-    "]"
-  }
+  [#metadata(body) <todo>]
+  showybox.showybox(
+    title: [TODO] + if annotation != none [: #annotation], 
+    title-style: (
+      weight: 900,
+      color: red.darken(40%),
+      sep-thickness: 0pt,
+    ),
+    frame: (
+      title-color: red.transparentize(80%),
+      border-color: red.darken(40%),
+      body-color: white.transparentize(100%),
+      thickness: (left: 1pt),
+      radius: 0pt,
+    ),
+    {
+      show: cheq.checklist
+      body
+    },
+  )
 }
 
-#let no-cite = todo(block: false)[Quelle Benötigt]
+#let no-cite = {
+  [#metadata(none) <todo>]
+  "["
+  h(0pt, weak: true)
+  text(red)[Quelle Benötigt]
+  h(0pt, weak: true)
+  "]"
+}

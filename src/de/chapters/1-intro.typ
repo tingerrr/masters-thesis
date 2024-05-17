@@ -1,8 +1,8 @@
 #import "/src/util.typ": *
 
 = Motivation
-Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des @gls:t4gl[T4gl-Laufzeitsystems] durch Analyse und gezielte Verbesserung der Datenspeicherung von T4gl-Arrays.
-Die in @gls:t4gl verwendeten assoziativen Arrays sind in ihrer jetzigen Form für manche Nutzungsfälle unzurreichend optimiert.
+Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsystems durch Analyse und gezielte Verbesserung der Datenspeicherung von T4gl-Arrays.
+Die in T4gl verwendeten assoziativen Arrays sind in ihrer jetzigen Form für manche Nutzungsfälle unzurreichend optimiert.
 Häufige Schreibzugriffe und unzureichend granulare Datenteilung verursachen unnötig tiefe Kopien der Daten und darausfolgende Latenzen.
 
 #todo[

@@ -57,7 +57,7 @@ bib:clrs-09:
     - Stein, Clifford
   edition: 3
   date: 2009
-  publisher: MIT Press
+  publisher: MIT Press & McGraw-Hill
     # see: https://github.com/typst/hayagriva/issues/151
     # - MIT Press
     # - McGraw-Hill
@@ -316,3 +316,35 @@ bib:knu-76:
     publisher:
       value: Association for Computing Machinery
       short: ACM
+
+bib:sch-05:
+  type: book
+  title: Softwareentwicklung eingebetteter Systeme
+  subtitle: Grundlagen, Modellierung, Qualitätssicherung
+  author:
+    - Scholz, Peter
+  date: 2005-04-13
+  url:
+    value: https://link.springer.com/chapter/10.1007/3-540-27522-3_3
+    date: 2023-05-22
+  publisher: Springer
+  location: Berlin, Heidelberg
+  serial:
+    doi: 10.1007/3-540-27522-3
+    isbn: 978-3-540-23405-0
+    issn: 1439-5428
+    e-issn: 2522-0667
+  edition: 1
+
+bib:lo-11:
+  type: book
+  title: Real-Time Systems Design and Analysis
+  subtitle: Tools for the Practitioner
+  author:
+    - Laplante, Phillip A.
+    - Ovaska, Seppo J.
+  edition: 4
+  date: 2011-11
+  publisher: Wiley & IEEE Press
+  serial:
+    isbn: 978-1-118-13660-7
