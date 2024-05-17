@@ -6,7 +6,7 @@
 #import "@preview/showybox:2.0.1"
 #import "@preview/cheq:0.1.0"
 
-#let cpp = [C] + text(0.75em, baseline: -0.175em)[++]
+#let cpp = box([C] + text(0.75em, baseline: -0.175em)[++])
 
 #let _block = block
 

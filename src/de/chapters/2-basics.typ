@@ -174,10 +174,6 @@ Ein gutes Beispiel bietet die einfach verknüpfte Liste (@fig:linked-sharing).
   label: <fig:linked-sharing>,
 )
 
-#todo[Add this to reading guide + expand on stroke colors and such][
-  Die Knoten mit einfachem Strich in @fig:linked-sharing sind der Buffer der Listen, während die Knoten mit Doppelstrich die einzelnen Instanzen sind.
-]
-
 Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im folgenden klare Terminologie für bestimmte Konzepte der Persistenz.
 
 / Buffer:
