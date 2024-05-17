@@ -214,12 +214,6 @@ Für unbalancierte Bäume lässt sich dabei aber noch keine besonders gute Zeitk
 Bei einem Binärbaum mit $n$ Kindern, welcher maximal unbalanciert ist (equivalent einer verknüpften Liste), degeneriert die Zeitkomplexität zu $Theta(n)$ für Veränderungen am Blatt des Baumes.
 Ein perfekt balancierter Binärbaum hat eine Tiefe $d = log_2 n$, so dass jeder Schreibzugriff auf einem persistenten Binärbaum maximal $d$ Knoten (Pfad zwischen Wurzel und Blattknoten) kopieren muss.
 
-#todo[
-  Elaborate on how combination of the right branching factor and balancing constraints ensures known logarithmic upper bounds, as shown by the various rrb papers.
-  Especially that this still holds to some degree if this balancing is relaxed, incase this is relevant for this impl.
-  This may be more appropraite in chapter 3.
-]
-
 = Echtzeitsysteme <sec:realtime>
 Unter Echtzeitsystemen versteht man Rechensysteme, welche ihre Aufgaben oder Berechnungen in einer vorgegebenen Zeit abarbeiten. Formal dazu die Definition von _Echtzeit_:
 
@@ -314,17 +308,6 @@ Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
 T4gl-Arrays werden intern durch Qt-Klassen verwaltet, diese implementieren einen CoW-Mechanismus, Kopien der Instanzen teilen sich den gleichen Buffer.
 Im Gegensatz zu persistenten verknüpften Listen werden die Buffer nicht partiell geteilt, eine Modifikation am Buffer benötigt eine komplette Kopie des Bufffers.
-
-#todo[
-  Elaborate more precisely on the writing problems as explained shortly in intro
-  - [ ] expensive deep copies for writes on shared data
-  - [ ] expensive deep copies for context switches
-  - [ ] other not yet identified problems?
-
-  Elaborate on the fact that these problems are largely with respect to the underlying data structure.
-  Correct the above section to reflect this.
-  This could also be more relevant for chapter 3.
-]
 
 #subpar.grid(
   figure(figures.t4gl.new, caption: [
