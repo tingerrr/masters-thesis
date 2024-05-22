@@ -301,25 +301,15 @@ Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
 Semantisch verhalten sich T4gl-Arrays wie Referenzdatentypen, wird ein T4gl-Array mit einer existierenden Instanz initialisiert, verwalten beide Instanzen aus Sicht von T4gl den gleichen Buffer.
 
-#subpar.grid(
-  figure(figures.t4gl.new, caption: [
-    Ein T4gl Array nach Initalisierung. \ \
-  ]),
-  figure(figures.t4gl.shallow, caption: [
-    Zwei T4gl-Arrays teilen sich eine C++ Instanz nach _shallow-clone_.
-  ]), <fig:t4gl-indirection:shallow>,
-  figure(figures.t4gl.deep-new, caption: [
-    Zwei T4gl-Arrays teilen sich einen Buffer nach _deep-clone_. \ \
-  ]), <fig:t4gl-indirection:deep>,
-  figure(figures.t4gl.deep-mut, caption: [
-    Zwei T4gl-Arrays teilen sich _keinen_ Buffer nach _deep-clone_ *und* Schreibzugriff.
-  ]), <fig:t4gl-indirection:mut>,
-  columns: 2,
-  caption: [T4gl-Arrays in verschiedenen Stadien der Bufferteilung.],
-  label: <fig:t4gl-indireciton>,
-)
+#figure(
+  ```t4gl
+  String[10] array1
+  String[10] array2 = array1
 
-#todo[
-  Annotate the levels in the above figure to show which level manages which part of the system.
-]
+  array1[0] = "Hello World!"
+  // array1[0] == array2[0]
+  ```,
+  caption: [Demonstration von Referenzverhalten von T4gl-Array.],
+) <lst:t4gl-ref>
 
+Die beiden T4gl-Arrays in @lst:t4gl-ref zeigen auf die gleichen Elemente, Schreibzugriffe in `array1` sind auch in `array2` zu sehen und umgekehrt.
