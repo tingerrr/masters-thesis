@@ -8,8 +8,6 @@
 // convenient smallcaps for simple author names
 #show regex("![A-Z]{2,}\b"): it => smallcaps(upper(it.text.slice(1, 2)) + lower(it.text.slice(2)))
 
-#let bib = "/src/bib.yaml"
-
 #show: doc(
   kind: masters-thesis(
     id: [AI-2024-MA-005],
@@ -28,8 +26,10 @@
     (target: raw,   title: [Listingverzeichnis]),
   ),
   outlines-position: start,
-  bibliography: bibliography(bib, title: "Literatur"),
+  bibliography: bibliography("/src/bib.yaml", title: "Literatur"),
 )
+
+#set grid.cell(breakable: false)
 
 #set raw(syntaxes: "/assets/t4gl.sublime-syntax")
 

@@ -144,9 +144,9 @@
   let t4gl-shallow = fdiag({
     instance((-0.5, 0), `a`, name: <i_a>)
     edge("-|>")
-    instance((0, 0.5), `storage`, name: <s>)
+    instance((0, 0.5), `shared storage`, name: <s>, stroke: green)
     edge("-|>")
-    node((0, 1), `buffer`, name: <b>)
+    node((0, 1), `buffer`, name: <b>, stroke: green)
 
     instance((0.5, 0), `b`, name: <i_b>)
     edge(<i_b>, <s>, "-|>")
@@ -154,33 +154,33 @@
 
   let t4gl-deep-new = fdiag({
     instance((-0.5, 0), `a`, name: <i_a>)
-    instance((0.5, 0), `b`, name: <i_b>)
+    instance((0.5, 0), `c`, name: <i_c>)
 
-    instance((-0.5, 0.5), `storage`, name: <s_a>)
-    instance((0.5, 0.5), `storage`, name: <s_b>)
+    instance((-0.5, 0.5), `storage a`, name: <s_a>)
+    instance((0.5, 0.5), `storage c`, name: <s_c>, stroke: red)
 
-    node((0, 1), `buffer`, name: <b>)
+    node((0, 1), `shared buffer`, name: <b>, stroke: green)
 
     edge(<i_a>, <s_a>, "-|>")
-    edge(<i_b>, <s_b>, "-|>")
-    edge(<s_b>, <b>, "-|>")
+    edge(<i_c>, <s_c>, "-|>")
+    edge(<s_c>, <b>, "-|>")
     edge(<s_a>, <b>, "-|>")
   })
 
   let t4gl-deep-mut = fdiag({
     instance((-0.5, 0), `a`, name: <i_a>)
-    instance((0.5, 0), `b`, name: <i_b>)
+    instance((0.5, 0), `c`, name: <i_c>)
 
-    instance((-0.5, 0.5), `storage`, name: <s_a>)
-    instance((0.5, 0.5), `storage`, name: <s_b>)
+    instance((-0.5, 0.5), `storage a`, name: <s_a>)
+    instance((0.5, 0.5), `storage c`, name: <s_c>)
 
-    node((-0.5, 1), `buffer`, name: <b_a>)
-    node((0.5, 1), `buffer`, name: <b_b>)
+    node((-0.5, 1), `buffer a`, name: <b_a>)
+    node((0.5, 1), `buffer c`, name: <b_c>, stroke: red)
 
     edge(<i_a>, <s_a>, "-|>")
-    edge(<i_b>, <s_b>, "-|>")
+    edge(<i_c>, <s_c>, "-|>")
     edge(<s_a>, <b_a>, "-|>")
-    edge(<s_b>, <b_b>, "-|>")
+    edge(<s_c>, <b_c>, "-|>")
   })
 
   //

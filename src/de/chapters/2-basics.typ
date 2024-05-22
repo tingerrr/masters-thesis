@@ -51,7 +51,6 @@ Ein klassisches Beispiel für eine dynamische Datenstruktur ist der Vektor, ein 
 
 #figure(
   ```cpp
-
   #import <vector>
 
   int main() {
@@ -73,7 +72,7 @@ Die C++ Standardbibliothek stellt unter der Header-Datei `<vector>` die gleichna
 `std::vector` verfügt über Methoden, welche eigenhändig den Speicher erweitern, insofern das für die gegebene Operation nötig oder möglich ist.
 So wird zum Beispiel bei der Verwendung von `push_back` der Speicher erweitert, wenn die jetzige Kapazität des Vektors unzureichend ist.
 @lst:vec-ex zeigt wie ein `std::vector` angelegt und stückweise befüllt werden kann, dabei wird zum ersten Aufruf von `push_back` der dynamische Speicher angelegt.
-Muss der Speicher zum Erweitern verschoben werden, ergibt sich eine Zeitkomplexität von $O(n)$ ($n = $ Anhzal der Element im Vektor).
+Muss der Speicher zum Erweitern verschoben werden, ergibt sich eine Zeitkomplexität von $O(n)$.
 #footnote[
   Die Zeitkomplexität von `push_back` über die gesamte Lebenszeit eines Vektors ist durch den Wachstumsfaktor amortisiert Konstant @bib:iso-cpp-20[S. 834].
   Wird die Kapazität vorher reserviert und nicht überschritten, ist die Komplexität $O(1)$.
@@ -81,18 +80,14 @@ Muss der Speicher zum Erweitern verschoben werden, ergibt sich eine Zeitkomplexi
 Nach dem dritten Aufruf von `push_back` enthält der Vektor die Sequenz `[3, 2, 1]`.
 Ein Vektor bringt über dem herkömmlichen Array verschiedene Vor- und Nachteile mit sich.
 
-// NOTE: typst needs general purpose sticky elements, these are not headings, but behave very similar
-#block(breakable: false)[
-  *Vorteile*
-  - Die Kapazität ist nicht fest definiert, es kann zur Laufzeit entschieden werden wie viele Objekte gespeichert werden.
-  - Die Verwaltung des Buffers wird automatisch durch den Vektor übernommen.
-]
-#block(breakable: false)[
-  *Nachteile*
-  - Durch die unbekannte Größe können Iterationen über die Struktur seltener aufgerollt oder anderweitig optimiert werden.
-  - Der Buffer der Datenstruktur kann meist nicht ohne Indirektion angelegt werden, sprich eine Instanz enthält meist die Elemente nicht direkt, sondern nur einen Pointer zum eigentlichen Buffer. #footnote[
-    Manche Programmiersprachen unterstützen dynamische Speicheranlegung ohne Indirektion wie `alloca` oder "Variable-Sized Types" welche Indirektion in manchen Fällen verhindern können.
-  ]
+*Vorteile*
+- Die Kapazität ist nicht fest definiert, es kann zur Laufzeit entschieden werden wie viele Objekte gespeichert werden.
+- Die Verwaltung des Buffers wird automatisch durch den Vektor übernommen.
+
+*Nachteile*
+- Durch die unbekannte Größe können Iterationen über die Struktur seltener aufgerollt oder anderweitig optimiert werden.
+- Der Buffer der Datenstruktur kann meist nicht ohne Indirektion angelegt werden, sprich eine Instanz enthält meist die Elemente nicht direkt, sondern nur einen Pointer zum eigentlichen Buffer. #footnote[
+  Manche Programmiersprachen unterstützen dynamische Speicheranlegung ohne Indirektion wie `alloca` oder "Variable-Sized Types" welche Indirektion in manchen Fällen verhindern können.
 ]
 
 Die bekannte Größe eines Arrays hat nicht nur Einfluss auf die Optimierungsmöglichkeiten eines Programms, sondern auch auf die Komplexitätsanalyse.
@@ -152,7 +147,6 @@ Im Gegensatz dazu stehen Datenstrukturen welche bei Schreibzugriffen ihre Daten 
 Persistente Datenstrukturen erstellen meist neue Instanzen für jeden Schreibzugriff welche die Daten der vorherigen Instanz teilen.
 Ein gutes Beispiel bietet die einfach verknüpfte Liste (@fig:linked-sharing).
 
-#set grid.cell(breakable: false)
 #subpar.grid(
   figure(figures.list.new, caption: [
     Eine Liste `l` wird über die Sequenz `[A, B, C]` angelegt.
@@ -194,14 +188,14 @@ Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im
 
 Persistenz zeigt vorallem bei Baumstrukturen ihre Vorteile, bei der Kopie des Buffers eines persistenten Baums können je nach Tiefe und Balance des Baumes Großteile des Baumes geteilt werden.
 Ähnlich persistenter einfacher verknüpfter Listen werden bei Schreibzugriffen auf peristente Bäume der originale Baum kopiert und nur die Knoten des Buffers kopiert welche zwischen Wurzel und dem veränderten Knoten liegen.
-@fig:tree-sharing illustriert wie an einen Baum `t` ein Knoten `X` angefügt werden kann ohne dessen {Persistenz aufzugeben.
+@fig:tree-sharing illustriert wie am Baum `t` ein Knoten `X` angefügt werden kann ohne dessen {Persistenz aufzugeben.
 
 #subpar.grid(
   figure(figures.tree.new, caption: [
     Eine Baumstruktur `t` an welche ein neuer Knoten `X` unter `C` angefügt werden soll.
   ]), <fig:tree-sharing:new>,
   figure(figures.tree.shared, caption: [
-    Bei Hinzufügen des Knotens `X` als Kind des Knotens `C` wird ein neuer Baum `m` angelegt.
+    Bei Hinzufügen des Knotens `X` als Kind des Knotens `C` wird ein neuer Baum `u` angelegt.
   ]), <fig:tree-sharing:shared>,
   columns: 2,
   caption: [
@@ -233,15 +227,14 @@ Je nach Strenge der Anforderungen lassen sich Echtzeitsysteme in drei verschiede
 / Hartes Echtzeitsystem:
   Eine einzige Verletzung der Echtzeitbedingungen hat katastrophale Folgen für das Echtzeitsystem @bib:lo-11[S. 6].
 
-= T4gl
+= T4gl <sec:t4gl>
 Besonders relevant für die weiteren Kapitel dieser Arbeit ist Verständnis von T4gl und dessen Komponenten.
-T4gl und umfasst die folgenden Komponenten:
+T4gl umfasst die folgenden Komponenten:
 - Programmiersprache
   - Formale Grammatik
   - Anwendungsspezifische Features
 - Compiler
   - Statische Anaylse
-  - Typanalyse
   - Übersetzung in Instruktionen
 - Laufzeitsystem
   - Ausführen der Instruktionen
@@ -252,13 +245,13 @@ Wird ein T4gl-Script dem Compiler übergeben startet dieser zunächst mit der st
 Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die statische Länge bestimmter Arrays, die Typsicherheit und die syntaktische Korrektheit des Scripts.
 Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ kompiliert.
 Im Anschluss führt des Laufzeitsystem die kompilierten Microsteps aus, verwaltet Speicher und Kontextwechsel der Microsteps und stellt die benöigten Systemschnittstellen zur Verfügung.
-Je nach Anwendungsfall werden an das Laufzeitsystem Echtzeitanforderungen gestellt.
+Je nach Anwendungsfall werden an das Laufzeitsystem Echtzeitanforderungen gestellt, T4gl gilt als weiches Echtzeitsystem.
 
 #todo[
   Maybe include the figure from the wiki explaining the execution model und how latencies introduced by longrunning instructions can break the real time constraints.
 ]
 
-== T4gl-Arrays
+== T4gl-Arrays <sec:t4gl:arrays>
 Bei T4gl-Arrays handelt es sich um assoziative Arrays, sprich eine Datenstruktur welche Schlüsseln Werte zuordnet.
 Um ein Array in T4gl zu deklarieren wird mindestens ein Schlüssel- und ein Wertetyp benötigt.
 Auf den Wertetyp folgt in eckigen Klammern eine Komma-separierte Liste von Schlüsseltypen.
@@ -287,7 +280,7 @@ Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werd
 
 Bei den in @lst:t4gl-ex gegebenen Deklarationen werden je nach den angegebenen Typen verschiedene Datenstrukturen vom Laufzeitsystem gewählt, diese ähneln den analogen C++ Varianten in @tbl:t4gl-array-analogies, wobei `T` und `U` Typen sind und `N` eine Zahl aus $NN^+$.
 Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9.
-Es handelt sich um eine Sonderform des T4gl-Arrays welches eine dichte festgelegt Schlüsselverteilung hat.
+Es handelt sich um eine Sonderform des T4gl-Arrays welches eine dichte festgelegte Schlüsselverteilung hat.
 Allerdings gibt es dabei gewisse Unterschiede.
 
 #figure(
@@ -306,8 +299,7 @@ Allerdings gibt es dabei gewisse Unterschiede.
 
 Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird.
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder eine dynamische Sequenzdatenstruktur oder ein geordentes assoiatives Array angelegt.
-T4gl-Arrays werden intern durch Qt-Klassen verwaltet, diese implementieren einen CoW-Mechanismus, Kopien der Instanzen teilen sich den gleichen Buffer.
-Im Gegensatz zu persistenten verknüpften Listen werden die Buffer nicht partiell geteilt, eine Modifikation am Buffer benötigt eine komplette Kopie des Bufffers.
+Semantisch verhalten sich T4gl-Arrays wie Referenzdatentypen, wird ein T4gl-Array mit einer existierenden Instanz initialisiert, verwalten beide Instanzen aus Sicht von T4gl den gleichen Buffer.
 
 #subpar.grid(
   figure(figures.t4gl.new, caption: [
@@ -331,6 +323,3 @@ Im Gegensatz zu persistenten verknüpften Listen werden die Buffer nicht partiel
   Annotate the levels in the above figure to show which level manages which part of the system.
 ]
 
-T4gl Arrays selbst setzen kein CoW zwischen der T4gl und C++ Ebene durch, sondern teilen sich die C++ Instanzen schreibfähig, sprich, Schreibzugriffe auf `a` in @fig:t4gl-indirection:shallow sind in `b` zu sehen und umgekehrt.
-Erst durch einen _deep-clone_ kommt es in T4gl zu einer Kopie der C++ Instanz wie in @fig:t4gl-indirection:deep.
-Die eigentliche Kopie der Daten erfolgt dann beim nächsten Schreibzugriff in @fig:t4gl-indirection:mut.
