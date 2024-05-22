@@ -1,0 +1,16 @@
+= QnA
+- 2-3-fingertrees allow efficient sequence building and copying
+  - deque-operations are amortized $Theta(1)$
+  - mutation through path copying and rebalancing using persistent trees can maintain the same bounds if middle trees are suspended
+  - deque-operations + copying are a fundamental problem in T4gl-Arrays
+- 2-3-fingertrees sacrifice cache-efficiency because of a small branching factor
+  - small branching factor comes with higher depth and more indirection to access individual elements
+- generalization of 2-3-fingertrees into m-n-fingertrees
+  - increase branching factor to increase cache efficiency
+  - maintain amortized $Theta(1)$ deque-operations if possible
+- crux of the deque-operations is that similar to stack-operations on vectors, the number of operations that need to descend into the tree to a depth of $n$ grows only with $log n$
+  - is this maintained, the debit analysis of the original 2-3-fingertrees should generalize to m-n-fingertrees with the right digit sizes
+- deep spine suspensions are important for deque bounds, but _may_ cause bad worst-casse performance
+  - can these be distributed over all deque ops such that we get many oprations of equal expense period, not amortized?
+  - one possible solution may be to eager evaluate suspensions in a manner that preserves a bounded execution per deque op, while avoiding an explosions for for deep spine traversal
+- worst case analysis is important to prove it's usefulness in real time execution

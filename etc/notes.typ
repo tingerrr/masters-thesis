@@ -61,39 +61,47 @@
 
   let month(m, fmt: auto) = day(m, 01, fmt: if fmt == auto { "[month repr:short]" } else { fmt })
 
+  let date-to-at(m, d) = (m - 4) + (d / 30)
+  let ms(m, d, ..args) = milestone(at: date-to-at(m, d), ..args)
+  let ts(name, from, to, ..args) = task(name, (date-to-at(..from), date-to-at(..to)), ..args)
+
+  let consultation(m, d) = {
+    let num(n) = {
+      let suffix = ("1": "st", "2": "nd", "3": "rd").at(str(n), default: "th")
+      [#n#super(suffix)]
+    }
+
+    let c = counter("consultations")
+    let n = context { c.display(num) }
+    let body = c.step() + align(center, [
+      *#n Cons.* \
+      #day(m, d)
+    ])
+
+    ms(m, d,
+      style: (stroke: (dash: "dashed")),
+      body,
+    )
+  }
+
   headerline(group(([*2024*], 7)))
   headerline(group(..range(4, 11).map(month)))
 
   taskgroup(title: [*Thesis*], {
-    task("Writing", (0.3, 6.3), style: (stroke: 2pt + gray))
-    task("Research", (0.3, 3), style: (stroke: 2pt + gray))
-    task("Development", (2, 5), style: (stroke: 2pt + gray))
-    task("Review & Corrections", (5, 6.3), style: (stroke: 2pt + gray))
-    task("Defense", (6.3, 7), style: (stroke: 2pt + gray))
+    ts("Writing", (4, 9), (10, 9), style: (stroke: 2pt + gray))
+    ts("Research", (4, 9), (6, 30), style: (stroke: 2pt + gray))
+    ts("Development", (6, 0), (8, 30), style: (stroke: 2pt + gray))
+    ts("Review & Corrections", (9, 0), (10, 9), style: (stroke: 2pt + gray))
+    ts("Defense", (10, 9), (10, 30), style: (stroke: 2pt + gray))
   })
 
   // consultations
-  milestone(
-    at: 0.9,
-    style: (stroke: (dash: "dashed")),
-    move(dx: -15pt, align(center, [
-      *Consultation* \
-      #day(4, 25)
-    ]))
-  )
-
-  milestone(
-    at: 1.5,
-    style: (stroke: (dash: "dashed")),
-    align(center, [
-      *Consultation* \
-      #day(5, 16)
-    ])
-  )
+  consultation(4, 25)
+  consultation(5, 16)
+  consultation(6, 13)
 
   // end goals
-  milestone(
-    at: 6.3,
+  ms(10, 09,
     style: (stroke: (dash: "dashed")),
     move(dx: -15pt, align(center, [
       *Due Date* \
@@ -101,8 +109,7 @@
     ]))
   )
 
-  milestone(
-    at: 6.6,
+  ms(10, 20,
     style: (stroke: (dash: "dashed")),
     align(center, [
       *Defense* \
@@ -124,4 +131,5 @@
 #(
   (2024, 04, 25),
   (2024, 05, 16),
+  (2024, 06, 13),
 ).map(log).join(pagebreak(weak: true))
