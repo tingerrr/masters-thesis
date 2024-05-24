@@ -19,7 +19,7 @@ Im folgenden werden Variationen der !KNUTH'schen Definitionen verwendet @bib:knu
 
 #figures.big-o <eq:big-o>
 
-Trotz der definition der Symbole in @eq:big-o als Mengen schreibt man $g(n) = O(f(n))$, wenn $g(n)$ die obere asymptotische Grenze $f(n)$ hat, gleicherweise gibt $Omega(f(n))$ eine untere asymptotische Grenze an.
+Trotz der Definition der Symbole in @eq:big-o als Mengen, schreibt man $g(n) = O(f(n))$, wenn $g(n)$ die obere asymptotische Grenze $f(n)$ hat, gleicherweise gibt $Omega(f(n))$ eine untere asymptotische Grenze an.
 Es gilt $g(n) = Theta(f(n))$ wenn sowohl $g(f) = O(f(n))$ als auch $g(f) = Omega(f(n))$ gilt @bib:clrs-09[S. 48, Theorem 3.1].
 Die Varianten $o(f(n))$ und $omega(f(n))$ werden im Weiteren nicht verwendet.
 @tbl:landau zeigt verschiedene Komplexitäten in aufsteigender Ordnung der Funktion $f(n)$, dabei steht $alpha$ für ein Symbol aus @eq:big-o.
@@ -308,3 +308,9 @@ Semantisch verhalten sich T4gl-Arrays wie Referenzdatentypen, wird ein T4gl-Arra
 ) <lst:t4gl-ref>
 
 Die beiden T4gl-Arrays in @lst:t4gl-ref zeigen auf die gleichen Elemente, Schreibzugriffe in `array1` sind auch in `array2` zu sehen und umgekehrt.
+
+== Scheduling
+#todo[
+  Introduce t4gls scheduling and runtime model, how certain operations are ore aren't broken into microsteps.
+  This will later be relevant for the realtime analysis of the new storage data structure.
+]

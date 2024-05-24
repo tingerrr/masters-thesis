@@ -31,6 +31,9 @@
   ),
   outlines-position: start,
   bibliography: bibliography("/src/bib.yaml", title: "Literatur"),
+  appendices: (
+    include "appendices/a-non-rec-proof.typ",
+  ),
 )
 
 #set grid.cell(breakable: false)

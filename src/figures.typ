@@ -3,6 +3,7 @@
   list,
   t4gl,
   tree,
+  finger-tree,
 ) = {
   import "/src/util.typ": *
   import fletcher: edge, node
@@ -230,6 +231,78 @@
     edge(<u-C>, <X>, "-|>")
   })
 
+  //
+  // finger-tree
+  //
+
+  let finger-tree = fdiag({
+    let elem = node.with(radius: 7.5pt)
+    let spine = node.with(radius: 7.5pt, fill: blue.lighten(75%))
+    let node = node.with(radius: 5pt, fill: gray.lighten(50%))
+
+    let elems(coord, data, parent: none, ..args) = {
+      let parent = if parent != none { parent } else {
+        label(str(data.first()) + "-" + str(data.last()))
+      }
+      let (x, y) = coord
+      let deltas = range(0, data.len()).map(dx => dx * 0.3)
+      let deltas = deltas.map(dx => dx - deltas.last() / 2)
+
+      for (e, dx) in data.zip(deltas) {
+        let l = label(str(e))
+
+        elem((x + dx, y), raw(str(e)), name: l, ..args)
+        edge(parent, l, "-|>")
+      }
+    }
+
+    instance((0, -0.5), `t`)
+    edge("-|>")
+    spine((0, 0), name: <l1>)
+    edge("-|>")
+    spine((0, 0.5), name: <l2>)
+    edge("-|>")
+    spine((0, 1), name: <l3>)
+    edge("-|>")
+    spine((0, 1.5), name: <l4>)
+
+    elems((-3.15, 1.25), (1, 2, 3), parent: <l1>, fill: teal.lighten(50%))
+    elems((2.15, 1.25), (20, 21), parent: <l1>, fill: teal.lighten(50%))
+
+    node((-2.45, 1.25), name: <4-5>, fill: teal.lighten(50%))
+    node((-1.7, 1.25), name: <6-8>, fill: teal.lighten(50%))
+    node((1.7, 1.25), name: <18-19>, fill: teal.lighten(50%))
+
+    elems((-2.45, 1.75), (4, 5))
+    elems((-1.7, 1.75), (6, 7, 8))
+    elems((1.7, 1.75), (18, 19))
+
+    edge(<l2>, <4-5>, "-|>")
+    edge(<l2>, <6-8>, "-|>")
+    edge(<l2>, <18-19>, "-|>")
+
+    node((-0.725, 1.25), name: <9-12>, fill: teal.lighten(50%))
+    node((0.725, 1.25), name: <13-17>, fill: teal.lighten(50%))
+
+    node((-1.1, 1.75), name: <9-10>)
+    node((-0.35, 1.75), name: <11-12>)
+    node((0.35, 1.75), name: <13-14>)
+    node((1.1, 1.75), name: <15-17>)
+
+    elems((-1.1, 2.25), (9, 10))
+    elems((-0.35, 2.25), (11, 12))
+    elems((0.35, 2.25), (13, 14))
+    elems((1.1, 2.25), (15, 16, 17))
+
+    edge(<l3>, <9-12>, "-|>")
+    edge(<9-12>, <9-10>, "-|>")
+    edge(<9-12>, <11-12>, "-|>")
+
+    edge(<l3>, <13-17>, "-|>")
+    edge(<13-17>, <13-14>, "-|>")
+    edge(<13-17>, <15-17>, "-|>")
+  })
+
   (
     big-o-def,
     (
@@ -247,8 +320,54 @@
     (
       new: tree-new,
       shared: tree-shared,
-    )
+    ),
+    finger-tree,
   )
 }
 
+#let complexity-comparison(
+  cases: ([worst], [average], [best]),
+  columns,
+  ..args,
+) = {
+  let headers = columns.keys()
+  let rows = (:)
+  for (column, entry) in columns {
+    for key in entry.keys() {
+      if key not in rows {
+        rows.insert(key, (:))
+      }
 
+      if column not in entry.at(key) {
+        rows.at(key).insert(column, ())
+      }
+
+      for idx in range(cases.len()) {
+        let comp = entry.at(key).at(idx)
+        rows.at(key).at(column).push(if comp == none [-] else { comp })
+      }
+    }
+  }
+
+  let column-gutter = (
+    ..(0.5em,) + ((0pt,) * (cases.len() - 1)),
+  ) * (columns.len() + 1)
+
+  table(
+    columns: 1 + columns.len() * cases.len(),
+    stroke: none,
+    align: (x, y) => if y > 1 { left } else { center },
+    column-gutter: column-gutter,
+    ..args.named(),
+    table.header(
+      [Operation], ..headers.map(table.cell.with(colspan: cases.len(), stroke: (bottom: 0.5pt))),
+      none, ..(cases * columns.len()),
+      table.hline(stroke: 0.5pt),
+    ),
+    ..rows.pairs().map(((op, entries)) => {
+      (op, ..headers.map(header => {
+        entries.at(header, default: ([-], ) * 3)
+      }))
+    }).flatten()
+  )
+}

@@ -35,6 +35,7 @@
       radius: 0pt,
     ),
     {
+      set text(lang: "en")
       show: cheq.checklist
       body
     },
