@@ -1,5 +1,12 @@
 #import "@preview/timeliney:0.0.1"
 
+#let consultations = (
+  (2024, 04, 25),
+  (2024, 05, 16),
+  (2024, 06, 13),
+  (2024, 06, 26),
+)
+
 #import "util.typ": *
 
 #set heading(offset: 1, numbering: (..args) => {
@@ -96,9 +103,9 @@
   })
 
   // consultations
-  consultation(4, 25)
-  consultation(5, 16)
-  consultation(6, 13)
+  for (_, m, d) in consultations {
+    consultation(m, d)
+  }
 
   // end goals
   ms(10, 09,
@@ -128,8 +135,4 @@
   include "log/" + date + ".typ"
 }
 
-#(
-  (2024, 04, 25),
-  (2024, 05, 16),
-  (2024, 06, 13),
-).map(log).join(pagebreak(weak: true))
+#consultations.map(log).join(pagebreak(weak: true))
