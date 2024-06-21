@@ -20,6 +20,10 @@
     date: datetime(year: 2024, month: 10, day: 09),
     field: [Angewandte Informatik],
   ),
+  abstracts: (
+    (title: [Kurzfassung], body: lorem(100)),
+    (title: [Abstract], body: lorem(100)),
+  ),
   outlines: (
     (target: image, title: [Abbildungsverzeichnis]),
     (target: table, title: [Tabellenverzeichnis]),
