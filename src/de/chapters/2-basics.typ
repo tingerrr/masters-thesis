@@ -180,15 +180,11 @@ Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im
 / Copy-on-Write (CoW):
   Mechanismus zur Bufferteilung + Schreibfähigkeit, viele Instanzen teilen sich einen Buffer.
   Eine Instanz gilt als Referent des Buffers auf welchen sie zeigt.
-  Ist diese Instanz der einzige Referent, könnne die Daten direkt beschrieben werden, ansonsten wird der geteilte Buffer kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen Buffers ist. #no-cite
-
-#todo[
-  Elaborate on the different types of mutability and cow granularity depending on where it happens (instanz vs buffer).
-]
+  Ist diese Instanz der einzige Referent, können die Daten direkt beschrieben werden, ansonsten wird der geteilte Buffer kopiert (teilweise insofern möglich), sodass die Instanz einziger Referent des neuen Buffers ist. #no-cite
 
 Persistenz zeigt vorallem bei Baumstrukturen ihre Vorteile, bei der Kopie des Buffers eines persistenten Baums können je nach Tiefe und Balance des Baumes Großteile des Baumes geteilt werden.
 Ähnlich persistenter einfacher verknüpfter Listen werden bei Schreibzugriffen auf peristente Bäume der originale Baum kopiert und nur die Knoten des Buffers kopiert welche zwischen Wurzel und dem veränderten Knoten liegen.
-@fig:tree-sharing illustriert wie am Baum `t` ein Knoten `X` angefügt werden kann ohne dessen {Persistenz aufzugeben.
+@fig:tree-sharing illustriert wie am Baum `t` ein Knoten `X` angefügt werden kann ohne dessen Persistenz aufzugeben.
 
 #subpar.grid(
   figure(figures.tree.new, caption: [
@@ -243,8 +239,8 @@ T4gl umfasst die folgenden Komponenten:
 T4gl steht unter Entwicklung bei der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) und ist ein propräiteres Produkt.
 Wird ein T4gl-Script dem Compiler übergeben startet dieser zunächst mit der statischen Analyse.
 Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die statische Länge bestimmter Arrays, die Typsicherheit und die syntaktische Korrektheit des Scripts.
-Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ kompiliert.
-Im Anschluss führt des Laufzeitsystem die kompilierten Microsteps aus, verwaltet Speicher und Kontextwechsel der Microsteps und stellt die benöigten Systemschnittstellen zur Verfügung.
+Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ #footnote[Atomare Instruktionen] kompiliert.
+Im Anschluss führt des Laufzeitsystem die kompilierten _Microsteps_ aus, verwaltet Speicher und Kontextwechsel der _Microsteps_ und stellt die benöigten Systemschnittstellen zur Verfügung.
 Je nach Anwendungsfall werden an das Laufzeitsystem Echtzeitanforderungen gestellt, T4gl gilt als weiches Echtzeitsystem.
 
 #todo[
@@ -252,7 +248,7 @@ Je nach Anwendungsfall werden an das Laufzeitsystem Echtzeitanforderungen gestel
 ]
 
 == T4gl-Arrays <sec:t4gl:arrays>
-Bei T4gl-Arrays handelt es sich um assoziative Arrays, sprich eine Datenstruktur welche Schlüsseln Werte zuordnet.
+Bei T4gl-Arrays handelt es sich um assoziative Arrays mit geordneten Schlüsseln, sprich eine Datenstruktur welche Schlüsseln Werte zuordnet.
 Um ein Array in T4gl zu deklarieren wird mindestens ein Schlüssel- und ein Wertetyp benötigt.
 Auf den Wertetyp folgt in eckigen Klammern eine Komma-separierte Liste von Schlüsseltypen.
 Indezierung erfolgt wie in der Deklaration durch eckige Klammern, es müssen aber nicht für alle Schlüssel ein Wert angegeben werden.
@@ -281,7 +277,6 @@ Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werd
 Bei den in @lst:t4gl-ex gegebenen Deklarationen werden je nach den angegebenen Typen verschiedene Datenstrukturen vom Laufzeitsystem gewählt, diese ähneln den analogen C++ Varianten in @tbl:t4gl-array-analogies, wobei `T` und `U` Typen sind und `N` eine Zahl aus $NN^+$.
 Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9.
 Es handelt sich um eine Sonderform des T4gl-Arrays welches eine dichte festgelegte Schlüsselverteilung hat.
-Allerdings gibt es dabei gewisse Unterschiede.
 
 #figure(
   table(columns: 2, align: left,
