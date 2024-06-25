@@ -256,6 +256,9 @@
       }
     }
 
+    let fill-digit-elem = gradient.linear(angle: 45deg, teal.lighten(50%), white).sharp(2)
+    let fill-digit-node = gradient.linear(angle: 45deg, teal.lighten(50%), gray).sharp(2)
+
     instance((0, -0.5), `t`)
     edge("-|>")
     spine((0, 0), name: <l1>)
@@ -266,12 +269,12 @@
     edge("-|>")
     spine((0, 1.5), name: <l4>)
 
-    elems((-3.15, 1.25), (1, 2, 3), parent: <l1>, fill: teal.lighten(50%))
-    elems((2.15, 1.25), (20, 21), parent: <l1>, fill: teal.lighten(50%))
+    elems((-3.15, 1.25), (1, 2, 3), parent: <l1>, fill: fill-digit-elem)
+    elems((2.15, 1.25), (20, 21), parent: <l1>, fill: fill-digit-elem)
 
-    node((-2.45, 1.25), name: <4-5>, fill: teal.lighten(50%))
-    node((-1.7, 1.25), name: <6-8>, fill: teal.lighten(50%))
-    node((1.7, 1.25), name: <18-19>, fill: teal.lighten(50%))
+    node((-2.45, 1.25), name: <4-5>, fill: fill-digit-node)
+    node((-1.7, 1.25), name: <6-8>, fill: fill-digit-node)
+    node((1.7, 1.25), name: <18-19>, fill: fill-digit-node)
 
     elems((-2.45, 1.75), (4, 5))
     elems((-1.7, 1.75), (6, 7, 8))
@@ -281,8 +284,8 @@
     edge(<l2>, <6-8>, "-|>")
     edge(<l2>, <18-19>, "-|>")
 
-    node((-0.725, 1.25), name: <9-12>, fill: teal.lighten(50%))
-    node((0.725, 1.25), name: <13-17>, fill: teal.lighten(50%))
+    node((-0.725, 1.25), name: <9-12>, fill: fill-digit-node)
+    node((0.725, 1.25), name: <13-17>, fill: fill-digit-node)
 
     node((-1.1, 1.75), name: <9-10>)
     node((-0.35, 1.75), name: <11-12>)
