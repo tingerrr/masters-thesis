@@ -5,6 +5,13 @@
 #import "@preview/fletcher:0.4.4"
 #import "@preview/showybox:2.0.1"
 #import "@preview/cheq:0.1.0"
+#import "@preview/lovelace:0.3.0"
+
+#let algorithm = lovelace.pseudocode-list.with(
+  line-number-supplement: "Zeile",
+  booktabs: true,
+  booktabs-stroke: 1pt + black,
+)
 
 #let cpp = box([C] + text(0.75em, baseline: -0.175em)[++])
 

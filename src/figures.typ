@@ -266,8 +266,6 @@
     spine((0, 0.5), name: <l2>)
     edge("-|>")
     spine((0, 1), name: <l3>)
-    edge("-|>")
-    spine((0, 1.5), name: <l4>)
 
     elems((-3.15, 1.25), (1, 2, 3), parent: <l1>, fill: fill-digit-elem)
     elems((2.15, 1.25), (20, 21), parent: <l1>, fill: fill-digit-elem)

@@ -85,57 +85,55 @@ Im folgenden werden 2-3-Fingerbäume als alternative Storage-Datenstrukturen fü
 
 = 2-3-Bäume
 #todo[
-  Introduce the notation of 2-3 Trees as the simpelest Form of B-Tree, this should give a good indicaiton why the generalization of FingerTrees uses B-Trees itself and what 2-3-4-FingerTrees mean notationally.
+  Introduce the notation of 2-3 Trees as the simpelest Form of B-Tree, this should give a good indication why the generalization of FingerTrees uses B-Trees itself and what 2-3-4-FingerTrees mean notationally.
   Introduce the usage of branching factors here or further up depending on when it is first used.
 ]
 
 = 2-3-Fingerbäume
 2-3-Fingerbäume wurden von !HINZE und !PATERSON @bib:hp-06 eingeführt und sind eine Erweiterung von 2-3-Bäumen, welche für verschiedene Sequenzoperationen optimiert wurden.
-Die Authoren führen dabei folgende Begriffe ein:
+Die Authoren führen dabei folgende Begriffe im Verlauf des Texts ein:
 / Spine: Die Wirbelsäule eines Fingerbaums, sie beschreibt die Kette der zentralen Knoten, welche die sogenannten _Digits_ enthalten.
-/ Digit: Erweiterung von 2-3-Knoten auf 1-4-Knoten, von welchen jeweils zwei in einem internen Wirbelknoten vorzufinden sind.
-/ Safe: Sichere _Digits_ sind _Digits_ mit 2 oder 3 Elementen, ein Element kann ohne Probleme entnommen oder hinzugefügt werden.
-/ Unsafe: Unsichere _Digits_ sind _Digits_ mit 1 oder 4 Elementen, ein Element zu entnehmen oder hinzuzufügen kann Über- bzw. Unterlauf verursachen (Wechsel von Elementen zwischen Ebenen des Baumes).
+/ Digit: Erweiterung von 2-3-Knoten auf 1-4-Knoten, von welchen jeweils zwei in einem Wirbelknoten vorzufinden sind.
+  Obwohl ein Wirbelknoten zwei Digits enthält, sind, statt diesen selbst, direkt deren 1 bis 4 Kindknoten an beiden Seiten angefügt.
+  Das reduziert die Anzahl unnötiger Knoten in Abbildungen und entspricht mehr der späteren Implementierung.
+  Demnach wird im Folgenden _Digits_ verwendet um die linken und rechten direkten Kindknoten der Wirbelknotne zu beschreiben.
+/ Safe: Sichere Ebenen sind Ebenen mit 2 oder 3 _Digits_, ein _Digit_ kann ohne Probleme entnommen oder hinzugefügt werden.
+  Zu beachten ist dabei, dass die Sicherheit einer Ebene sich auf eine Seite bezieht, eine Ebene kann links sicher und rechts unsicher sein.
+/ Unsafe: Unsichere Ebenen sind Ebenen mit 1 oder 4 _Digits_, ein _Digit_ zu entnehmen oder hinzuzufügen kann Über- bzw. Unterlauf verursachen (Wechsel von _Digits_ zwischen Ebenen des Baumes um die Zweigfaktoren zu bewahren).
 
-#todo[
-  Clear up that Digit is indeed derived from the "numerical" representation which inspired them (Okasaki).
-  Clear up that the concept of fingers refers to getting easy access at some point of a data structure by placing "fingers" there.
-  The usage of both Digit and Finger in FingerTrees to refer to different concepts is more or less coincidental.
-]
-
-Die Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben, dabei sind diese über `v` und `a` parametriert.
-`a` sind die im Baum gespeicherten Elemente und `v` die Suchinformationen für interne Knoten.
+Der Name Fingerbäume rührt daher, dass imaginär zwei Finger an die beiden Enden der Sequenz gesetzt werden.
+Diese Finger ermöglichen den schnellen Zugriff an den Enden der Sequenz.
+Die zuvor definierten _Digits_ haben dabei keinen direkten Zusammenhang mit den Fingern eines Fingerbaums, trotz der etymologischen Verwandschaft beider Begriffe.
+@fig:finger-tree zeigt den Aufbau eines 2-3-Fingerbaums, die in #text(blue.lighten(75%))[*blau*] eingefärbten Knoten sind Wirbelknoten, die in #text(teal.lighten(50%))[*türkis*] eingefärbten Knoten sind die _Digits_.
+In #text(gray)[*grau*] eingefärbte Knoten sind interne Knoten.
+Weiße Knoten sind Elemente, die Blattknoten der Teilbäume.
+Knoten, welche mehr als einer Kategorie zuzuordnen sind, sind geteilt eingefärbt.
 
 #figure(
-  ```haskell
-  data FingerTree v a
-      = Empty
-      | Single a
-      | Deep !v !(Digit a) (FingerTree v (Node v a)) !(Digit a)
+  figures.finger-tree,
+  caption: [Ein 2-3-Fingerbaum der Tiefe 3 und 21 Elementen.],
+) <fig:finger-tree>
 
-  data Node v a = Node2 !v a a | Node3 !v a a a
-  data Digit a = One a | Two a a | Three a a a | Four a a a a
-  ```,
-  caption: [Die Definition von 2-3-Fingerbäumen in Haskell.],
-) <lst:finger-tree>
+Die Tiefe ergibt such bei 2-3-Fingerbäumen aus der Anzahl der zentralen Wirbel.
+Jeder Wirbelknoten beschreibe eine Ebene $t$, der Baum in @fig:finger-tree hat Ebene 1 bis Ebene 3.
+Aus der tiefe der Wirbelknoten ergibt sich die Tiefe der Teilbäume (2-3-Baume) in deren _Digits_.
+Die Elemente sind dabei nur in den Blattknoten vorzufinden.
+In Ebene 1 sind Elemente direkt in den _Digits_ enhalten, die Teilbäume haben die Tiefe 1.
+In Ebene 2 sind die Elemente in Knoten verpackt, die _Digits_ von Ebene 2 enthalten Teilbäume der Tiefe 2.
+Die dritte Ebene enthält Knoten von Knoten von Elementen, sprich Teilbäume der Tiefe 3, und so weiter.
+Dabei ist zu beachten, dass der letzte Wirbelknoten einen optionalen mittleren Einzelknoten enthalten kann, ein _Sonderdigit_ zur Überbrückung der der Bildung interner Wirbleknoten.
+Die linken _Digits_ jedes Wirbelknoten bilden dabei den Anfang der Sequenz, während die rechten _Digits_ das Ende der Sequenz beschreiben.
+Die Nummerierung der Knoten in @fig:finger-tree illustriert die Reihenfolge der Elemente.
+Interne Knoten und Wirbelknoten enthalten außerdem die Suchinformationen des Unterbaums in dessen Wurzel sie liegen.
+Je nach Wahl des Typs dieser Suchinformationen kann ein 2-3-Fingerbaum als gewöhnlicher Vektor, geordnete Sequenz, _Priority-Queue_ oder Intervalbaum verwendet werden.
 
-Durch die in @bib:hp-06 beschribenen Optimierungen weisen 2-3-Fingerbäume im Vergleich zu gewöhnlichen 2-3-Bäumen geringere asymptotische Komplexitäten für Sequenzoperationen auf.
+Durch den speziellen Aufbau von 2-3-Fingerbäumen weisen diese im Vergleich zu gewöhnlichen 2-3-Bäumen geringere asymptotische Komplexitäten für Sequenzoperationen auf.
 @tbl:finger-tree-complex zeigt einen Vergleich der Komplexitäten verschiedener Operationen über $n$ Elemente.
-
 Dabei ist zu sehen, dass _Push_ und _Pop_ Operationen auf 2-3-Fingerbäumen im _average-case_ amortisiert konstantes Zeitverhalten aufweisen, im Vergleich zu dem generell logarithmischen Zeitverhalten bei gewöhnlichen 2-3-Bäumen.
 Fingerbäume sind symmetrische Datenstrukturen, _Push_ und _Pop_ kann problemlos an beiden Enden durchgeführt wurden.
 
-2-3-Fingerbäume weisen verschiedene Besonderheiten auf:
-+ Die Elemente sind nur in den Blattknoten von Teilbäumen vorzufinden, interne Knoten enthalten lediglich Suchinformationen.
-+ Mit der Tiefe der Wirbelknoten steigt die Tiefe der Teilbäume in den _Digits_.
-+ Ein innerer Wirbelknoten enthält je ein _Digit_ für den Anfang und das Ende der Sequenz, und kann daher zwischen 2 bis 8 Knoten enhalten (1 bis 4 pro Seite).
-+ Der letzte Wirbelknoten kann leer sein oder einen Knoten enthalten, dieser Knoten enthält die Mitte der Sequenz.
-+ Je nach Wahl des Typs der Suchinformation `v` kann ein 2-3-Fingerbaum als gewöhnlicher Vektor, geordnete Sequenz oder _Priority-Queue_ verwendet werden.
-
 #let am1 = [#footnote(numbering: "*")[Amortisiert] <ft:amortized>]
 #let am2 = footnote(numbering: "*", <ft:amortized>)
-
-#todo[Verify all of these complexity claims, ensure they're sufficiently precise.]
 
 #figure(
   figures.complexity-comparison(
@@ -160,8 +158,6 @@ Fingerbäume sind symmetrische Datenstrukturen, _Push_ und _Pop_ kann problemlos
 ) <tbl:finger-tree-complex>
 
 Ein wichtiger Bestandteil der Komplexitätsanalyse der _Push_ und _Pop_ Operationen von 2-3-Fingerbäumen ist die Suspension der Wirbelknoten durch _lazy evaluation_.
-@fig:finger-tree zeigt den Aufbau eines 2-3-Fingerbaums, die in #text(blue.lighten(75%))[*blau*] eingefärbten Knoten sind Wirbelknoten, die in #text(teal.lighten(50%))[*türkis*] eingefärbten Knoten sind _Digits_, die Zahlen geben die Elemente und deren Ordnung an.
-In #text(gray)[*grau*] eingefärbte Knoten sind interne Knoten.
 
 #todo[
   They argue that rebalancing is paid for by the previous cheap operations using Okasakis debit analysis.
@@ -169,16 +165,43 @@ In #text(gray)[*grau*] eingefärbte Knoten sind interne Knoten.
   My assumption was that the rebalancing simply happens less and less often as it always creates safe layers when it happens, each time it gets deeper it creates it leaves only safe layers.
 ]
 
+Die Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben.
+`T` sind die im Baum gespeicherten Elemente und `M` die Suchinformationen für interne Knoten.
+Im Regelfall wären alle Klassendefinitionen über `T` und `M` per ```cpp template``` parametriert, darauf wurde Verzichtet um die Definition im Rahmen zu halten.
+
 #figure(
-  figures.finger-tree,
-  caption: [Ein 2-3-Fingerbaum der Tiefe 2 und 12 Elementen.],
-) <fig:finger-tree>
+  ```cpp
+  using T = ...;
+  using M = ...;
+
+  class Node {};
+  class Internal : public Node {
+    M measure;
+    std::array<Node*, 3> children; // 2..3 children
+  };
+  class Leaf : public Node {
+    T value;
+  };
+
+  class FingerTree {};
+  class Shallow : public FingerTree {
+    Node* value; // 0..1 digits
+  };
+  class Deep : public FingerTree {
+    M measure;
+    std::array<Node*, 4> left;  // 1..4 digits
+    FingerTree* middle;
+    std::array<Node*, 4> right; // 1..4 digits
+  };
+  ```,
+  caption: [Die Definition von 2-3-Fingerbäumen in C++ übersetzt.],
+) <lst:finger-tree>
 
 = Generische Fingerbäume
 Im Folgenden wird betrachtet, inwiefern die Zweigfaktoren von Fingerbäumen generalisierbar sind, ohne die in @tbl:finger-tree-complex beschriebenen Komplexitäten zu verschlechtern.
 Höhere Zweigfaktoren der Teilbäume eines Fingerbaums reduzieren die Tiefe des Baumes und können die Cache-Effizienz erhöhen.
 
-Wir beschreiben die Struktur eines Fingerbaums durch die Minima und Maxima seiner Zweigfaktoren $k$ (Zweigfaktor der internen Knoten) und $d$ (Zweigfaktor der _Digits_)
+Wir beschreiben die Struktur eines Fingerbaums durch die Minima und Maxima seiner Zweigfaktoren $k$ (Zweigfaktor der internen Knoten) und $d$ (Anzahl der _Digits_ auf jeder Seite einer Ebene)
 
 $
   k_min &<= k &<= k_max \
@@ -191,24 +214,57 @@ $
   ceil(k_max / 2) <= k_min \
 $
 
+Die in @lst:finger-tree gegebene Definition lässt sich dadurch erweitern, das `std::array` durch `std::vector` ersetzt wird um die wählbaren Zweigfaktoren zu ermöglichen.
+Diese können ebenfalls mit ```cpp template``` Parametern zur Kompilierzeit gesetzt um den Wechsel auf Vektoren zu vermeiden.
+Die Definition von `Shallow` wird ebenfalls erweitert, sodass diese mehr als ein _Sonderdigit_ enthalten kann.
+
+#figure(
+  ```cpp
+  using T = ...;
+  using M = ...;
+
+  class Node {};
+  class Internal : public Node {
+    M measure;
+    std::vector<Node*> children; // k_min..k_max children
+  };
+  class Leaf : public Node {
+    T value;
+  };
+
+  class FingerTree {};
+  class Shallow: public FingerTree {
+    std::vector<Node*> values; // 0..(2 d_min - 1) digits
+  };
+  class Deep : public FingerTree {
+    M measure;
+    std::vector<Node*> left;  // d_min..d_max digits
+    FingerTree* middle;
+    std::vector<Node*> right; // d_min..d_max digits
+  };
+  ```,
+  caption: [Die Definition von generischen Fingerbäumen in C++.],
+) <lst:gen-finger-tree>
+
 #todo[
   A later inequality seems to imply $d_min < k_min$ as well as $k_max < d_max$, so this may be worth mentioning here once proven.
 ]
 
 #todo[
   We need better terminology to separate the notion of
-  - elements of the tree (those in the leaves, always of type `a`)
+  - elements of the tree (those in the leaves, always of type `T`)
   - elements in a layer (those which are packed up for the next layer or unwrapped for the previous layer, those being the nested type `Node^t a`)
-  - nodes (as being names for those "wrapped" elements, those being of type `Node a'` where `a'` is the nested type at layer `t`)
+  - nodes (as being names for those "wrapped" elements, those being of type `Node T'` where `T'` is the nested type at layer `t`)
 
   This was repeatedly brought up in review of the sections below.
 ]
 
-Da jeder tiefe Wirbelknoten mindestens $2 d_min$ Elemente enthalten muss, muss die Bildung dieser minimal Anzahl der Elemente im letzten Wirbelknoten überbrückt werden.
-Prinzipiell gilt für die letzten Wirbelknoten
+Da Wirbelknoten mindestens $2 d_min$ _Digits_ enthalten, muss die Bildung dieser Minimalanzahl der Elemente im letzten Wirbelknoten überbrückt werden.
+Das erzielt man durch das Einhängen von _Sonderdigits_ in den letzten Wirbleknoten, bis genug für beide Seiten vorhanden sind.
+Prinzipiell gilt für den letzten Wirbelknoten
 
 $
-  0 <= d <= d_max
+  0 <= d < 2 d_min
 $
 
 Ein generischer Fingerbaum ist dann durch diese Minima und Maxima beschrieben.
@@ -220,29 +276,32 @@ $
 $
 
 == Baumtiefe
-Sei $n(t)$ die Anzahl $n$ der Elemente in beiden _Digits_ eines Wirbelknotens auf Ebene $t$, so gibt es ebenfalls die minimale und maximale Anzahl $n_min (t) <= n(t) <= n_max (t)$ für diesen Wirbelknoten.
-Diese ergeben sich jeweils aus den minimalen und maximalen Anzahlen der _Digits_, welche Teilbäme mit minimalen bzw. maximalen Knoten enthalten.
+Sei $n(t)$ die Anzahl $n$ der Elemente einer Ebene $t$, also die Anzahl aller Elemente in allen Teilbäumen der Digits eines Wirbelknotens, so gibt es ebenfalls die minimale und maximale mögliche Anzahl für diesen Wirbelknoten.
+Diese ergeben sich jeweils aus den minimalen und maximalen Anzahlen der _Digits_, welche Teilbäme mit minimal bzw. maximal belegten Knoten enthalten.
 
 $
-  n_"smin" (t) &= k_min^(t - 1) \
-  n_min (t) &= 2 d_min k_min^(t - 1) \
+  n_"lmin" (t) &= k_min^(t - 1) \
+  n_"imin" (t) &= 2 d_min k_min^(t - 1) \
   n_max (t) &= 2 d_max k_max^(t - 1) \
 $
 
-$n_"smin"$ beschreibt das Sonderminimum der letzten Wirbelknoten.
+$n_"lmin"$ beschreibt das Minimum des letzten Wirbelknotens, da dieser nicht an die Untergrenze $2 d_min$ gebunden ist.
+$n_"imin"$ ist das Minimum interner Wirbleknoten.
 Für die kumulativen Minima und Maxima aller Ebenen bis zur Ebene $t$ ergibt sich
 
 $
-  n'_"smin" (t) &= n_"smin" (t) + n'_min (t - 1) \
-  n'_min (t) &= n_min (t) + n_min (t - 1) + dots.c + n_min (1) &= sum_(i = 1)^t n_min (i) \
+  n'_"lmin" (t) &= n_"lmin" (t) + n'_"tmin" (t - 1) \
+  n'_"imin" (t) &= n_"imin" (t) + n_"imin" (t - 1) + dots.c + n_"imin" (1) &= sum_(i = 1)^t n_"imin" (i) \
   n'_max (t) &= n_max (t) + n_max (t - 1) + dots.c + n_max (1) &= sum_(i = 1)^t n_min (i) \
 $
 
+Das wirkliche Minimum eines Baumes der Tiefe $t$ ist daher $n'_min (t) = n'_"lmin"$, da es immer einen letzten nicht internen Wirbelknoten auf Tiefe $t$ gibt.
 @fig:cum-depth zeigt die Minima und Maxima von $n$ für die Baumtiefen $t in [1, 8]$ für 2-3-Fingerbäume.
-Dabei zeigen die horizontalen Linien das kumulative Sonderminimum $n'_"smin"$ und Maximum $n'_max$ pro Ebene.
+Dabei zeigen die horizontalen Linien das kumulative Minimum $n'_min$ und Maximum $n'_max$ pro Ebene.
 
 #todo[
-  Flip the plot's axes, it may be confusing that $n(t)$ is used in the label, implying a running variable of $t$, but this may increase the vertical size unecessarily, leaving lots of white space.
+  Perhaps flip the plot's axes, it may be confusing that $n(t)$ is used in the label, implying a running variable of $t$.
+  But this may increase the vertical size unecessarily, leaving lots of white space.
 ]
 
 #[
@@ -366,96 +425,138 @@ Dabei zeigen die horizontalen Linien das kumulative Sonderminimum $n'_"smin"$ un
 ]
 
 == Über- & Unterlaufsicherheit
-#todo[
-  Incorporate the bounds mentioned in @bib:hp-06 regarding deque operations and why they are important for us.
-  We want to ensure amortized $Theta(1)$ for those.
-]
+Über- bzw. Unterlauf einer Ebene $t$ ist der Wechsel von _Digits_ zwischen der Ebene $t$ und der Ebene $t + 1$.
+Beim Unterlauf der Ebene $t$ sind nicht genug _Digits_ in $t$ enthalten.
+Es wird ein _Digit_ aus der Ebene $t + 1$ entnommen und dessen Kindknoten in $t$ gelegt.
+Der Überlauf einer Ebene $t$ erfolgt, wenn in $t$ zu viele _Digits_ enthalten sind.
+Es werden genug _Digits_ aus $t$ entnommen, sodass diese in einen Knoten verpackt und als _Digit_ in $t + 1$ gelegt werden können.
+Das Verpacken und Entpacken der _Digits_ ist nötig um die erwarteten Baumtiefen pro Ebene zu erhalten, sowie zur Reduzierung der Häufigkeit der Über- und Unterflüsse je tiefer der Baum wird.
+Eine Ebene $t$ mit $d$ _Digits_ gilt als sicher @bib:hp-06[S. 7], wenn
 
-#let dd1 = $Delta d_t$
-#let dd2 = $Delta d_(t + 1)$
-
-Eine Ebene $t$ mit $d$ Elementen gilt als sicher @bib:hp-06[S. 7], wenn
-
-#todo[
-  It must be made clear that because of the nested type definition digits are elemnts of a layer and in the first layer they are elements of the tree as well.
-  This dichotomy in the branching factors being the child element count was noted as confusing.
-]
+#let dd = $Delta d_t$
 
 $
   d_min < d_t < d_max
 $
 
-#todo[
-  Under and overflow can also occur when inserting/removing but may be remedied by other nodes in the same layer's digits.
-  It seems that these can be handled just fine as long as overflow moves inwards as with the push/pop cases.
-]
-
 Ist eine Ebene sicher, ist das Hinzufügen oder Wegnehmen eines Elements trivial.
 Ist eine Ebene unsicher, kommt es beim Hinzufügen oder Wegnehmen zum Über- oder Unterlauf, Elemente müssen zwischen Ebenen gewechselt werden, um die obengenannten Ungleichungen einzuhalten.
-Damit die obengenannten Komplexitäten eingehalten werden, dürfen nur alle $n$ Operationen $log n$ Ebenen in den Baum über- oder unterfließen.
-#todo[
-  Construct a debit analysis of deque-operations to prove that said bounds hold under those more generic conditions.
-]
-Das ist möglich, solange eine unsichere Ebene nach Über- oder Unterlauf wieder sicher ist.
-Dazu betrachten wir den Über- und Unterlauf einer unsicheren Ebene $t$ in eine oder aus einer sicheren Ebene $n + 1$.
-Über- oder Unterlauf von unsicheren Ebenen in bzw. aus unsicheren Ebenen kann rekursiv angewendet werden bis eine sichere Ebene erreicht wird.
+Erneut gilt zu beachten, dass die Sicherheit einer Ebene nur für eine Seite der Ebene gilt.
+Welche Seite, hängt davon ab an welcher Seite eine Operation wie _Push_ oder _Pop_ durchgeführt wird.
+Wir betrachten den Über- und Unterlauf einer unsicheren Ebene $t$ in eine oder aus einer sicheren Ebene $t + 1$.
+ Über- oder Unterlauf von unsicheren Ebenen in bzw. aus unsicheren Ebenen kann rekursiv angewendet werden bis eine sichere Ebene erreicht wird.
+Ähnlich der 2-3-Fingerbäume wird durch die Umwandlung von unsicheren in sichere Ebenen dafür gesorgt, dass nur jede zweite Operation eine Ebene in dem Baum herabsteigen muss, nur jede vierte zwei Ebenen, und so weiter.
 
-Der Wechsel von Elementen zwischen zwei Ebenen erfordert entweder
-- das Anheben von Elementen der Ebene $t$ in Knoten zur Ebene $t + 1$ bei Überlauf,
-- oder das Herunterlassen von Knoten der Ebene $t + 1$ zu Ebene $t$ bei Unterlauf.
+#todo[Mention the term of "recursive slowdown" (coined by Okasaki).]
 
-$Delta d_(t + 1)$ ist die Anzahl der Knoten in Ebene $t + 1$, welche für $dd1$ Elemente in Ebene $t$ benötigt werden, es gilt
+Damit die Elemente einer Ebene $t$ in eine andere Ebene $t + 1$ überlaufen können, müssen diese in einen Knoten der Ebene $t + 1$ passen, es gilt
 $
-  dd2_min k_min <= dd1 <= dd2_max k_max \
-$
+  k_min <= dd <= k_max \
+$ <eq:node-constraint>
 
-Überlauf entsteht bei Hinzufügen eines Elements in eine Ebene mit $d_max$ Elementen, es werden Elemente aus Ebene $t$ zu Ebene $t + 1$ bewegt, die folgenden Ungleichungen müssen eingehalten werden, damit die Ebene $t$ nach dem Überlauf sicher ist.
+Dabei ist $dd$ die Anzahl der Elemente in $t$ welche in $t + 1$ überlaufen sollen.
+Essentiell ist, dass eine unsicher Ebene nach dem Übelauf wieder sicher ist, dazu müssen folgende Ungleichung eingehalten werden.
 Die Ebene $t + 1$, kann dabei sicher bleiben oder unsicher werden.
 $
-  t     &: d_min <& d_max     &text(#green, - dd1) text(#red, + 1) &<  d_max \
-  t + 1 &: d_min <& d_(t + 1) &text(#green, + dd2)                 &<= d_max \
+  t     &: d_min <& d_max     &text(#green, - dd) text(#red, + 1) &<  d_max \
+  t + 1 &: d_min <& d_(t + 1) &text(#green, + 1)                  &<= d_max \
 $
 
 Gleichermaßen gelten für den Unterlauf folgende Ungleichungen.
 $
-  t     &: d_min <&  d_min     &text(#green, + dd1) text(#red, - 1) &< d_max \
-  t + 1 &: d_min <=& d_(t + 1) &text(#green, - dd2)                 &< d_max \
+  t     &: d_min <&  d_min     &text(#green, + dd) text(#red, - 1) &< d_max \
+  t + 1 &: d_min <=& d_(t + 1) &text(#green, - 1)                  &< d_max \
 $
 
-Betrachten wir nun 2-3-Fingerbäume, bei $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$ ergibt sich
+$dd$ und die Zweigfaktoren $d_min$, $d_max$, $k_min$ und $k_max$ sind so zu wählen, die zuvorgenannten Ungleichungen halten.
+Betrachten wir 2-3-Fingerbäume, gilt $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$, daraus ergibt sich
 
 $
-  "überlauf" &: 2 <= dd1 <= 3 \
-  "unterlauf" &: 1 < dd1 < 4 \
+  "Überlauf" &: 2 <= dd <= 3 \
+  "Unterlauf" &: 1 < dd < 4 \
 $
 
-In @bib:hp-06 entschieden sich die Authoren bei Überlauf für $dd1 = 3$, gaben aber an, dass $dd1 = 2$ ebenfalls funktioniert.
-Daraus folgt unmittelbar $dd2 = 1$.
+In @bib:hp-06 entschieden sich die Authoren bei Überlauf für $dd = 3$, gaben aber an, dass $dd = 2$ ebenfalls funktioniert.
 Aus den oben genannten Ungleichungen lassen sich Fingerbäume mit anderen $d$ und $k$ wählen, welche die gleichen asymptotischen Komplexitäten für _Deque_-Operationen aufweisen.
-Zum Beispiel 2-3-4-Fingerbäume mit $dd2 = 1$ und $d_min = 1$:
+Zum Beispiel 2-3-4-Fingerbäume mit $d_min = 1$:
 $
-  2 <= dd1 <= 4 \
-  dd1 < d_max \
+  2 <= dd <= 4 \
+  dd < d_max \
   4 < d_max \
 $
 
 Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ einen validen 2-3-4-Fingerbaum beschreiben.
 
-== Push & Pop
 #todo[
-  Given the above inequalities and the following over and underflow which must necessarily only happen every $d_min$ push or pop operations respectively, it should follow that push and pop are both amortized constant time and logarithmic worst time.
-  Perform amortized analysis to prove these claims.
+  + Now the quesiton is if @eq:node-constraint is enough on it's own to chose $dd$, this may be related to the relation of $d$ to $k$ noted further up.
+  + Below here should follow the debig analysis, or further down with more context from the push and pop operations.
 ]
 
+== Push & Pop
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  algorithm(numbered-title: $"ftree-push-left"(E, T): (a, "FingerTree" a) -> "FingerTree" a$)[
+    + *switch* $T$
+      + *case* $T$ *is* $"Shallow" t$
+        + *let* $t' = "concat"([E], t)$
+        + *if* $|t'| = 2 d_min$
+          + *let* $l, r = "split"(t', d_min)$
+          + *return* $"Deep"(l, "Shallow"([]), r)$
+        + *else*
+          + *return* $"Shallow"(t')$
+      + *case* $T$ *is* $"Deep"(l, m, r)$
+        + *let* $l' = "concat"([E], l)$
+        + *if* $|l'| <= d_max$
+          + *return* $"Deep"(l', m, r)$
+        + *let* $l'', o = "split"(l', |l'| - dd)$
+        + *let* $m' = "ftree-push-left"(m, "Node"(o))$
+        + *return* $"Deep"(l'', m', r)$
+  ],
+  caption: [Die _Insert_ Operation an der linken Seite eines Fingerbaumes.],
+) <alg:finger-tree:push-left>
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  algorithm(numbered-title: $"ftree-pop-left"(T): "FingerTree" a -> (a, "FingerTree" a)$)[
+    + *switch* $T$
+      + *case* $T$ *is* $"Shallow"(t)$
+        + *let* $e, t' = "pop-left"(t)$
+        + *return* $(e, "Shallow"(t'))$
+      + *case* $T$ *is* $"Deep"(l, m, r)$
+          + *let* $e, l' = "pop-left"(l)$
+          + *if* $|l'| >= d_min$
+            + *return* $(e, "Deep"(l', m, r))$
+          + *else*
+            + *if* $m$ *is* $"Shallow"(t)$ *and* $|t| = 0$
+              + *return* $(e, "Shallow"("concat"(l', r)))$
+            + *else*
+              + *let* $e', m' = "ftree-pop-left"(m)$
+              + *return* $"Deep"("concat"(l', "children"(e')), m', r)$
+  ],
+  caption: [Die _Pop_ Operation an der linken Seite eines Fingerbaumes.],
+) <alg:finger-tree:pop-left>
+
 == Insert & Remove
+Die Operationen _Insert_ und _Remove_ sind in @bib:hp-06 durch eine Kombination von _Split_, _Push_ bzw. _Pop_ und _Concat_ implementiert.
+Dabei sind _Split_ und _Concat_ jeweils Operationen mit logarithmischer Zeitkomplexität $Theta(log n)$.
+Je nach Implementierung können spezialisierte Varianten von _Insert_ und _Remove_ durch den gleichen Über-/Unterfluss Mechanismus implementiert werden welcher bei _Push_ und _Pop_ zum Einsatz kommt.
+
 #todo[
-  Insert and remove in @bib:hp-06 are done using a split + push/pop + concat, I'm unsure whether this is a feasible thing to do when we need to carefully manage the lazy evaluation ourselves.
-  Either prove that the bounds hold given the correct suspension or propose specialized implementations which do inter-digit rebalancing with over/underflow in the correct direction.
+  See if this is feasible.
+  Perhaps show pseudo code of how this would be achieved.
 ]
 
 == Echtzeitanalyse
-#todo[
-  Analyze the theoretical impact the new data structure _should_ have on the current runtime given its _worst-case_ bounds.
-  This should also require a more thorough introduction of how t4gl schedules its threads and microsteps, as well as how these operations would fit into this.
-  Show whether the data structure is a suitable fit for t4gl given the insight from the analysis.
-]
+Das amortisierte Zeitverhalten der verschiedenen Operationen hat für die Echtzeitanalyse keinen Belang.
+Dennoch bieten Fingerbäume sublineares Zeitverhalten für alle Operationen im _worst-case_ und sind daher gewöhnlichen CoW-Datenstrukturen ohne granulare Persistenz vorzuziehen.
+Je nach Anforderungen des Systems können für verschiedene Operationen zulässige Höchstlaufzeiten festegelegt werden.
+Granular persistente Baumstrukturen wie Fingerbäume können prinzipell mehr Elemente enthalten bevor diese Höchstlaufzeiten pro Operationen erreicht werden.
+Aus Sicht der Echtzeitanforderungen an die Operationen auf der Datenstruktur selbst, ist jede Datenstruktur mit logarithmischem Zeitverhalten vorzuziehen.
+Die Wahl von Fingerbäumen über B-Bäumen ist daher eher eine Optimierung als eine Notwendigkeit.
+
+#todo[Perhaps talk about the constant factors introduced by the choice of the branching factors.]
+
+// diff marker
