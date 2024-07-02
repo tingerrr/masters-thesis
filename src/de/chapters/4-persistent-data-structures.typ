@@ -515,3 +515,96 @@ Aus Sicht der Echtzeitanforderungen an die Operationen auf der Datenstruktur sel
 Die Wahl von Fingerbäumen über B-Bäumen ist daher eher eine Optimierung als eine Notwendigkeit.
 
 #todo[Perhaps talk about the constant factors introduced by the choice of the branching factors.]
+
+= SRB-Bäume
+RRB-Bäume (engl. _Relaxed Radix Balanced Trees_) sind beinahe perfekt balancierte Suchbäume, welche für Sequenzdatenstrukturen wie Vektoren verwendet werden und wurden von !Bagwell _et al._ eingeführt @bib:br-11 @bib:brsu-15 @bib:stu-15.
+Um das Element an einem Bestimmten Index zu finden wird bei perfekter Balancierung eines Knotens der Teilindex direkt errechnet.
+Bei nicht perfekter Balancierung stützt sich die Suche auf Längeninformationen der Kindknoten.
+Dabei wird nach Indizes gesucht, sprich, fortlaufende Ganzzahlwerte zwischen 0 und der Anzahl der Element $n$ in der Sequenz.
+Im folgenden wird eine Erweiterung von RRB-Bäumen vorgestellt, SRB-Bäume (engl. _Sparse Radix Balanced Trees_), welche für nicht fortlaufende Schlüssel verwendet werden können.
+Ein SRB-Baum ist aufgebaut wie ein perfekt balancierter voll belegter RRB-Baum über alle Indizes welche vom Schlüsseltyp dargestellt werden können, aber ohne diese Knoten welche nicht belegt sind.
+Im Gegensatz zu RRB-Bäumen, können Teilindizes auf jeder Ebene direkt errechnet werden, ohne dass die Länge der Kindknoten bekannt sein muss.
+Da aber nicht alle Knoten besetzt sind, muss auf jeder Ebene geprüft werden ob der errechnete Teilindex auf einen besetzten Knoten zeigt.
+Durch die perfekte Balancierung ist die Baumtiefe $d$ nur von der Schlüsselbreite $b$ und dem Zweigfaktor $k$ abhängig.
+
+$
+  d = log_k b
+$ <eq:srb-tree:depth>
+
+@fig:srb-tree zeigt einen SRB-Baum über die Sequenz `[0, 16, 65279, 65519]` für `uint16` Schlüssel und einem Zweigfaktor von 16.
+Die belegten Knoten sind in #text(teal.lighten(50%))[*türkis*] hervorgehoben.
+
+#figure(
+  figures.srb-tree,
+  caption: [Ein SRB-Baum für die 16 bit Schlüssel und einen Zweigfaktor von 16.],
+) <fig:srb-tree>
+
+== Schlüsseltypen
+Durch die spezifische Art der Suche können nur Schlüsseltypen verwendet werden welche Anhand von Radixsuche Teilindizes errechnen lassen.
+Das beschränkt sich generell auf unvorzeichenbehaftet Ganzzahltypen.
+Für diese Schlüssel $u$ ergibt sich ein Teilindex $i$ auf Ebene $t$ wiefolgt:
+$
+  u / k^(d - t) mod k
+$
+
+Bei Zweigfaktoren $k = 2^l$ ergibt sich eine optimierte Rechnung, welche verschiedene Bitshifting Operationen verwendet:
+$
+  (u >> (l dot.op (d - t))) \& (k - 1)
+$
+
+Sollte für ein Schlüsseltyp $T$, eine bijektive Abbildung $f$ und dessen Invers $f^(-1)$ existieren und es gilt
+$
+  forall t_1, t_2 in T : t_1 < t_2 <=> f(t_1) < f(t_2)
+$
+
+dann kann durch diese Abbildungen auch der Schlüsseltyp $T$ durch einen SRB-Baum verwaltet werden.
+Ein simples Beispiel sind vorzeichenbehaftete Schlüssel, welche einfach um ihr Minimum verschoben werden, so dass alle möglichen Werte vorzeichenunbehaftet sind.
+Das setzt natürlich vorraus, dass ein Minimum existiert, wie es bei Ganzzahlräpresentationen in den meisten Prozessoren der Fall ist.
+
+== Zeitverhalten
+Um zur Laufzeit den Blattknoten zu finden, in welchem sich ein Schlüssel befindet, wird pro Ebene per Radixsuche der Index dieser Ebene errechnet und geprüft ob dieser Index besetzt ist.
+Ist der Index nicht besetzt endet die Suche, ansonsten führt diese fort bis der Blattknoten erreicht ist.
+Durch die perfekte Balancierung ist die Baumtiefe nur von der Schlüsselbreite abhängig, nicht von der Anzahl der gespeicherten Elementen.
+Operationen wie _Insert_, _Remove_ oder _Search_ haben daher eine Zeitkomplexität von $Theta(d)$ mit $d$ aus @eq:srb-tree:depth.
+
+Gerade unter Echzeitbedingungen erleichtert das die Analyse enorm, durch die Wahl von Höchstschlüsselbreiten kann SRB-Bäumen konstantes _worst-case_ Zetiverhalten für alle Operationen zugewisen werden.
+
+#todo[
+  Elaborate on examples of this in the implementation chapter, notably we only expect integral keys of size $[8, 16, 32, 64]$ bit.
+]
+
+== Speicherauslastung
+Sei $v$ der benötigte Speicher eines Werts und $p$ der benötigte Speicher eines Pointers in einem SRB-Baum.
+Wir definieren die Speicherauslastung $s_U$ als das Verhältnis zwischen den belegten Speicherplätzen $s_S$ und den gesamten Speicherplätzen $s_A$, welche von der Datenstruktur angelegt wurden.
+
+$
+  s_U (p, v) = (s_S (p, v)) / (s_A (p, v)) \
+$
+
+Im Idealfall liegt $s_U$ nahe 1, sprich 100%.
+Die in @fig:srb-tree gegebene SRB-Baum verbraucht pro Blattknoten $16 s_w$ Speicherplatz, unegachtet der Belegung.
+Interne Knoten benötigen $16 s_p$ Speicherplatz.
+Bei ungünstiger Belegung, zum Beispiel einem Element pro möglichem Blattknoten ergibt sich ein Speicherplatzverbrauch von $16^4 s_w + 16^3 s_p + 16^2 s_p + 16 s_p$ bei nur $16^3$ belegten Elementen.
+Bei Pointern mit $p = 8 "byte"$ und Pointern als Werten ($v = p$) folgt eine Speicherauslastung von
+
+$
+  s_U (p, v) &= (16^3 v) / (16^4 v + 16^3 p + 16^2 p + 16 p) \
+  &= 0.058... \
+  &approx 6% \
+$
+
+Dabei sind Verwaltungsstrukturen ignoriert welche die Belegung der Elemente enthalten, da diese verhältnismäßig klein bis gar nicht vorhanden sind.
+Für einen SRB-Baum mit einem Zweigfaktor $k$ und einer Schlüsselbreite $b$ und der sich daraus ergebenden Baumtiefe $d = ceil(log_k 2^b)$, ergibt sich eine Speicherauslastung im _worst-case_ von:
+
+$
+  s_U (p, v) = (k^(d - 1) v) / (k^d v + sum_(n = 1)^(d - 1) k^n p)
+$
+
+#todo[
+  It remains to be seen, whether this is actually a problem.
+
+  Perhaps nodes can be interned in some way, to reduce duplication.
+  This could be beneficial especially for smaller branching factors.
+
+  However, it's also unlikely that a program will actually get this far since it would need to be able to allocate all that memory in the first place, which is well out of bounds of a usual computer's memory.
+]

@@ -406,3 +406,48 @@
   edge(<13-17>, <15-17>, "-|>")
 })
 
+//
+// srb tree
+//
+
+#let srb-tree = fdiag({
+  let arraybox(..args, leaf: false, hl: (0,)) = {
+    let items = args.pos()
+    grid(
+      inset: 5pt,
+      stroke: 1pt,
+      fill: (x, y) => if x in hl { teal.lighten(50%) },
+      columns: if leaf { int(items.len() / 2) } else { items.len() },
+      rows: 1.5em,
+      ..items.map(i => [#i])
+    )
+  }
+
+  let node = node.with(inset: 0pt, stroke: none)
+
+  instance((0, -0.5), `t`, name: <t>)
+  edge("-|>")
+  node((0, 0), arraybox(0, [...], 15, hl: (0, 2)), name: <l1>)
+
+  node((-0.5, 0.5), arraybox(0, [...], 15), name: <l2-1>)
+  node((0.5, 0.5), arraybox(0, [...], 15, hl: (2,)), name: <l2-2>)
+
+  edge(<l1>, <l2-1>, "-|>")
+  edge(<l1>, <l2-2>, "-|>")
+
+  node((-1, 1), arraybox(0, 1, [...], 15, hl: (0, 1)), name: <l3-1>)
+  node((1, 1), arraybox(0, 1, [...], 14, 15, hl: (1, 3)), name: <l3-2>)
+
+  edge(<l2-1>, <l3-1>, "-|>", shift: -2pt)
+  edge(<l2-2>, <l3-2>, "-|>")
+
+  node((-1.5, 1.75), arraybox(leaf: true, 0, [...], 15, 0, [...], 15), name: <l4-1>)
+  node((-0.5, 1.75), arraybox(leaf: true, 0, [...], 15, 16, [...], 31), name: <l4-2>)
+  node((0.5, 1.75), arraybox(leaf: true, 0, [...], 15, 65279, [...], 65295), name: <l4-3>)
+  node((1.5, 1.75), arraybox(leaf: true, 0, [...], 15, 65503, [...], 65519, hl: (2,)), name: <l4-4>)
+
+  edge(<l3-1>, <l4-1>, "-|>", shift: -10pt)
+  edge((rel: (-30pt, 0pt), to: <l3-1>), <l4-2>, "-|>")
+  edge(<l3-2>, <l4-3>, "-|>", shift: -4pt)
+  edge(<l3-2>, <l4-4>, "-|>", shift: -2pt)
+})

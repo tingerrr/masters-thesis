@@ -7,6 +7,7 @@
   tree,
   b-tree,
   finger-tree,
+  srb-tree,
 ) = {
   import "figures/algorithms.typ": *
   import "figures/figures.typ": *
@@ -58,5 +59,6 @@
         search: finger-tree-alg-search,
       ),
     ),
+    srb-tree,
   )
 }
