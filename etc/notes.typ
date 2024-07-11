@@ -5,6 +5,7 @@
   (2024, 05, 16),
   (2024, 06, 13),
   (2024, 06, 26),
+  (2024, 07, 18),
 )
 
 #import "util.typ": *
@@ -131,7 +132,7 @@
   let date = date(..d)
   heading(level: 2)[Konsultation #date]
 
-  set heading(offset: 3)
+  set heading(offset: 2)
   include "log/" + date + ".typ"
 }
 
