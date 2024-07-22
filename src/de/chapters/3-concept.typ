@@ -493,26 +493,48 @@ Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ e
 ]
 
 == Push & Pop
+#let math-type(ty) = $text(#teal.darken(35%), ty)$
+#let math-func(ty) = $op(text(#fuchsia.darken(35%), ty))$
+
+#let Maybe = math-type("Maybe")
+
+#let Node = math-type("Node")
+#let Deep = math-type("Deep")
+#let Shallow = math-type("Shallow")
+#let FingerTree = math-type("FingerTree")
+
+#let popl = math-func("pop-left")
+#let pushl = math-func("push-left")
+#let concat = math-func("concat")
+#let split = math-func("split")
+
+#let ftpushl = math-func("ftree-push-left")
+#let ftpopl = math-func("ftree-pop-left")
+
+#[
+  #show math.equation: it => {
+    show "E": math-type
+    it
+  }
 
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
-  algorithm(numbered-title: $"ftree-push-left"(E, T): (a, "FingerTree" a) -> "FingerTree" a$)[
-    + *switch* $T$
-      + *case* $T$ *is* $"Shallow" t$
-        + *let* $t' = "concat"([E], t)$
-        + *if* $|t'| = 2 d_min$
-          + *let* $l, r = "split"(t', d_min)$
-          + *return* $"Deep"(l, "Shallow"([]), r)$
-        + *else*
-          + *return* $"Shallow"(t')$
-      + *case* $T$ *is* $"Deep"(l, m, r)$
-        + *let* $l' = "concat"([E], l)$
-        + *if* $|l'| <= d_max$
-          + *return* $"Deep"(l', m, r)$
-        + *let* $l'', o = "split"(l', |l'| - dd)$
-        + *let* $m' = "ftree-push-left"(m, "Node"(o))$
-        + *return* $"Deep"(l'', m', r)$
+  algorithm(numbered-title: $ftpushl(e, t): (E, FingerTree E) -> FingerTree E$)[
+    + *switch* $t$
+      + *case* $t$ *is* $Shallow$
+        + *let* $"values" = pushl(e, t."values")$
+        + *if* $|"values"| < 2 d_min$
+          + *return* $Shallow("values")$
+        + *let* $"left", "right" = split("values", d_min)$
+        + *return* $Deep("left", Shallow(nothing), "right")$
+      + *case* $t$ *is* $Deep$
+        + *let* $"left" = pushl(e, t."left")$
+        + *if* $|"left"| <= d_max$
+          + *return* $Deep("left", t."middle", t."right")$
+        + *let* $"rest", "overflow" = split("left", |"left"| - dd)$
+        + *let* $"middle" = ftpushl(Node("overflow"), t."middle")$
+        + *return* $Deep("rest", "middle", t."right")$
   ],
   caption: [Die _Insert_ Operation an der linken Seite eines Fingerbaumes.],
 ) <alg:finger-tree:push-left>
@@ -520,24 +542,24 @@ Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ e
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
-  algorithm(numbered-title: $"ftree-pop-left"(T): "FingerTree" a -> (a, "FingerTree" a)$)[
-    + *switch* $T$
-      + *case* $T$ *is* $"Shallow"(t)$
-        + *let* $e, t' = "pop-left"(t)$
-        + *return* $(e, "Shallow"(t'))$
-      + *case* $T$ *is* $"Deep"(l, m, r)$
-          + *let* $e, l' = "pop-left"(l)$
-          + *if* $|l'| >= d_min$
-            + *return* $(e, "Deep"(l', m, r))$
-          + *else*
-            + *if* $m$ *is* $"Shallow"(t)$ *and* $|t| = 0$
-              + *return* $(e, "Shallow"("concat"(l', r)))$
-            + *else*
-              + *let* $e', m' = "ftree-pop-left"(m)$
-              + *return* $"Deep"("concat"(l', "children"(e')), m', r)$
+  // BUG: this should break nicely with 0.12
+  algorithm(numbered-title: par(justify: false)[$ftpopl(t): FingerTree E -> (Maybe E, FingerTree E)$])[
+    + *switch* $t$
+      + *case* $t$ *is* $Shallow$
+        + *let* $e, "rest" = popl(t."values")$
+        + *return* $(e, Shallow("rest"))$
+      + *case* $t$ *is* $Deep$
+        + *let* $e, "rest" = popl(t."left")$
+        + *if* $|"rest"| >= d_min$
+          + *return* $(e, Deep("rest", t."middle", t."right"))$
+        + *if* $t."middle"$ *is* $Shallow$ *and* $|t."middle"."values"| = 0$
+          + *return* $(e, Shallow(concat(t."left", t."right")))$
+        + *let* $"node", "mrest" = ftpopl(t."middle")$
+        + *return* $(e, Deep(concat("rest", "node"."values"), "mrest", t."right"))$
   ],
   caption: [Die _Pop_ Operation an der linken Seite eines Fingerbaumes.],
 ) <alg:finger-tree:pop-left>
+]
 
 == Insert & Remove
 Die Operationen _Insert_ und _Remove_ sind in @bib:hp-06 durch eine Kombination von _Split_, _Push_ bzw. _Pop_ und _Concat_ implementiert.
