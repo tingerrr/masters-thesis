@@ -43,14 +43,20 @@
 #chapter[Einleitung] <chap:intro>
 #include "chapters/1-intro.typ"
 
-#chapter[Grundlagen] <chap:basics>
-#include "chapters/2-basics.typ"
+#chapter[T4gl] <chap:t4gl>
+#include "chapters/2-t4gl.typ"
 
-#chapter[Konzept] <chap:concept>
-#include "chapters/3-concept.typ"
+#chapter[Lösungsansätze] <chap:non-solutions>
+#include "chapters/3-non-solutions.typ"
 
-#chapter[Implementierung] <chap:impl>
-#include "chapters/4-impl.typ"
+#chapter[Persistente Datastrukturen] <chap:persistence>
+#include "chapters/4-persistent-data-structures.typ"
+
+#chapter[Implementierung & Optimierungen] <chap:impl>
+#include "chapters/5-implementation-optimizations.typ"
+
+#chapter[Analyse & Vergleich] <chap:benchmarks>
+#include "chapters/6-benchmarks.typ"
 
 #chapter[Fazit] <chap:conclusion>
-#include "chapters/5-conclusion.typ"
+#include "chapters/7-conclusion.typ"

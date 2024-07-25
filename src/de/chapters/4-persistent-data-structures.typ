@@ -1,55 +1,170 @@
 #import "/src/util.typ": *
 #import "/src/figures.typ"
 
-= Problematik
-Die in @sec:t4gl:arrays beschrieben T4gl-Arrays bestehen aus Komponenten in drei Ebenen:
-+ T4gl: Die Instanzen aus Sicht des T4gl-Programmierers.
-+ Storage: Die Daten aus Sicht des T4gl-Programmierers, aber Instanzen aus Sicht des T4gl-Laufzeitsystems.
-+ Speicher: Die Daten aus Sicht des T4gl-Laufzeitsystems. Diese Ebene ist für den T4gl-Programmierer unsichtbar.
+#todo[This is too elaborate and needs to be slimmed down.]
 
-Zwischen den Ebenen 1 und 2 kommt geteilte Schreibfähigkeit durch Referenzzählung zum Einsatz, mehrere T4gl-Instanzen teilen sich eine Storage-Instanz und können von dieser lesen als auch in sie schreiben.
-Zwischen den Ebenen 2 und 3 kommt CoW + Referenzzählung zum Einsatz, mehrere Storage-Instanz teilen sich die gleichen Daten, Schreibzugriffe auf die Daten sorgen vorher dafür, dass die Storage-Instanz der einzige Referent ist, wenn nötig durch Kopie.
-Wir definieren je nach Ebene zwei Arten von Kopien:
-/ seichte Kopie:
-  Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleichen Storage-Instanz zeigt.
-  Wird in T4gl durch Initialisierung von Arrays durch existierende Instanzen oder die Übergabe von Arrays an normale Funktionen hervorgerufen.
-/ tiefe Kopie:
-  Eine Kopie der T4gl-Instanz *und* der Storage-Instanz, welche beide auf die gleichen Daten zeigen.
-  Das erfolgt entweder über den expliziten Aufruf der Methode `clone` durch den T4gl Programmierer, oder bei Ausnahmefällen von Zuweisungen durch das Laufzeitsystem.
+Datenstrukturen sind Organisierungsstrukturen der Daten im Speicher eines Rechensystems.
+Der Aufbau dieser Datenstrukturen hat Einfluss auf deren Speicherbedarf und das Zeitverhalten verschiedener Operationen auf diesen Datenstrukturen.
+Die Wahl der Datenstruktur ist abhängig vom Anwendungsfall und den Anforderungen der Datenverwaltung.
 
-Bei einer seichten Kopie der Instanz `a` in @fig:t4gl-indirection:new ergibt sich die Instanz `b` in @fig:t4gl-indirection:shallow.
-Eine tiefe Kopie hingegen führt zur Instanz `c` in @fig:t4gl-indirection:deep.
-Obwohl eine tiefe Kopie zunächst nur auf Ebene 1 und 2 Instanzen Kopiert, erfolgt die Kopie der Daten auf Ebene 3 beim ersten Schreibzugriff einer der Instanzen (@fig:t4gl-indirection:mut).
+Dynamische Datenstrukturen sind Datenstrukturen, welche vor allem dann Verwendung finden, wenn die Anzahl der verwalteten Elemente nicht vorraussehbar ist.
+Ein klassisches Beispiel für eine dynamische Datenstruktur ist der Vektor, ein dynamisches Array.
 
-#subpar.grid(
-  figure(figures.t4gl.new, caption: [
-    Ein T4gl Array nach Initalisierung. \ \
-  ]), <fig:t4gl-indirection:new>,
-  figure(figures.t4gl.shallow, caption: [
-    Zwei T4gl-Arrays teilen sich eine C++ Instanz nach seichter Kopie.
-  ]), <fig:t4gl-indirection:shallow>,
-  figure(figures.t4gl.deep-new, caption: [
-    Zwei T4gl-Arrays teilen sich die gleichen Daten nach tiefer Kopie. \ \
-  ]), <fig:t4gl-indirection:deep>,
-  figure(figures.t4gl.deep-mut, caption: [
-    Zwei T4gl-Arrays teilen sich keine Daten nach tiefer Kopie und Schreibzugriff.
-  ]), <fig:t4gl-indirection:mut>,
-  columns: 2,
-  caption: [T4gl-Arrays in verschiedenen Stadien der Datenteilung.],
-  label: <fig:t4gl-indirection>,
-)
+#figure(
+  ```cpp
+  #import <vector>
 
-#todo[
-  Annotate the levels in the above figure to show which level manages which part of the system.
+  int main() {
+    std::vector<int> vec;
+
+    vec.push_back(3);
+    vec.push_back(2);
+    vec.push_back(1);
+
+    return 0;
+  }
+  ```,
+  caption: [
+    Ein C++ Program welches einen `std::vector` anlegt und mit Werten befüllt.
+  ],
+) <lst:vec-ex>
+
+Die C++ Standardbibliothek stellt unter der Header-Datei `<vector>` die gleichnamige Template-Klasse bereit.
+`std::vector` verfügt über Methoden, welche den Speicher erweitern, sofern das für die gegebene Operation nötig oder möglich ist.
+So wird zum Beispiel bei der Verwendung von `push_back` der Speicher erweitert, wenn die jetzige Kapazität des Vektors unzureichend ist.
+@lst:vec-ex zeigt wie ein `std::vector` angelegt und stückweise befüllt werden kann, dabei wird zum ersten Aufruf von `push_back` der dynamische Speicher angelegt.
+Muss der Speicher zum Erweitern verschoben werden, ergibt sich eine Zeitkomplexität von $O(n)$.
+#footnote[
+  Die Zeitkomplexität von `push_back` über die gesamte Lebenszeit eines Vektors ist durch den Wachstumsfaktor amortisiert konstant @bib:iso-cpp-20[S. 834].
+  Wird die Kapazität vorher reserviert und nicht überschritten, ist die Komplexität $O(1)$.
+]
+Nach dem dritten Aufruf von `push_back` enthält der Vektor die Sequenz `[3, 2, 1]`.
+Ein Vektor bringt über dem herkömmlichen Array verschiedene Vor- und Nachteile mit sich.
+
+*Vorteile*
+- Die Kapazität ist nicht fest definiert, es kann zur Laufzeit entschieden werden, wie viele Objekte gespeichert werden.
+- Die Verwaltung der Daten wird automatisch durch den Vektor übernommen.
+
+*Nachteile*
+- Durch die unbekannte Größe können Iterationen über die Struktur seltener aufgerollt oder anderweitig optimiert werden.
+
+Die bekannte Größe eines Arrays hat nicht nur Einfluss auf die Optimierungsmöglichkeiten eines Programms, sondern auch auf die Komplexitätsanalyse.
+Ist die Länge des Arrays bereits zur Analysezeit bekannt und unabhängig von er Problemgröße, kann sie wie eine Konstante behandelt werden.
+
+#figure(
+  ```cpp
+  void print_array(std::array<int, 3>& arr) {
+    for (const int& value : arr) {
+      std::cout << value << std::endl;
+    }
+  }
+  ```,
+  caption: [
+    Eine Funktion welche über ein `std::array` der Länge 3 iteriert und dessen Werte ausgibt.
+  ],
+) <lst:array-ex>
+
+Die Zeitkomplexität von `print_array` in @lst:array-ex ist $Theta(n)$ mit $n = 3$, für die weitere Analyse kann die Zeitkomplexität von `print_array` als $Theta(1)$ betrachtet werden.
+@lst:array-ex-unrolled zeigt eine alternative Schreibweise der Schleife aus @lst:array-ex.
+#footnote[
+  Unter Anwendung von Compiler-Optimierungen wird dies, wenn sinnvoll, automatisch vorgenommen.
 ]
 
-Durch die Teilung der Daten in Ebene 3 nach einer tiefen Kopie kommt es somit nicht zur Kopie wenn keine weiteren Schreibzugriffe auf `a` oder `c` passieren.
-Allerdings ist das selten der Fall.
-Ein Hauptanwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
-Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine tiefe Kopie der Storage-Instanz erstellt.
-Die T4gl-Instanz, welche an den Programmierer übergeben wird, sowie die interne Storage-Instanz teilen sich Daten, welche vom Laufzeitsystem zwangsläufig beim nächsten Schreibzugriff kopiert werden müssen.
-Diese Kopie und, daraus folgend, der Schreibzugriff haben dann eine Zeitkomplexität von $Theta(n)$.
-Das gilt für jeden ersten Schreibzugriff, welcher nach einer Übergabe der Daten an den T4gl-Programmierer erfolgt.
+#figure(
+  ```cpp
+  std::cout << value[0] << std::endl;
+  std::cout << value[1] << std::endl;
+  std::cout << value[2] << std::endl;
+  ```,
+  caption: [Die Schleife aus @lst:array-ex nach dem Aufrollen.],
+) <lst:array-ex-unrolled>
+
+Es folgt aus der Substitution, dass das Programm keine Schleifen enthält, deren Höchstiterationszahl nicht bekannt ist.
+Man vergleiche dies mit dem Programm in @lst:vector-ex.
+Die Schleife ist nicht mehr trivial aufrollbar, da über die Anzahl der Elemente in `vec` ohne Weiteres keine Annahme gemacht werden kann.
+Die Zeitkomplexität der Funktion `print_vector` ist $Theta(n)$, da deren Laufzeit linear von der Problemgröße $n$ abhängt.
+
+#figure(
+  ```cpp
+  void print_vector(std::vector<int>& vec) {
+    for (const int& value : vec) {
+      std::cout << value << std::endl;
+    }
+  }
+  ```,
+  caption: [
+    Eine Funktion ähnlich der aus @lst:array-ex, mit einem `std::vector`, statt einem `std::array`.
+  ],
+) <lst:vector-ex>
+
+Es ist nicht unmöglich, fundierte Vermutungen über die Anzahl von Elementen in einer Datenstruktur anzustellen.
+Dennoch fällt es mit dynamischen Datenstrukturen schwerer, alle Invarianzen eines Programms bei der Analyse zu berücksichtigen.
+
+= Persistenz und Kurzlebigkeit <sec:per-eph>
+Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert, gilt diese als _persistent/langlebig_ @bib:kt-96[S. 202].
+In den Standartbibliotheken verschiedener Programmiersprachen hat sich für dieses Konzept der Begriff _Immutable_ durchgesetzt.
+Im Gegensatz dazu stehen Datenstrukturen, welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als _kurzlebig_.
+Persistente Datenstrukturen erstellen meist neue Instanzen für jeden Schreibzugriff, welche die Daten der vorherigen Instanz teilen.
+Ein gutes Beispiel bietet die einfach verkettete Liste (@fig:linked-sharing).
+
+#subpar.grid(
+  figure(figures.list.new, caption: [
+    Eine Liste `l` wird über die Sequenz `[A, B, C]` angelegt.
+  ]),
+  figure(figures.list.copy, caption: [
+    Eine Kopie `m` von `l` teilt sich den Kopf der Liste mit `l`.
+  ]),
+  figure(figures.list.pop, caption: [
+    // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
+    Soll der Kopf von `m` gelöscht werden, zeigt `m` stattdessen auf den Rest. \ \
+  ]),
+  figure(figures.list.push, caption: [
+    Soll ein neuer Kopf an `n` angefügt werden, kann der Rest weiterhin geteilt werden.
+  ]),
+  columns: 2,
+  caption: [
+    Eine Abfolge von Operationen auf persistenten verketten Listen.
+  ],
+  label: <fig:linked-sharing>,
+)
+
+Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im folgenden klare Terminologie für bestimmte Konzepte der Persistenz.
+
+/ Daten:
+  Die Teile einer Datenstruktur welche die eigentlichen Elemente enthält, in @fig:linked-sharing beschreibt das die Knoten mit einfacher Umrandung, während doppelt umrandete Knoten die Instanzen sind.
+/ Schreibfähigkeit:
+  Möglichkeit von Schreibzugriffen, ohne die vorherigen Daten intakt zu lassen.
+  Das steht im Gegensatz zu persistenten Datenstrukturen, welche bei jedem Schreibzugriff eine neue Instanz zurückgeben.
+  Die Listen in @fig:linked-sharing sind teilweise schreibfähig, da eine Instanz selbst schreibfähig ist, aber geteilte Daten nicht von einer Instanz allein verändert werden können.
+/ Copy-on-Write (CoW):
+  Mechanismus zur Datenteilung + Schreibfähigkeit, viele Instanzen teilen sich die gleichen Daten.
+  Eine Instanz gilt als Referent der Daten, auf welchen sie zeigt.
+  Ist diese Instanz der einzige Referent, können die Daten direkt beschrieben werden, ansonsten werden die geteilten Daten kopiert (teilweise, sofern möglich), sodass die Instanz einziger Referent der neuen Daten ist. #no-cite
+
+Persistenz zeigt vorallem bei Baumstrukturen ihre Vorteile, bei der Kopie der Daten eines persistenten Baums können je nach Tiefe und Balance des Baumes Großteile des Baumes geteilt werden.
+Ähnlich persistenter einfacher verketteter Listen, werden bei Schreibzugriffen auf persistente Bäume nur die Knoten des Baumes kopiert, welche zwischen Wurzel und dem veränderten Knoten liegen.
+Betrachten wir partielle Persistenz von Bäume am Beispiel eines Binärbaums, sprich eines Baums mit Zweigfakoren zwishen $0$ und $2$.
+@fig:tree-sharing illustriert wie am Binärbaum `t` ein Knoten `X` angefügt werden kann, ohne dessen partielle Persistenz aufzugeben.
+Es wird eine neue Instanz angelegt und eine Kopie der Knoten `A` und `C` angelegt, der neue Knoten `X` wird in `C` eingehangen und der Knoten `B` wird von beiden `A` Knoten geteilt.
+Durch die Teilung on `B` werden auch alle Kindknoten unter `B` geteilt.
+
+#subpar.grid(
+  figure(figures.tree.new, caption: [
+    Eine Baumstruktur `t`, an welche ein neuer Knoten `X` unter `C` angefügt werden soll.
+  ]), <fig:tree-sharing:new>,
+  figure(figures.tree.shared, caption: [
+    Bei Hinzufügen des Knotens `X` als Kind des Knotens `C` wird ein neuer Baum `u` angelegt.
+  ]), <fig:tree-sharing:shared>,
+  columns: 2,
+  caption: [
+    Partielle Persistenz teilt zwischen mehreren Instanzen die Teile der Daten, welche sich nicht verändert haben, ähnlich der Persistenz in @fig:linked-sharing.
+  ],
+  label: <fig:tree-sharing>,
+)
+
+Für unbalancierte Bäume lässt sich dabei aber noch keine besonders gute Zeitkomplexität garantieren.
+Bei einem Binärbaum mit $n$ Kindern, welcher maximal unbalanciert ist (equivalent einer verketten Liste), degeneriert die Zeitkomplexität zu $Theta(n)$ für Veränderungen am Blatt des Baumes.
+Ein perfekt balancierter Binärbaum hat eine Tiefe $d = log_2 n$, sodass jeder Schreibzugriff auf einem persistenten Binärbaum maximal $d$ Knoten (Pfad zwischen Wurzel und Blattknoten) kopieren muss.
 
 = Lösungsansatz
 Zunächst definieren wir Invarianzen von T4gl-Arrays, welche durch eine Änderung der Storage-Datenstruktur nicht verletzt werden dürfen:
