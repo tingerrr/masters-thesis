@@ -1,109 +1,47 @@
 #import "/src/util.typ": *
 #import "/src/figures.typ"
 
-#todo[This is too elaborate and needs to be slimmed down.]
+Die in @chap:non-solutions beschriebenen Lösungsansätze haben alle etwas gemeinsam, sie bekämpfen Symptome statt Ursachen.
+Die Häufigkeit der Kopien kann reduziert werden, aber nie komplett eliminiert, da es eine fundamentale Operation ist.
+Es gilt also, ungeachtet der Häufigkeit einer solchen Operation, auf Seiten der Implementierung von T4gl-Arrays, Kopien von Daten nur dann Anzufertigen wenn das vonnöten ist.
+In @sec:t4gl:arrays wurde beschreiben wie T4gl-Arrays bereits Datenteilen und nur bei Schreibzugriffen auf geteilte Daten Kopien erstellen.
+Das fundamentale Problem ist, dass bei Schreibzugriffen auf geteilte Daten, ungeachtet der Ähnlichkeit der Daten nach dem Schreibzugriff, alle Daten kopiert werden.
 
-Datenstrukturen sind Organisierungsstrukturen der Daten im Speicher eines Rechensystems.
-Der Aufbau dieser Datenstrukturen hat Einfluss auf deren Speicherbedarf und das Zeitverhalten verschiedener Operationen auf diesen Datenstrukturen.
-Die Wahl der Datenstruktur ist abhängig vom Anwendungsfall und den Anforderungen der Datenverwaltung.
+Im Folgenden wird beschrieben wie effiziente Datenteilung durch _Persistenz_, auf Speicherebene der T4gl-Arrays die Komplexität von Typ-3 Kopien auf logarithmische Komplexität senken kann.
+Es werden die Begriffe der _Persitenz_ und _Kurzlebigkeit_ im Kontext von Datenstrukturen eingeführt, sowie der aktuelle Stand persistenter Datenstrukturen beschrieben.
+Im Anschluss werden persistente Datenstrukturen untersucht, welche als Alternative der jetzigen _Qt-Instanzen_ verwendet werden können.
 
-Dynamische Datenstrukturen sind Datenstrukturen, welche vor allem dann Verwendung finden, wenn die Anzahl der verwalteten Elemente nicht vorraussehbar ist.
-Ein klassisches Beispiel für eine dynamische Datenstruktur ist der Vektor, ein dynamisches Array.
+= Kurzlebige Datenstrukturen <sec:eph-data>
+Um den Begriff der _Persistenz_ zu verstehen, müssen zunächst _kurzlebige_ oder gewöhnliche Datenstrukuren entgegengestellt werden.
+Dafür betrachten wir den Vektor, ein dynamisches Array.
 
 #figure(
-  ```cpp
-  #import <vector>
+  figures.vector.repr,
+  caption: [Der Aufbau eines Vektors in C++.],
+) <fig:vec-repr>
 
-  int main() {
-    std::vector<int> vec;
+Ein Vektor besteht in den meisten Fällen aus 3 Elementen, einen Pointer `ptr` auf die Daten des Vektors (in #text(gray)[*grau*] eingezeichnet), die Länge `len` des Vektors und die Kapazität `cap`.
+@fig:vec-repr zeigt den Aufbau eines Vektors in C++ #footnote[
+  Der gezeigte Aufbau ist nicht vom Standard @bib:iso-cpp-20 vorgegeben, manche Implementierungen speichern statt der Kapazität einen `end` Pointer aus welchem die Kapaziät errechnet werden kann.
+  Funktionalität und Verhalten sind allerdings gleich.
+].
+Operationen am Vektor wie `push_back`, `pop_back` oder Indizierung arbeiten direkt am Speicher welcher an `ptr` anfängt.
+Reicht der Speicher nicht aus, wird er erweitert und die Daten werden aus dem alten Speicher in den neuen Speicher verschoben.
+Die in @lst:vec-ex gezeigten Aufrufe zu `push_back` schreiben die Werte direkt in den Speicher des Vektors.
+Zu keinem Zeitpunkt gibt es mehrere Instanzen welche auf die gleichen Daten zeigen.
+Wird der Vektor `vec` auf `other` zugewiesen, werden alle Daten kopiert, die Zeitkomplexität der Kopie selbst ist proportional zur Anzahl der Elemente $Theta(n)$.
 
-    vec.push_back(3);
-    vec.push_back(2);
-    vec.push_back(1);
-
-    return 0;
-  }
-  ```,
+#figure(
+  figures.vector.example,
   caption: [
-    Ein C++ Program welches einen `std::vector` anlegt und mit Werten befüllt.
+    Ein C++ Program, welches einen `std::vector` anlegt und mit Werten befüllt.
   ],
 ) <lst:vec-ex>
 
-Die C++ Standardbibliothek stellt unter der Header-Datei `<vector>` die gleichnamige Template-Klasse bereit.
-`std::vector` verfügt über Methoden, welche den Speicher erweitern, sofern das für die gegebene Operation nötig oder möglich ist.
-So wird zum Beispiel bei der Verwendung von `push_back` der Speicher erweitert, wenn die jetzige Kapazität des Vektors unzureichend ist.
-@lst:vec-ex zeigt wie ein `std::vector` angelegt und stückweise befüllt werden kann, dabei wird zum ersten Aufruf von `push_back` der dynamische Speicher angelegt.
-Muss der Speicher zum Erweitern verschoben werden, ergibt sich eine Zeitkomplexität von $O(n)$.
-#footnote[
-  Die Zeitkomplexität von `push_back` über die gesamte Lebenszeit eines Vektors ist durch den Wachstumsfaktor amortisiert konstant @bib:iso-cpp-20[S. 834].
-  Wird die Kapazität vorher reserviert und nicht überschritten, ist die Komplexität $O(1)$.
-]
-Nach dem dritten Aufruf von `push_back` enthält der Vektor die Sequenz `[3, 2, 1]`.
-Ein Vektor bringt über dem herkömmlichen Array verschiedene Vor- und Nachteile mit sich.
-
-*Vorteile*
-- Die Kapazität ist nicht fest definiert, es kann zur Laufzeit entschieden werden, wie viele Objekte gespeichert werden.
-- Die Verwaltung der Daten wird automatisch durch den Vektor übernommen.
-
-*Nachteile*
-- Durch die unbekannte Größe können Iterationen über die Struktur seltener aufgerollt oder anderweitig optimiert werden.
-
-Die bekannte Größe eines Arrays hat nicht nur Einfluss auf die Optimierungsmöglichkeiten eines Programms, sondern auch auf die Komplexitätsanalyse.
-Ist die Länge des Arrays bereits zur Analysezeit bekannt und unabhängig von er Problemgröße, kann sie wie eine Konstante behandelt werden.
-
-#figure(
-  ```cpp
-  void print_array(std::array<int, 3>& arr) {
-    for (const int& value : arr) {
-      std::cout << value << std::endl;
-    }
-  }
-  ```,
-  caption: [
-    Eine Funktion welche über ein `std::array` der Länge 3 iteriert und dessen Werte ausgibt.
-  ],
-) <lst:array-ex>
-
-Die Zeitkomplexität von `print_array` in @lst:array-ex ist $Theta(n)$ mit $n = 3$, für die weitere Analyse kann die Zeitkomplexität von `print_array` als $Theta(1)$ betrachtet werden.
-@lst:array-ex-unrolled zeigt eine alternative Schreibweise der Schleife aus @lst:array-ex.
-#footnote[
-  Unter Anwendung von Compiler-Optimierungen wird dies, wenn sinnvoll, automatisch vorgenommen.
-]
-
-#figure(
-  ```cpp
-  std::cout << value[0] << std::endl;
-  std::cout << value[1] << std::endl;
-  std::cout << value[2] << std::endl;
-  ```,
-  caption: [Die Schleife aus @lst:array-ex nach dem Aufrollen.],
-) <lst:array-ex-unrolled>
-
-Es folgt aus der Substitution, dass das Programm keine Schleifen enthält, deren Höchstiterationszahl nicht bekannt ist.
-Man vergleiche dies mit dem Programm in @lst:vector-ex.
-Die Schleife ist nicht mehr trivial aufrollbar, da über die Anzahl der Elemente in `vec` ohne Weiteres keine Annahme gemacht werden kann.
-Die Zeitkomplexität der Funktion `print_vector` ist $Theta(n)$, da deren Laufzeit linear von der Problemgröße $n$ abhängt.
-
-#figure(
-  ```cpp
-  void print_vector(std::vector<int>& vec) {
-    for (const int& value : vec) {
-      std::cout << value << std::endl;
-    }
-  }
-  ```,
-  caption: [
-    Eine Funktion ähnlich der aus @lst:array-ex, mit einem `std::vector`, statt einem `std::array`.
-  ],
-) <lst:vector-ex>
-
-Es ist nicht unmöglich, fundierte Vermutungen über die Anzahl von Elementen in einer Datenstruktur anzustellen.
-Dennoch fällt es mit dynamischen Datenstrukturen schwerer, alle Invarianzen eines Programms bei der Analyse zu berücksichtigen.
-
 = Persistenz und Kurzlebigkeit <sec:per-eph>
 Wenn eine Datenstruktur bei Schreibzugriffen die bis dahin bestehenden Daten nicht verändert, gilt diese als _persistent/langlebig_ @bib:kt-96[S. 202].
-In den Standartbibliotheken verschiedener Programmiersprachen hat sich für dieses Konzept der Begriff _Immutable_ durchgesetzt.
-Im Gegensatz dazu stehen Datenstrukturen, welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als _kurzlebig_.
+In den Standartbibliotheken verschiedener Programmiersprachen hat sich für dieses Konzept der Begriff _immutable_ durchgesetzt.
+Im Gegensatz dazu stehen Datenstrukturen, welche bei Schreibzugriffen ihre Daten direkt beschreiben, diese gelten als _kurzlebig_, wie zum Beispiel der Vektor, beschrieben in @sec:eph-data.
 Persistente Datenstrukturen erstellen meist neue Instanzen für jeden Schreibzugriff, welche die Daten der vorherigen Instanz teilen.
 Ein gutes Beispiel bietet die einfach verkettete Liste (@fig:linked-sharing).
 
@@ -116,10 +54,10 @@ Ein gutes Beispiel bietet die einfach verkettete Liste (@fig:linked-sharing).
   ]),
   figure(figures.list.pop, caption: [
     // NOTE: the double linebreaks are a bandaid fix for the otherwise unaligned captions
-    Soll der Kopf von `m` gelöscht werden, zeigt `m` stattdessen auf den Rest. \ \
+    Soll der Kopf von `m` gelöscht werden, zeigt eine neue Liste `n` stattdessen auf den Rest. \
   ]),
   figure(figures.list.push, caption: [
-    Soll ein neuer Kopf an `n` angefügt werden, kann der Rest weiterhin geteilt werden.
+    Soll ein neuer Kopf an `n` angefügt werden, kann der Rest durch die neue Instanz `o` weiterhin geteilt werden.
   ]),
   columns: 2,
   caption: [
@@ -128,21 +66,15 @@ Ein gutes Beispiel bietet die einfach verkettete Liste (@fig:linked-sharing).
   label: <fig:linked-sharing>,
 )
 
-Die in @fig:linked-sharing gezeigte Trennung von Kopf und Instanz ermöglicht im folgenden klare Terminologie für bestimmte Konzepte der Persistenz.
-
+Im Folgenden werden durch die Datenteilung _Instanzen_ und _Daten_ semantische getrennt:
+/ Instanzen:
+  Teile der Datenstruktur, welche auf die geteilten Daten verweisen und anderweitig nur Verwaltungsinformationen enthalten.
 / Daten:
   Die Teile einer Datenstruktur welche die eigentlichen Elemente enthält, in @fig:linked-sharing beschreibt das die Knoten mit einfacher Umrandung, während doppelt umrandete Knoten die Instanzen sind.
-/ Schreibfähigkeit:
-  Möglichkeit von Schreibzugriffen, ohne die vorherigen Daten intakt zu lassen.
-  Das steht im Gegensatz zu persistenten Datenstrukturen, welche bei jedem Schreibzugriff eine neue Instanz zurückgeben.
-  Die Listen in @fig:linked-sharing sind teilweise schreibfähig, da eine Instanz selbst schreibfähig ist, aber geteilte Daten nicht von einer Instanz allein verändert werden können.
-/ Copy-on-Write (CoW):
-  Mechanismus zur Datenteilung + Schreibfähigkeit, viele Instanzen teilen sich die gleichen Daten.
-  Eine Instanz gilt als Referent der Daten, auf welchen sie zeigt.
-  Ist diese Instanz der einzige Referent, können die Daten direkt beschrieben werden, ansonsten werden die geteilten Daten kopiert (teilweise, sofern möglich), sodass die Instanz einziger Referent der neuen Daten ist. #no-cite
 
 Persistenz zeigt vorallem bei Baumstrukturen ihre Vorteile, bei der Kopie der Daten eines persistenten Baums können je nach Tiefe und Balance des Baumes Großteile des Baumes geteilt werden.
 Ähnlich persistenter einfacher verketteter Listen, werden bei Schreibzugriffen auf persistente Bäume nur die Knoten des Baumes kopiert, welche zwischen Wurzel und dem veränderten Knoten liegen.
+Dass nennt sich eine Pfadkopie (_engl._ path copying).
 Betrachten wir partielle Persistenz von Bäume am Beispiel eines Binärbaums, sprich eines Baums mit Zweigfakoren zwishen $0$ und $2$.
 @fig:tree-sharing illustriert wie am Binärbaum `t` ein Knoten `X` angefügt werden kann, ohne dessen partielle Persistenz aufzugeben.
 Es wird eine neue Instanz angelegt und eine Kopie der Knoten `A` und `C` angelegt, der neue Knoten `X` wird in `C` eingehangen und der Knoten `B` wird von beiden `A` Knoten geteilt.
@@ -165,9 +97,10 @@ Durch die Teilung on `B` werden auch alle Kindknoten unter `B` geteilt.
 Für unbalancierte Bäume lässt sich dabei aber noch keine besonders gute Zeitkomplexität garantieren.
 Bei einem Binärbaum mit $n$ Kindern, welcher maximal unbalanciert ist (equivalent einer verketten Liste), degeneriert die Zeitkomplexität zu $Theta(n)$ für Veränderungen am Blatt des Baumes.
 Ein perfekt balancierter Binärbaum hat eine Tiefe $d = log_2 n$, sodass jeder Schreibzugriff auf einem persistenten Binärbaum maximal $d$ Knoten (Pfad zwischen Wurzel und Blattknoten) kopieren muss.
+Je besser ein persistenter Baum balanciert ist, desto geringer ist die Anzahl der Knoten welche bei Pfadkopien unnötig kopiert werden müssen.
 
 = Lösungsansatz
-Zunächst definieren wir Invarianzen von T4gl-Arrays, welche durch eine Änderung der Storage-Datenstruktur nicht verletzt werden dürfen:
+Zunächst definieren wir Invarianzen von T4gl-Arrays, welche durch eine Änderung der Implementierung nicht verletzt werden dürfen:
 + T4gl-Arrays sind assoziative Datenstrukturen.
   - Es werden Werte mit Schlüsseln addressiert.
 + T4gl-Arrays sind nach ihren Schlüsseln geordnet.
@@ -177,35 +110,60 @@ Zunächst definieren wir Invarianzen von T4gl-Arrays, welche durch eine Änderun
   - Schreibzugriffe auf ein Array, welches eine flache Kopie eines anderen T4gl-Arrays ist, sind in beiden Instanzen sichtbar.
   - Tiefe Kopien von T4gl-Arrays teilen sichtbar keine Daten, ungeachtet, ob die darin enthaltenen Typen selbst Referenztypen sind.
 
-Die Ordnung der Schlüssel schließt ungeordnete assoziative Datenstrukturen wie Hashtabellen aus und das Referenztypenverhalten ist durch Referenzzählung und Storage-Instanzteilung wie bis dato umsetzbar.
-Es muss lediglich die Implementierung der Storage-Instanzen insofern verbessert werden, dass Schlüssel geordnet vorliegen und nicht dicht verteilt sein müssen.
+Die Ordnung der Schlüssel schließt ungeordnete assoziative Datenstrukturen wie Hashtabellen aus
+Das Referenztypenverhalten ist dadurch umzusetzten, dass wie bis dato drei Ebenen verwendet werden (@sec:t4gl:arrays), es werden lediglich die _Qt-Instanzen_ durch neue Datenstrukturen ersetzt.
 Essentiell für die Verbesserung des _worst-case_ Zeitverhaltens bei Kopien und Schreibzugriffen ist die Reduzierung der Daten, welche bei Schreibzugriffen kopiert werden müssen.
 Hauptproblem bei flachen Kopien gefolgt von Schreibzugriff auf CoW-Datenstrukturen, ist die tiefe Kopie _aller_ Daten in den Daten der Instanzen, selbst wenn nur ein einziges Element beschrieben oder eingefügt/entfernt wird.
 Ein Großteil der Elemente in den originalen und neuen kopierten Daten sind nach dem Schreibzugriff gleich.
-Deshalb wurde als Basis des Lösungsansatzes die Wahl einer persistenten Datenstruktur mit granularer Datenteilung festgelegt.
-Durch höhere Granularität der Datenteilung müssen bei Schreibzugriffen weniger Daten kopiert werden.
+Durch höhere Granularität der Datenteilung müssen bei Schreibzugriffen weniger unveränderte Daten kopiert werden.
+
 Ein Beispiel für persistente Datenstrukturen mit granularer Datenteilung sind RRB-Vektoren @bib:br-11 @bib:brsu-15 @bib:stu-15, eine Sequenzdatenstruktur auf Basis von Radix-Balancierten Bäumen.
-Trotz der zumeist logarithmischen _worst-case_ Komplexitäten können RRB-Vektoren nicht als Basis für T4gl-Arrays dienen, da die Effizienz der RRB-Vektoren auf der Relaxed-Radix-Balancierung aufbaut, welche von einer Sequenzdatenstrukur ausgeht.
-Da die Schlüsselverteilung in T4gl-Arrays nicht dicht ist, können die Schlüssel nicht ohne Weiteres auf dicht verteilte Indizes abgebildet werden, welche für die Radixsuche essentiell sind.
-Ohne die Relaxed-Radix-Balancierung handelt es sich bei RRB-Vektoren lediglich um B-Bäume @bib:bm-70 @bib:bay-71 hoher Ordnung.
-Bei persistenten B-Bäumen haben die meisten Operationen eine _worst-_ und _average-case_ Zeitkomplexität von $Theta(log n)$.
-Eine Verbesserung der _average-case_ Zeitkomplexität für bestimmten Sequenzoperationen (_Push_, _Pop_) bieten 2-3-Fingerbäume @bib:hp-06.
+Trotz der zumeist logarithmischen _worst-case_ Komplexitäten, können RRB-Vektoren nicht als Basis für T4gl-Arrays verwendet werden.
+Die Effizienz der RRB-Vektoren baut auf der Relaxed-Radix-Balancierung, dabei wird von einer Sequenzdatenstrukur ausgegangen.
+Da die Schlüsselverteilung in T4gl-Arrays nicht dicht ist, können die Schlüssel nicht ohne Weiteres auf dicht verteilte Indizes abgebildet werden.
+Etwas fundemantaler sind B-Bäume @bib:bm-70 @bib:bay-71, bei persistenten B-Bäumen haben die meisten Operationen eine _worst-_ und _average-case_ Zeitkomplexität von $Theta(log n)$.
+Eine Verbesserung der _average-case_ Zeitkomplexität für bestimmte Sequenzoperationen (_Push_, _Pop_) bieten 2-3-Fingerbäume @bib:hp-06.
 Diese bieten sowohl exzellentes Zeitverhalten, als auch keine Enschränkung auf die Schlüsselverteilung.
 Im folgenden werden 2-3-Fingerbäume als alternative Storage-Datenstrukturen für T4gl-Arrays untersucht.
 
 #todo[
-  + The mention of persistence without an example seems jarring, but showing an example here and in @sec:per-eph also feels weird.
-  + The above could go with some examples, especially regarding RRB-Vectors and how they could be used as paired sequences ordered by key on insertion given that it's insert/remove bounds are sublinear.
+  The above could go with some examples, especially regarding RRB-Vectors and how they could be used as paired sequences ordered by key on insertion given that it's insert/remove bounds are sublinear.
 ]
 
-= 2-3-Bäume
-#todo[
-  Introduce the notation of 2-3 Trees as the simpelest Form of B-Tree, this should give a good indication why the generalization of FingerTrees uses B-Trees itself and what 2-3-4-FingerTrees mean notationally.
-  Introduce the usage of branching factors here or further up depending on when it is first used.
-]
+= B-Bäume
+Eine für die Persistenz besonders gut geeignete Datenstruktur sind B-Bäume @bib:bm-70 @bib:bay-71, da diese durch ihren Aufbau generell balanciert sind.
+Schreiboperationen auf persistenten B-Bäumen müssen lediglich $Theta(log n)$ Knoten kopieren.
+B-Bäume können vollständig durch ihre Zweigfaktoren beschreiben kategorisiert werden, sprich, die Anzahl der Kindknoten, welche ein interner Knoten haben kann bzw. muss.
+Ein B-Baum ist wiefolgt definiert @bib:knu-98[S. 483]:
++ Jeder Knoten hat maximal $k_max$ Kindknoten.
++ Jeder interne Knoten, außer dem Wurzelknoten, hat mindestens $k_min = ceil(k_max \/ 2)$ Knoten
++ Der Wurzelknoten hat mindestens 2 Kindknoten, es sei denn dieser ist selbst ein Blattknoten
++ Alle Blattknoten haben die gleiche Entfernung zum Wurzelknoten
++ Ein interner Knoten mit $k$ Kindknoten enthält $k - 1$ Schlüssel
+
+Üblicherweise, beschreibt man B-Bäume durch Angabe ihrer Zweigfaktoren, ein B-Baum mit den Zweigfaktoren $k_min = 32$ und $k_max = 64$ wäre eine 32-64-Baum.
+
+Die Schlüssel innerhalb eines internen Knoten dienen als Suchhilfe, sie sind Elemente mit fester Ordnungsrelation und treten aufsteigend geordnet auf.
+@fig:b-tree zeigt einen internen Knoten eins B-Baumes mit $k_min = 2$ und $k_max = 4$, ein sogannter 2-4-Baum.
+Dabei sind $s_i$ Schlüssel und $k_j$ Kindknoten des internen Knoten.
+Die Schlüssel der Unterbäume sind dabei wiefolgt verteilt, sei $x$ ein Schlüssel im Unterbaum mit der Wurzel $k_i$, so gilt
+
+$
+  &x <= s_i             &&bold("wenn") i = 1 \
+  &x > s_(i - 1)        &&bold("wenn") i = k_max \
+  &s_(i - 1) < x <= s_i &&bold("sonst") \
+$
+
+Die Schlüssel dienen als Trennwerte der Unterbäume und erlauben bei der Suche auf jeder Ebene den Suchbereich drastisch zu reduzieren.
+Die simpelste Form von B-Bäumen sind sogennante 2-3-Bäume (B-Bäume mit $k_min = 2$ und $k_max = 3$), dabei ist die Angabe der Zweigfaktoren als Prefix des Baums eine übliche Konvention.
+
+#figure(
+  figures.b-tree.node,
+  caption: [Ein interner B-Baum Knoten eines 2-4-Baumes.],
+) <fig:b-tree>
 
 = 2-3-Fingerbäume
-2-3-Fingerbäume wurden von !HINZE und !PATERSON @bib:hp-06 eingeführt und sind eine Erweiterung von 2-3-Bäumen, welche für verschiedene Sequenzoperationen optimiert wurden.
+2-3-Fingerbäume wurden von !Hinze und !Paterson @bib:hp-06 eingeführt und sind eine Erweiterung von 2-3-Bäumen, welche für verschiedene Sequenzoperationen optimiert wurden.
 Die Authoren führen dabei folgende Begriffe im Verlauf des Texts ein:
 / Spine: Die Wirbelsäule eines Fingerbaums, sie beschreibt die Kette der zentralen Knoten, welche die sogenannten _Digits_ enthalten.
 / Digit: Erweiterung von 2-3-Knoten auf 1-4-Knoten, von welchen jeweils zwei in einem Wirbelknoten vorzufinden sind.
@@ -552,8 +510,7 @@ Welche Seite, hängt davon ab an welcher Seite eine Operation wie _Push_ oder _P
 Wir betrachten den Über- und Unterlauf einer unsicheren Ebene $t$ in eine oder aus einer sicheren Ebene $t + 1$.
  Über- oder Unterlauf von unsicheren Ebenen in bzw. aus unsicheren Ebenen kann rekursiv angewendet werden bis eine sichere Ebene erreicht wird.
 Ähnlich der 2-3-Fingerbäume wird durch die Umwandlung von unsicheren in sichere Ebenen dafür gesorgt, dass nur jede zweite Operation eine Ebene in dem Baum herabsteigen muss, nur jede vierte zwei Ebenen, und so weiter.
-
-#todo[Mention the term of "recursive slowdown" (coined by Okasaki).]
+Dieses Konzept nennt sich impliziter rekursive Verlangsamung (_eng._ implicit recursive slowdown) @bib:oka-98 und ist Kernbestandteil der amortisierten Komplexität _Deque_-Operationen.
 
 Damit die Elemente einer Ebene $t$ in eine andere Ebene $t + 1$ überlaufen können, müssen diese in einen Knoten der Ebene $t + 1$ passen, es gilt
 $

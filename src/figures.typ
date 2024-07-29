@@ -2,7 +2,9 @@
   big-o,
   list,
   t4gl,
+  vector,
   tree,
+  b-tree,
   finger-tree,
 ) = {
   import "/src/util.typ": *
@@ -104,7 +106,7 @@
     node((1, 0), `B`, stroke: green)
     edge("-|>")
     node((1.5, 0), `C`, stroke: green)
-    instance((0, 0.5), `m`)
+    instance((0, 0.5), `n`)
     edge((1, 0), "-|>")
   })
 
@@ -116,7 +118,7 @@
     node((1, 0), `B`, stroke: green)
     edge("-|>")
     node((1.5, 0), `C`, stroke: green)
-    instance((0, 0.5), `m`)
+    instance((0, 0.5), `o`)
     edge("-|>")
     node((0.5, 0.5), `D`)
     edge((1, 0), "-|>")
@@ -185,6 +187,45 @@
   })
 
   //
+  // vector
+  //
+  let vector-repr = cetz.canvas({
+    import cetz.draw: *
+
+    rotate(x: 180deg)
+
+    rect((-0.1, -0.1), (1.1, 3.1))
+    grid((0, 0), (1, 3))
+    content((0.5, 0.5), `ptr`)
+    content((0.5, 1.5), `len`)
+    content((0.5, 2.5), `cap`)
+
+    grid((3, 0), (4, 4), stroke: gray)
+    content((3.5, 0.5), `e1`)
+    content((3.5, 1.5), `e2`)
+    content((3.5, 2.5), `e3`)
+    content((3.5, 3.5), `...`)
+
+    line((1, 0.5), (3, 0.5), mark: (end: (symbol: ">", fill: black)))
+  })
+
+  let vector-ex = ```cpp
+  #import <vector>
+
+  int main() {
+    std::vector<int> vec;
+
+    vec.push_back(3);
+    vec.push_back(2);
+    vec.push_back(1);
+
+    std::vector<int> other = vec;
+
+    return 0;
+  }
+  ```
+
+  //
   // trees
   //
   let tree-new = fdiag({
@@ -232,9 +273,38 @@
   })
 
   //
+  // b-tree
+  //
+  let b-tree-node = cetz.canvas({
+    import cetz.draw: *
+
+    rotate(x: 180deg)
+
+    grid((0, 0), (3, 1))
+    content((0.5, 0.5), $s_1$)
+    content((1.5, 0.5), $s_2$)
+    content((2.5, 0.5), $s_3$)
+
+    line((-1, 2), (0, 1), name: "l1")
+    line((0.5, 2), (1, 1), name: "l2")
+    line((2.5, 2), (2, 1), name: "l3")
+    line((4, 2), (3, 1), name: "l4")
+
+    for l in range(1, 5) {
+      content(
+        ("l" + str(l) + ".start", 50%, "l" + str(l) + ".end"),
+        box(
+          fill: white,
+          outset: (bottom: 0.4em, x: 0.2em),
+          $k_#l$
+        ),
+      )
+    }
+  })
+
+  //
   // finger-tree
   //
-
   let finger-tree = fdiag({
     let elem = node.with(radius: 7.5pt)
     let spine = node.with(radius: 7.5pt, fill: blue.lighten(75%))
@@ -319,8 +389,15 @@
       deep-mut: t4gl-deep-mut,
     ),
     (
+      repr: vector-repr,
+      example: vector-ex,
+    ),
+    (
       new: tree-new,
       shared: tree-shared,
+    ),
+    (
+      node: b-tree-node,
     ),
     finger-tree,
   )

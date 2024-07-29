@@ -324,6 +324,7 @@ bib:sch-05:
   author:
     - Scholz, Peter
   date: 2005-04-13
+  edition: 1
   url:
     value: https://link.springer.com/chapter/10.1007/3-540-27522-3_3
     date: 2023-05-22
@@ -334,7 +335,6 @@ bib:sch-05:
     isbn: 978-3-540-23405-0
     issn: 1439-5428
     e-issn: 2522-0667
-  edition: 1
 
 bib:lo-11:
   type: book
@@ -343,8 +343,59 @@ bib:lo-11:
   author:
     - Laplante, Phillip A.
     - Ovaska, Seppo J.
-  edition: 4
   date: 2011-11
+  edition: 4
   publisher: Wiley & IEEE Press
   serial:
     isbn: 978-1-118-13660-7
+
+bib:knu-97a:
+  type: book
+  title: "The Art of Computer Programming Volume 1: Fundamental Algorithms"
+  author:
+    - Knuth, Donald Ervin
+  date: 1997
+  volume: 1
+  edition: 3
+  publisher: Addison-Wesley
+  location: Reading, Massachusetts, USA
+  serial:
+    isbn: 978-0-201-89683-1
+
+bib:knu-97b:
+  type: book
+  title: "The Art of Computer Programming Volume 2: Seminumerical Algorithms"
+  author:
+    - Knuth, Donald Ervin
+  date: 1998
+  volume: 2
+  edition: 2
+  publisher: Addison-Wesley
+  location: Reading, Massachusetts, USA
+  serial:
+    isbn: 978-0-201-89684-8
+
+bib:knu-98:
+  type: book
+  title: "The Art of Computer Programming Volume 3: Sorting and Searching"
+  author:
+    - Knuth, Donald Ervin
+  date: 1998
+  volume: 3
+  edition: 2
+  publisher: Addison-Wesley
+  location: Reading, Massachusetts, USA
+  serial:
+    isbn: 978-0-201-89685-5
+
+bib:oka-98:
+  type: book
+  title: Purely Functional Data Structures
+  author:
+    - Okasaki, Chris
+  date: 1998
+  publisher: Cambridge University Press
+  location: The Pitt Building, Trumpington Street, Cambridge, United Kingdom
+  serial:
+    isbn: 521-63124-6
+    doi: 10.1017/CBO9780511530104

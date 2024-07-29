@@ -79,12 +79,12 @@ Diese Konventionen sollen vorallem Konzepte der Persistenz vereinfachen.
 == Notation
 #todo[This is too elaborate and needs to be slimmed down to the bare minimum.]
 
-!LANDAU-Symbole umfassen Symbole zur Klassifizierung der asymptotischen Komplexität von Funktionen und Algorithmen.
-Im folgenden werden Variationen der !KNUTH'schen Definitionen verwendet @bib:knu-76[S. 19] @bib:clrs-09[S. 44-48], sprich:
+!Landau-Symbole umfassen Symbole zur Klassifizierung der asymptotischen Komplexität von Funktionen und Algorithmen.
+Im folgenden werden Variationen der !Knuth'schen Definitionen verwendet @bib:knu-76[S. 19] @bib:clrs-09[S. 44-48], sprich:
 
 #figures.big-o <eq:big-o>
 
-Bei der Verwendung von !LANDAU-Symbolen steht die Variable $n$ für die Größe der Daten welche für die Laufzeit eines Algorithmus relevant sind.
+Bei der Verwendung von !Landau-Symbolen steht die Variable $n$ für die Größe der Daten welche für die Laufzeit eines Algorithmus relevant sind.
 Bei Operationen auf Datenstrukturen entspricht die Größe der Anzahl der verwalteten Elemente in der Struktur.
 
 #figure(
