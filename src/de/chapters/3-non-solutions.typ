@@ -5,7 +5,7 @@
   This chapter introduces solutions which were initially considered, but either don't solve the problem entirely, or rely on other changes to bring anything worthwile to the table.
   This includes:
   - new move semantics similar to Rust
-    - breaking change for basiclaly all codebasese
+    - breaking change for basically all codebases
     - too complex for a high level language
     - would need significant changes in the compiler and runtime
     - does not help when copies are actually required

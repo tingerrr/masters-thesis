@@ -1,7 +1,7 @@
 #import "/src/util.typ": *
 #import "/src/figures.typ"
 
-T4gl (_engl._ #strong[T]esting #strong[4]th #strong[G]eneration #strong[L]anguage) ist ein proprietäres Softwareprodukt zur Entwicklung von Testsoftware für Reifenprüfanlagen.
+T4gl (_engl._ #strong[T]esting #strong[4]th #strong[G]eneration #strong[L]anguage) ist ein proprietäres Softwareprodukt zur Entwicklung von Testsoftware für Industrieprüfanlagen wie die  LUB (#strong[L]ow Speed #strong[U]niformity and #strong[B]alance) oder HSU (#strong[H]igh #strong[S]peed #strong[U]niformity and Balance).
 T4gl steht bei der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) unter Entwicklung und umfasst die folgenden Komponenten:
 - Programmiersprache
   - Anwendungsspezifische Features
@@ -46,7 +46,7 @@ Je nach Strenge der Anforderungen lassen sich Echtzeitsysteme in drei verschiede
   Eine einzige Verletzung der Echtzeitbedingungen hat katastrophale Folgen für das Echtzeitsystem @bib:lo-11[S. 6].
 
 #todo[
-  Reduce this to simply mention hard and firm realtime, but since they aren't important the definitions can go.
+  Reduce this to simply mention hard and firm realtime, since they aren't used the definitions can go.
 ]
 
 Für Anwendungsfälle in denen Echtzeitanforderungen an T4gl gestellt werden, gibt es bei Nichteinhaltung keine katastrophalen Folgen, es müssen lediglich Testergibnisse verwofen werden.
@@ -56,10 +56,10 @@ T4gl ist demnach ein weiches Echtzeitsystem.
 Bei T4gl-Arrays handelt es sich um mehrdimensionale assoziative Arrays mit Schlüsseln, welche eine voll definierte Ordnungsrelation haben.
 Um ein Array in T4gl zu deklarieren, wird mindestens ein Schlüssel- und ein Wertetyp benötigt.
 Auf den Wertetyp folgt in eckigen Klammern eine komma-separierte Liste von Schlüsseltypen.
-Indiezierung erfolgt wie in der Deklaration durch eckige Klammern, es muss aber nicht für alle Schlüssel einen Wert angegeben werden.
+Indizierung erfolgt wie in der Deklaration durch eckige Klammern, es muss aber nicht für alle Schlüssel einen Wert angegeben werden.
 Bei Angabe von weniger Schlüsseln als in der Deklaration, wird eine Referenz auf einen Teil des Arrays zurückgegben.
-Sprich, ein Array des Typs `T[U, V, W]` welches mit `[u]` indieziert wird, gibt ein Unter-Array des Typs `T[V, W]` zurück.
-Wird in der Deklaration des Arrays ein Ganzzahlwert statt eines Typs angegeben (z.B. `T[10]`), wird das Array mit fester Größe und Standartwerten und durchlaufenden Schlüsseln (`0` bis `9`) angelegt.
+Sprich, ein Array des Typs `T[U, V, W]` welches mit `[u]` indiziert wird, gibt ein Unter-Array des Typs `T[V, W]` zurück, ein solches Unter-Array kann entnommen aber nicht gesetzt werden.
+Wird in der Deklaration des Arrays ein Ganzzahlwert statt eines Typs angegeben (z.B. `T[10]`), wird das Array mit fester Größe und Standardwerten und durchlaufenden Schlüsseln (`0` bis `9`) angelegt.
 Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werden.
 
 #figure(
@@ -68,14 +68,13 @@ Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werd
   map[42] = "Hello World!"
 
   String[Integer, Integer] nested
-  nested[0] = map
-  nested[1, 37] = "first item in second sub array"
+  nested[1, 37] = "T4gl is wacky!"
 
-  String[10] static
-  static[9] = "last item"
+  String[10] staticArray
+  staticArray[9] = "Truly wacky!"
   ```,
   caption: [
-    Beispiele für Deklaration und Indiezierung von T4gl-Arrays.
+    Beispiele für Deklaration und Indizierung von T4gl-Arrays.
   ],
 ) <lst:t4gl-ex>
 
@@ -128,11 +127,11 @@ T4gl-Arrays bestehen aus Komponenten in drei Ebenen:
 
 Zwischen den Ebenen 1 und 2 kommt geteilte Schreibfähigkeit durch Referenzzählung zum Einsatz, mehrere T4gl-Instanzen teilen sich eine _Qt-Instanz_ und können von dieser lesen, als auch in sie schreiben, ungeachtet der Anzahl der Referenten.
 Zwischen den Ebenen 2 und 3 kommt CoW + Referenzzählung zum Einsatz, mehrere _Qt-Instanz_ teilen sich die gleichen Daten, Schreibzugriffe auf die Daten sorgen vorher dafür, dass die _Qt-Instanz_ der einzige Referent ist, wenn nötig durch eine Kopie.
-Wir definieren je nach Teife drei Arten von Kopien:
-/ Typ-1 (seichte Kopie):
+Wir definieren je nach Teife drei Typen von Kopien:
+/ Typ-1 (flache Kopie):
   Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleichen _Qt-Instanz_ zeigt.
   Wird in T4gl durch Initialisierung von Arrays durch existierende Instanzen oder die Übergabe von Arrays an normale Funktionen hervorgerufen.
-  Eine seichte Kopie ist immer eine $Theta(1)$ Operation.
+  Eine flache Kopie ist immer eine $Theta(1)$ Operation.
 / Typ-2:
   Eine Kopie der T4gl-Instanz *und* der _Qt-Instanz_, welche beide auf die gleichen Daten zeigen.
   Wird eine tiefe Kopie durch das Laufzeitsystem selbst hervorgerufen, erfolgt die Kopie der Daten verspätet beim nächten Schreibzugriff auf eine der _Qt-Instanzen_.
@@ -157,7 +156,7 @@ Bei korrektem Betrieb des Laufzeitsystems sind Typ-2 Kopien kurzlebig und immer 
     Ein T4gl Array nach Initalisierung. \ \
   ]), <fig:t4gl-indirection:new>,
   figure(figures.t4gl.shallow, caption: [
-    Zwei T4gl-Arrays teilen sich eine C++ Instanz nach seichter Kopie.
+    Zwei T4gl-Arrays teilen sich eine C++ Instanz nach flacher Kopie.
   ]), <fig:t4gl-indirection:shallow>,
   figure(figures.t4gl.deep-new, caption: [
     Zwei T4gl-Arrays teilen sich die gleichen Daten nach tiefer Kopie. \ \
@@ -173,7 +172,7 @@ Bei korrektem Betrieb des Laufzeitsystems sind Typ-2 Kopien kurzlebig und immer 
   Annotate the levels in the above figure to show which level manages which part of the system.
 ]
 
-Ein Hauptanwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
+Ein kritischer Anwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
 Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine Typ-2 Kopie erstellt.
 Die T4gl-Instanz, welche an den Programmierer übergeben wird, sowie die interne _Qt-Instanz_ teilen sich Daten, welche vom Laufzeitsystem zwangsläufig beim nächsten Schreibzugriff kopiert werden müssen.
 Es kommt zur Typ-3 Kopie, und daraus folgend, zu einem nicht-trivialem zeitlichem Aufwand von $Theta(n)$.

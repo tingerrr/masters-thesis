@@ -174,13 +174,13 @@ Zunächst definieren wir Invarianzen von T4gl-Arrays, welche durch eine Änderun
   - Die Schlüsseltypen von T4gl-Arrays haben eine voll definierte Ordnungsrelation.
   - Iteration über T4gl-Arrays ist deterministisch in aufsteigender Reihenfolge der Schlüssel.
 + T4gl-Arrays verhalten sich wie Referenztypen.
-  - Schreibzugriffe auf ein Array, welches eine seichte Kopie eines anderen T4gl-Arrays ist, sind in beiden Instanzen sichtbar.
+  - Schreibzugriffe auf ein Array, welches eine flache Kopie eines anderen T4gl-Arrays ist, sind in beiden Instanzen sichtbar.
   - Tiefe Kopien von T4gl-Arrays teilen sichtbar keine Daten, ungeachtet, ob die darin enthaltenen Typen selbst Referenztypen sind.
 
 Die Ordnung der Schlüssel schließt ungeordnete assoziative Datenstrukturen wie Hashtabellen aus und das Referenztypenverhalten ist durch Referenzzählung und Storage-Instanzteilung wie bis dato umsetzbar.
 Es muss lediglich die Implementierung der Storage-Instanzen insofern verbessert werden, dass Schlüssel geordnet vorliegen und nicht dicht verteilt sein müssen.
 Essentiell für die Verbesserung des _worst-case_ Zeitverhaltens bei Kopien und Schreibzugriffen ist die Reduzierung der Daten, welche bei Schreibzugriffen kopiert werden müssen.
-Hauptproblem bei seichten Kopien gefolgt von Schreibzugriff auf CoW-Datenstrukturen, ist die tiefe Kopie _aller_ Daten in den Daten der Instanzen, selbst wenn nur ein einziges Element beschrieben oder eingefügt/entfernt wird.
+Hauptproblem bei flachen Kopien gefolgt von Schreibzugriff auf CoW-Datenstrukturen, ist die tiefe Kopie _aller_ Daten in den Daten der Instanzen, selbst wenn nur ein einziges Element beschrieben oder eingefügt/entfernt wird.
 Ein Großteil der Elemente in den originalen und neuen kopierten Daten sind nach dem Schreibzugriff gleich.
 Deshalb wurde als Basis des Lösungsansatzes die Wahl einer persistenten Datenstruktur mit granularer Datenteilung festgelegt.
 Durch höhere Granularität der Datenteilung müssen bei Schreibzugriffen weniger Daten kopiert werden.
@@ -363,15 +363,6 @@ Die Definition von `Shallow` wird ebenfalls erweitert, sodass diese mehr als ein
 
 #todo[
   A later inequality seems to imply $d_min < k_min$ as well as $k_max < d_max$, so this may be worth mentioning here once proven.
-]
-
-#todo[
-  We need better terminology to separate the notion of
-  - elements of the tree (those in the leaves, always of type `T`)
-  - elements in a layer (those which are packed up for the next layer or unwrapped for the previous layer, those being the nested type `Node^t a`)
-  - nodes (as being names for those "wrapped" elements, those being of type `Node T'` where `T'` is the nested type at layer `t`)
-
-  This was repeatedly brought up in review of the sections below.
 ]
 
 Da Wirbelknoten mindestens $2 d_min$ _Digits_ enthalten, muss die Bildung dieser Minimalanzahl der Elemente im letzten Wirbelknoten überbrückt werden.
