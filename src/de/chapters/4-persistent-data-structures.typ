@@ -338,7 +338,7 @@ Es werden genug _Digits_ aus $t$ entnommen, sodass diese in einen Knoten verpack
 Das Verpacken und Entpacken der _Digits_ ist nötig um die erwarteten Baumtiefen pro Ebene zu erhalten, sowie zur Reduzierung der Häufigkeit der Über- und Unterflüsse je tiefer der Baum wird.
 Eine Ebene $t$ mit $d$ _Digits_ gilt als sicher @bib:hp-06[S. 7], wenn
 
-#let dd = $Delta d_t$
+#let dd = $Delta d$
 
 $
   d_min < d_t < d_max
@@ -351,7 +351,7 @@ Welche Seite, hängt davon ab an welcher Seite eine Operation wie _Push_ oder _P
 Wir betrachten den Über- und Unterlauf einer unsicheren Ebene $t$ in eine oder aus einer sicheren Ebene $t + 1$.
  Über- oder Unterlauf von unsicheren Ebenen in bzw. aus unsicheren Ebenen kann rekursiv angewendet werden bis eine sichere Ebene erreicht wird.
 Ähnlich der 2-3-Fingerbäume wird durch die Umwandlung von unsicheren in sichere Ebenen dafür gesorgt, dass nur jede zweite Operation eine Ebene in dem Baum herabsteigen muss, nur jede vierte zwei Ebenen, und so weiter.
-Dieses Konzept nennt sich impliziter rekursive Verlangsamung (_eng._ implicit recursive slowdown) @bib:oka-98 und ist Kernbestandteil der amortisierten Komplexität _Deque_-Operationen.
+Dieses Konzept nennt sich implizite rekursive Verlangsamung (_eng._ implicit recursive slowdown) @bib:oka-98 und ist Kernbestandteil der amortisierten Komplexität _Deque_-Operationen (_Push_/_Pop_).
 
 Damit die Elemente einer Ebene $t$ in eine andere Ebene $t + 1$ überlaufen können, müssen diese in einen Knoten der Ebene $t + 1$ passen, es gilt
 $
@@ -380,7 +380,7 @@ $
   "Unterlauf" &: 1 < dd < 4 \
 $
 
-In @bib:hp-06 entschieden sich die Authoren bei Überlauf für $dd = 3$, gaben aber an, dass $dd = 2$ ebenfalls funktioniert.
+!Hinze und !Paterson entschieden sich bei Überlauf für $dd = 3$, gaben aber an, dass $dd = 2$ ebenfalls funktioniert @bib:hp-06[S. 8].
 Aus den oben genannten Ungleichungen lassen sich Fingerbäume mit anderen $d$ und $k$ wählen, welche die gleichen asymptotischen Komplexitäten für _Deque_-Operationen aufweisen.
 Zum Beispiel 2-3-4-Fingerbäume mit $d_min = 1$:
 $
@@ -393,7 +393,7 @@ Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ e
 
 #todo[
   + Now the quesiton is if @eq:node-constraint is enough on it's own to chose $dd$, this may be related to the relation of $d$ to $k$ noted further up.
-  + Below here should follow the debig analysis, or further down with more context from the push and pop operations.
+  + Below here should follow the debit analysis, or further down with more context from the push and pop operations.
 ]
 
 == Push & Pop

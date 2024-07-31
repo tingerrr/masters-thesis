@@ -18,7 +18,7 @@
 #let ftpopl = math-func("ftree-pop-left")
 
 #let finger-tree-alg-push-left = algorithm(
-  numbered-title: $ftpushl(e, t): (E, FingerTree E) -> FingerTree E$
+  numbered-title: $ftpushl(e, t): (E, FingerTree E) -> FingerTree E$,
 )[
   + *switch* $t$
     + *case* $t$ *is* $Shallow$
@@ -38,7 +38,7 @@
 
 // BUG: this should break nicely with 0.12
 #let finger-tree-alg-pop-left = algorithm(
-  numbered-title: par(justify: false)[$ftpopl(t): FingerTree E -> (Maybe E, FingerTree E)$]
+  numbered-title: $ftpopl(t): FingerTree E -> (Maybe E, FingerTree E)$,
 )[
   + *switch* $t$
     + *case* $t$ *is* $Shallow$
