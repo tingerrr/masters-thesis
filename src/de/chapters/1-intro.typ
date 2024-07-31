@@ -49,6 +49,31 @@ Dabei sind folgende Begriffe relevant:
 Die folgenden Konventionen und Notationen werden während der Arbeit verwendet.
 Sollten bestimmte Teile der Arbeit diesen Konventionen nicht folgen, sind diese Abweichungen im umliegenden Text beschrieben.
 
+== Texthervorhebungen
+Wenn bestimmte Variablen, Werte, Typen oder Funktionen aus umliegenden Abbildungen referenziert werden, sind diese auf verschiedene Weise hervorgehoben.
+@tbl:syntax zeigt verschiedene Hervorhebungen.
+
+#import "/src/figures/util.typ": math-type, math-func
+
+#let FingerTree = math-type("FingerTree")
+#let concat = math-func("concat")
+
+#figure(
+  table(columns: 2, align: (x, y) => horizon + if x == 1 { left },
+    table.header[Hervorhebung][Beschreibung],
+    [`func`, ```cpp nullptr```, ```cpp if```], [
+      Hervorhebungen von Code- oder Programmiersprachen-spezifischen Funktionen, Typen oder Variablen, verwendet Monospace-Schriftart und Syntax-Highlighting.
+    ],
+    $FingerTree$, [
+      Typ oder Konstruktor in Pseudocode.
+    ],
+    $concat$, [
+      Funktion in Pseudocode.
+    ],
+  ),
+  caption: [Legende von Hervorhebungen im Lauftext.],
+) <tbl:syntax>
+
 == Grafiken
 @tbl:legend beschreibt die Konventionen für Grafiken, vor allem Grafiken zu Baum- oder Listenstrukturen.
 Diese Konventionen sollen vorallem Konzepte der Persistenz vereinfachen.

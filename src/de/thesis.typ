@@ -37,6 +37,8 @@
 )
 
 #set grid.cell(breakable: false)
+#show figure.where(kind: "algorithm"): set grid.cell(breakable: true)
+#show figure.where(kind: "algorithm"): set par(justify: false)
 
 #set raw(syntaxes: "/assets/t4gl.sublime-syntax")
 

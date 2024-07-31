@@ -55,6 +55,7 @@
       alg: (
         pushl: finger-tree-alg-push-left,
         popl: finger-tree-alg-pop-left,
+        search: finger-tree-alg-search,
       ),
     ),
   )

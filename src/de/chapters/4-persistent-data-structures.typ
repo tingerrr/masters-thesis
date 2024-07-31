@@ -130,7 +130,7 @@ Im folgenden werden 2-3-Fingerbäume als alternative Storage-Datenstrukturen fü
   The above could go with some examples, especially regarding RRB-Vectors and how they could be used as paired sequences ordered by key on insertion given that it's insert/remove bounds are sublinear.
 ]
 
-= B-Bäume
+= B-Bäume <sec:b-tree>
 Eine für die Persistenz besonders gut geeignete Datenstruktur sind B-Bäume @bib:bm-70 @bib:bay-71, da diese durch ihren Aufbau generell balanciert sind.
 Schreiboperationen auf persistenten B-Bäumen müssen lediglich $Theta(log n)$ Knoten kopieren.
 B-Bäume können vollständig durch ihre Zweigfaktoren beschreiben kategorisiert werden, sprich, die Anzahl der Kindknoten, welche ein interner Knoten haben kann bzw. muss.
@@ -165,14 +165,21 @@ Die simpelste Form von B-Bäumen sind sogennante 2-3-Bäume (B-Bäume mit $k_min
 = 2-3-Fingerbäume
 2-3-Fingerbäume wurden von !Hinze und !Paterson @bib:hp-06 eingeführt und sind eine Erweiterung von 2-3-Bäumen, welche für verschiedene Sequenzoperationen optimiert wurden.
 Die Authoren führen dabei folgende Begriffe im Verlauf des Texts ein:
-/ Spine: Die Wirbelsäule eines Fingerbaums, sie beschreibt die Kette der zentralen Knoten, welche die sogenannten _Digits_ enthalten.
-/ Digit: Erweiterung von 2-3-Knoten auf 1-4-Knoten, von welchen jeweils zwei in einem Wirbelknoten vorzufinden sind.
+/ Spine:
+  Die Wirbelsäule eines Fingerbaums, sie beschreibt die Kette der zentralen Knoten, welche die sogenannten _Digits_ enthalten.
+/ Digit:
+  Erweiterung von 2-3-Knoten auf 1-4-Knoten, von welchen jeweils zwei in einem Wirbelknoten vorzufinden sind.
   Obwohl ein Wirbelknoten zwei Digits enthält, sind, statt diesen selbst, direkt deren 1 bis 4 Kindknoten an beiden Seiten angefügt.
   Das reduziert die Anzahl unnötiger Knoten in Abbildungen und entspricht mehr der späteren Implementierung.
-  Demnach wird im Folgenden _Digits_ verwendet um die linken und rechten direkten Kindknoten der Wirbelknotne zu beschreiben.
-/ Safe: Sichere Ebenen sind Ebenen mit 2 oder 3 _Digits_, ein _Digit_ kann ohne Probleme entnommen oder hinzugefügt werden.
+  Demnach wird im Folgenden _Digits_ verwendet um die linken und rechten direkten Kindknoten der Wirbelknoten zu beschreiben.
+/ Measure:
+  Wert, welcher aus den Elementen errechnet und kombiniert werden kann.
+  Dient als Suchhilfe innerhalb des Baumes durch welchen identifierziert, wird wo ein Element im Baum zu finden ist ähnlich der Schlüssel in @fig:b-tree.
+/ Safe:
+  Sichere Ebenen sind Ebenen mit 2 oder 3 _Digits_, ein _Digit_ kann ohne Probleme entnommen oder hinzugefügt werden.
   Zu beachten ist dabei, dass die Sicherheit einer Ebene sich auf eine Seite bezieht, eine Ebene kann links sicher und rechts unsicher sein.
-/ Unsafe: Unsichere Ebenen sind Ebenen mit 1 oder 4 _Digits_, ein _Digit_ zu entnehmen oder hinzuzufügen kann Über- bzw. Unterlauf verursachen (Wechsel von _Digits_ zwischen Ebenen des Baumes um die Zweigfaktoren zu bewahren).
+/ Unsafe:
+  Unsichere Ebenen sind Ebenen mit 1 oder 4 _Digits_, ein _Digit_ zu entnehmen oder hinzuzufügen kann Über- bzw. Unterlauf verursachen (Wechsel von _Digits_ zwischen Ebenen des Baumes um die Zweigfaktoren zu bewahren).
 
 Der Name Fingerbäume rührt daher, dass imaginär zwei Finger an die beiden Enden der Sequenz gesetzt werden.
 Diese Finger ermöglichen den schnellen Zugriff an den Enden der Sequenz.
@@ -397,29 +404,87 @@ Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ e
 ]
 
 == Push & Pop
+Kernbestandteil von Fingerbäumen sind _Push_ und _Pop_ an beiden Seiten mit amortisierter Zeitkomplexität von $Theta(1)$.
+Die Algorithmen @alg:finger-tree:push-left[] und @alg:finger-tree:pop-left[] beschreiben die Operationen an der linken Seite eines Fingerbaums, durch die Symmetrie von Fingerbäumen lassen sich diese auf die rechte Seite übertragen.
 
-#[
-  #import "/src/figures.typ": math-type
-  #show math.equation: it => {
+#let show-E = body => {
+  import "/src/figures.typ": math-type
+  show math.equation: it => {
     show "E": math-type
     it
   }
 
-  #set grid.cell(breakable: true)
+  body
+}
 
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithmus],
-  figures.finger-tree.alg.pushl,
-  caption: [Die _Insert_ Operation an der linken Seite eines Fingerbaumes.],
-) <alg:finger-tree:push-left>
+#let Deep = math-type("Deep")
+#let Shallow = math-type("Shallow")
 
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithmus],
-  figures.finger-tree.alg.popl,
-  caption: [Die _Pop_ Operation an der linken Seite eines Fingerbaumes.],
-) <alg:finger-tree:pop-left>
+#let None = math-type("None")
+
+@alg:finger-tree:push-left ist in zwei Fälle getrennt, je nach der Art des Wirbelknoten $t$, in welchen der Knoten $e$ eingefügt werden soll.
+Ist der Wirbelknoten $Shallow$, wird der Knoten $e$ direkt als linke _Digit_ angefügt, sollten dabei genug Digits vorhanden sein um einen Wirbleknoten des Typs $Deep$ zu erstellen wird dieser erstellt, ansonsten bleibt der Fingerbaum $Shallow$.
+In beiden Fällen kommt es nicht zum Überlauf.
+Sollte der Wirbleknoten $Deep$ sein, wird der neue Knoten $e$ als linke _Digit_ angefügt.
+Wird die maximale Anzahl der _Digits_ $d_max$ überschritten, kommt es zum Überlauf.
+Beim Überlauf werden $dd$ _Digits_ in einen Knoten verpackt und in die nächste Ebene verschoben.
+
+#[
+  #show: show-E
+  #figure(
+    kind: "algorithm",
+    supplement: [Algorithmus],
+    figures.finger-tree.alg.pushl,
+    caption: [Die _Insert_ Operation an der linken Seite eines Fingerbaumes.],
+  ) <alg:finger-tree:push-left>
+]
+
+@alg:finger-tree:pop-left ist auf ähnliche Weise wie @alg:finger-tree:push-left in zwei Fälle getrennt, $Shallow$ und $Deep$.
+Ist der Wirbelknoten $Shallow$, wird lediglich ein _Digit_ von links abgetrennt und zurrück gegeben.
+Bei null _Digits_ der Wert $None$ zurückgegeben, in einer Spache wie C++ könnte das durch einen ```cpp nullptr``` oder das werfen einer _Exception_ umgesetzt werden.
+Bei einem $Deep$ Wirbelknoten wird eine linke _Digit_ entfernt.
+Bleiben dabei weniger als $d_min$ _Digits_ vorhanden erzeugt das entweder Unterfluss oder den Übergang zum $Shallow$ Fingerbaum.
+Ist die nächste Ebene selbst $Shallow$ und leer, werden die linken und rechten _Digits_ zusammen genommen und diese Ebene selbst wird $Shallow$.
+Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknoten füllen die linken _Digits_ auf.
+
+#[
+  #show: show-E
+  #figure(
+    kind: "algorithm",
+    supplement: [Algorithmus],
+    figures.finger-tree.alg.popl,
+    caption: [Die _Pop_ Operation an der linken Seite eines Fingerbaumes.],
+  ) <alg:finger-tree:pop-left>
+]
+
+== Suche
+Um ein gesuchtes Element in einem Fingerbaum zu finden, werden ähnlich wie bei B-Bäumen Hilfswerte verwendet um die richtigen Teilbäume zu finden.
+In Fingerbäumen sind das die sogenannten _Measures_.
+Ein Unterschied zu B-Bäumen ist, wo diese Werte vorzufinden sind.
+In B-Bäumen sind direkt in den internen Knoten bei $k$ Kindknoten $k - 1$ solcher Hilfswerte zu finden, bei Fingerbäumen sind _Measures_ stattdessen einmal pro internem Knoten vorzufinden.
+Desweiteren sind die _Measures_ in Fingerbäumen die Kombination der _Measures_ ihrer Kindknoten.
+
+Um einen Fingerbaum als Vektor zu verwenden, würde als _Measure_ ein Typ gewählt für welchen die Kombination durch Addition erfolgt und das Identitätselement 0 ist.
+Ein solcher _Measure_ gibt dann den Index eines Wertes an.
+
+Für die Anwendung in T4gl werden geordnete Sequenzen benötigt, ein angebrachter _Measure_ dafür ist der Schlüsselwert und die Kombination durch die Funktion $max$, sodass der _Measure_ interner Knoten den größten Schlüssel des Subbaums angibt.
+
+#let dsearch = math-func("digit-search")
+
+@alg:finger-tree:search zeigt, wie durch _Measures_ ein Fingerbaum durchsucht werden kann.
+Dabei ist $dsearch$ Binärsuche anhand der _Measures_ über eine Sequenz von _Digits_, gefolgt von gewöhnlicher B-Baumsuche (nach @sec:b-tree) der gefundenen _Digit_.
+Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefundenn werden.
+
+#todo[Add the remaining part, ensure the explanantion and algorithm are correct.]
+
+#[
+  #show: show-E
+  #figure(
+    kind: "algorithm",
+    supplement: [Algorithmus],
+    figures.finger-tree.alg.search,
+    caption: [Die _Search_ Operation auf einem Fingerbaum.],
+  ) <alg:finger-tree:search>
 ]
 
 == Insert & Remove
@@ -441,5 +506,3 @@ Aus Sicht der Echtzeitanforderungen an die Operationen auf der Datenstruktur sel
 Die Wahl von Fingerbäumen über B-Bäumen ist daher eher eine Optimierung als eine Notwendigkeit.
 
 #todo[Perhaps talk about the constant factors introduced by the choice of the branching factors.]
-
-// diff marker

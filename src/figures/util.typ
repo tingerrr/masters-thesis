@@ -1,8 +1,5 @@
-#import "/src/util.typ": fletcher, cetz, algorithm, i18n
+#import "/src/util.typ": fletcher, cetz, algorithm, i18n, math-type, math-func
 #import fletcher: edge, node
-
-#let math-type(ty) = $text(#teal.darken(35%), ty)$
-#let math-func(ty) = $op(text(#fuchsia.darken(35%), ty))$
 
 #let complexity-comparison(
   cases: ([worst], [average], [best]),
