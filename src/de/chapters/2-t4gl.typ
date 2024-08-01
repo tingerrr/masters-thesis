@@ -63,16 +63,7 @@ Wird in der Deklaration des Arrays ein Ganzzahlwert statt eines Typs angegeben (
 Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werden.
 
 #figure(
-  ```t4gl
-  String[Integer] map
-  map[42] = "Hello World!"
-
-  String[Integer, Integer] nested
-  nested[1, 37] = "T4gl is wacky!"
-
-  String[10] staticArray
-  staticArray[9] = "Truly wacky!"
-  ```,
+  figures.t4gl.ex.array1,
   caption: [
     Beispiele für Deklaration und Indizierung von T4gl-Arrays.
   ],
@@ -83,14 +74,7 @@ Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (di
 Es handelt sich um eine Sonderform des T4gl-Arrays, welches eine dichte festgelegte Schlüsselverteilung hat (es entspricht einem gewöhnlichen Array).
 
 #figure(
-  table(columns: 2, align: left,
-    table.header[Signatur][C++ Analogie],
-    `T[N] name`, `std::array<T, N>`,
-    `T[U] name`, `std::map<U, T> name`,
-    `T[U, N] name`, `std::map<U, std::array<T, N>> name`,
-    `T[N, U] name`, `std::array<std::map<U, T>, N> name`,
-    align(center)[...], align(center)[...],
-  ),
+  figures.t4gl.analogies,
   caption: [
     Semantische Analogien in C++ zu spezifischen Varianten von T4gl-Arrays.
   ],
@@ -102,13 +86,7 @@ T4gl-Arrays verhalten sich wie Referenztypen, wird eine Array `array2` durch ein
 Schreibzugriffe in einer Instanz sind auch in der anderen lesbar (Demonstiert in @lst:t4gl-ref).
 
 #figure(
-  ```t4gl
-  String[10] array1
-  String[10] array2 = array1
-
-  array1[0] = "Hello World!"
-  // array1[0] == array2[0]
-  ```,
+  figures.t4gl.ex.array2,
   caption: [Demonstration von Referenzverhalten von T4gl-Arrays.],
 ) <lst:t4gl-ref>
 
@@ -152,16 +130,16 @@ Diese Fälle sind nicht nur selten, sondern meist auch Fehler der Implementierun
 Bei korrektem Betrieb des Laufzeitsystems sind Typ-2 Kopien kurzlebig und immer von Typ-3 Kopien gefolgt, daher betrachten wir im folgenden auch Typ-2 Kopien als Operationen linearer Zeitkomplexität $Theta(n)$.
 
 #subpar.grid(
-  figure(figures.t4gl.new, caption: [
+  figure(figures.t4gl.layers.new, caption: [
     Ein T4gl Array nach Initalisierung. \ \
   ]), <fig:t4gl-indirection:new>,
-  figure(figures.t4gl.shallow, caption: [
+  figure(figures.t4gl.layers.shallow, caption: [
     Zwei T4gl-Arrays teilen sich eine C++ Instanz nach flacher Kopie.
   ]), <fig:t4gl-indirection:shallow>,
-  figure(figures.t4gl.deep-new, caption: [
+  figure(figures.t4gl.layers.deep-new, caption: [
     Zwei T4gl-Arrays teilen sich die gleichen Daten nach tiefer Kopie. \ \
   ]), <fig:t4gl-indirection:deep>,
-  figure(figures.t4gl.deep-mut, caption: [
+  figure(figures.t4gl.layers.deep-mut, caption: [
     Zwei T4gl-Arrays teilen sich keine Daten nach tiefer Kopie und Schreibzugriff.
   ]), <fig:t4gl-indirection:mut>,
   columns: 2,

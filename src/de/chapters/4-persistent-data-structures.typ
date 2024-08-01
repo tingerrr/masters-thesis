@@ -183,7 +183,7 @@ Weiße Knoten sind Elemente, die Blattknoten der Teilbäume.
 Knoten, welche mehr als einer Kategorie zuzuordnen sind, sind geteilt eingefärbt.
 
 #figure(
-  figures.finger-tree,
+  figures.finger-tree.repr,
   caption: [Ein 2-3-Fingerbaum der Tiefe 3 und 21 Elementen.],
 ) <fig:finger-tree>
 
@@ -243,30 +243,7 @@ Die Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben.
 Im Regelfall wären alle Klassendefinitionen über `T` und `M` per ```cpp template``` parametriert, darauf wurde Verzichtet um die Definition im Rahmen zu halten.
 
 #figure(
-  ```cpp
-  using T = ...;
-  using M = ...;
-
-  class Node {};
-  class Internal : public Node {
-    M measure;
-    std::array<Node*, 3> children; // 2..3 children
-  };
-  class Leaf : public Node {
-    T value;
-  };
-
-  class FingerTree {};
-  class Shallow : public FingerTree {
-    Node* value; // 0..1 digits
-  };
-  class Deep : public FingerTree {
-    M measure;
-    std::array<Node*, 4> left;  // 1..4 digits
-    FingerTree* middle;
-    std::array<Node*, 4> right; // 1..4 digits
-  };
-  ```,
+  figures.finger-tree.def.old,
   caption: [Die Definition von 2-3-Fingerbäumen in C++ übersetzt.],
 ) <lst:finger-tree>
 
@@ -292,30 +269,7 @@ Diese können ebenfalls mit ```cpp template``` Parametern zur Kompilierzeit gese
 Die Definition von `Shallow` wird ebenfalls erweitert, sodass diese mehr als ein _Sonderdigit_ enthalten kann.
 
 #figure(
-  ```cpp
-  using T = ...;
-  using M = ...;
-
-  class Node {};
-  class Internal : public Node {
-    M measure;
-    std::vector<Node*> children; // k_min..k_max children
-  };
-  class Leaf : public Node {
-    T value;
-  };
-
-  class FingerTree {};
-  class Shallow: public FingerTree {
-    std::vector<Node*> values; // 0..(2 d_min - 1) digits
-  };
-  class Deep : public FingerTree {
-    M measure;
-    std::vector<Node*> left;  // d_min..d_max digits
-    FingerTree* middle;
-    std::vector<Node*> right; // d_min..d_max digits
-  };
-  ```,
+  figures.finger-tree.def.new,
   caption: [Die Definition von generischen Fingerbäumen in C++.],
 ) <lst:gen-finger-tree>
 
@@ -368,125 +322,12 @@ Dabei zeigen die horizontalen Linien das kumulative Minimum $n'_min$ und Maximum
   But this may increase the vertical size unecessarily, leaving lots of white space.
 ]
 
-#[
-  #let (kmin, kmax) = (2, 3)
-  #let (dmin, dmax) = (1, 4)
-
-  #let fmins(t) = calc.pow(kmin, t - 1)
-  #let fmin(t) = 2 * dmin * calc.pow(kmin, t - 1)
-  #let fmax(t) = 2 * dmax * calc.pow(kmax, t - 1)
-
-  #let fcummin(t) = range(1, t + 1).map(fmin).fold(0, (acc, it) => acc + it)
-  #let fcummins(t) = fmins(t) + fcummin(t - 1)
-  #let fcummax(t) = range(1, t + 1).map(fmax).fold(0, (acc, it) => acc + it)
-
-  #let ranges(t) = {
-    let individual = range(2, t + 1).map(t => (
-      t: t,
-      mins: fmins(t),
-      min: fmin(t),
-      max: fmax(t),
-    ))
-
-    individual
-  }
-
-  #let cum-ranges(t) = {
-    let cummulative = range(1, t + 1).map(t => (
-      t: t,
-      mins: fcummins(t),
-      min: fcummin(t),
-      max: fcummax(t),
-    ))
-
-    cummulative
-  }
-
-  #let count = 8
-  #let cum-ranges = cum-ranges(count)
-  #let mmax = cum-ranges.last().max
-
-  #let base = 2
-  #let sqr = calc.pow.with(base)
-  #let lg = calc.log.with(base: base)
-  #let tick-max = int(calc.round(lg(mmax)))
-  #let tick-args = (
-    x-tick-step: none,
-    x-ticks: range(tick-max + 1).map(x => (x, sqr(x))),
-  )
-
-  // comment out to make linear scale plot
-  // #let sqr = x => x
-  // #let lg = x => x
-  // #let tick-max = int(lg(mmax))
-  // #let tick-args = ()
-
-  #import "@preview/cetz:0.2.2"
-
-  #figure(
-    cetz.canvas({
-      cetz.draw.set-style(axes: (bottom: (tick: (label: (angle: 45deg, anchor: "north-east")))))
-
-      cetz.plot.plot(
-        size: (9, 6),
-        x-label: $n$,
-        y-label: $t$,
-        y-tick-step: none,
-        y-ticks: range(1, count + 1),
-        plot-style: cetz.palette.pink,
-        ..tick-args,
-        {
-          let intersections(n) = {
-            cetz.plot.add-vline(
-              style: (stroke: (paint: gray.lighten(70%), dash: "dashed")),
-              lg(n),
-            )
-            cetz.plot.add(
-              label: box(inset: 0.2em)[$n' = #n$],
-              style: (stroke: none),
-              mark-style: cetz.palette.new(
-                colors: color.map.crest.chunks(32).map(array.first)
-              ).with(stroke: true),
-              mark: "x",
-              cum-ranges.filter(r => r.mins <= n and n <= r.max).map(r => (lg(n), r.t))
-            )
-          }
-          // force the plot domain
-          cetz.plot.add(
-            style: (stroke: none),
-            ((-1, 0), (tick-max + 1, count + 1)),
-          )
-          for t in cum-ranges {
-            cetz.plot.add(
-              label: if t.t == 1 { box(inset: 0.2em)[$n'(t)$] },
-              domain: (0, lg(mmax)),
-              style: cetz.palette.blue.with(stroke: true),
-              mark-style: cetz.palette.blue.with(stroke: true),
-              mark: "|",
-              (
-                (lg(t.mins), t.t),
-                (lg(t.max), t.t),
-              )
-            )
-          }
-          intersections(9)
-          intersections(27)
-          intersections(250)
-        },
-      )
-    }),
-    caption: [
-      Die minimale und maximale Anzahl von Elementen $n$ für einen 2-3-Fingerbaum der Tiefe $t$.
-    ],
-  ) <fig:cum-depth>
-
-  // #table(
-  //   columns: 6,
-  //   align: right,
-  //   table.header[$t$],
-  //   ..cum-ranges.map(t => (t.t, t.mins, $<=$, $n$, $<=$, t.max)).flatten().map(x => $#x$)
-  // )
-]
+#figure(
+  figures.finger-tree.ranges,
+  caption: [
+    Die minimale und maximale Anzahl von Elementen $n$ für einen 2-3-Fingerbaum der Tiefe $t$.
+  ],
+) <fig:cum-depth>
 
 == Über- & Unterlaufsicherheit
 Über- bzw. Unterlauf einer Ebene $t$ ist der Wechsel von _Digits_ zwischen der Ebene $t$ und der Ebene $t + 1$.
@@ -556,70 +397,27 @@ Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ e
 ]
 
 == Push & Pop
-#let math-type(ty) = $text(#teal.darken(35%), ty)$
-#let math-func(ty) = $op(text(#fuchsia.darken(35%), ty))$
-
-#let Maybe = math-type("Maybe")
-
-#let Node = math-type("Node")
-#let Deep = math-type("Deep")
-#let Shallow = math-type("Shallow")
-#let FingerTree = math-type("FingerTree")
-
-#let popl = math-func("pop-left")
-#let pushl = math-func("push-left")
-#let concat = math-func("concat")
-#let split = math-func("split")
-
-#let ftpushl = math-func("ftree-push-left")
-#let ftpopl = math-func("ftree-pop-left")
 
 #[
+  #import "/src/figures.typ": math-type
   #show math.equation: it => {
     show "E": math-type
     it
   }
 
+  #set grid.cell(breakable: true)
+
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
-  algorithm(numbered-title: $ftpushl(e, t): (E, FingerTree E) -> FingerTree E$)[
-    + *switch* $t$
-      + *case* $t$ *is* $Shallow$
-        + *let* $"values" = pushl(e, t."values")$
-        + *if* $|"values"| < 2 d_min$
-          + *return* $Shallow("values")$
-        + *let* $"left", "right" = split("values", d_min)$
-        + *return* $Deep("left", Shallow(nothing), "right")$
-      + *case* $t$ *is* $Deep$
-        + *let* $"left" = pushl(e, t."left")$
-        + *if* $|"left"| <= d_max$
-          + *return* $Deep("left", t."middle", t."right")$
-        + *let* $"rest", "overflow" = split("left", |"left"| - dd)$
-        + *let* $"middle" = ftpushl(Node("overflow"), t."middle")$
-        + *return* $Deep("rest", "middle", t."right")$
-  ],
+  figures.finger-tree.alg.pushl,
   caption: [Die _Insert_ Operation an der linken Seite eines Fingerbaumes.],
 ) <alg:finger-tree:push-left>
 
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
-  // BUG: this should break nicely with 0.12
-  algorithm(numbered-title: par(justify: false)[$ftpopl(t): FingerTree E -> (Maybe E, FingerTree E)$])[
-    + *switch* $t$
-      + *case* $t$ *is* $Shallow$
-        + *let* $e, "rest" = popl(t."values")$
-        + *return* $(e, Shallow("rest"))$
-      + *case* $t$ *is* $Deep$
-        + *let* $e, "rest" = popl(t."left")$
-        + *if* $|"rest"| >= d_min$
-          + *return* $(e, Deep("rest", t."middle", t."right"))$
-        + *if* $t."middle"$ *is* $Shallow$ *and* $|t."middle"."values"| = 0$
-          + *return* $(e, Shallow(concat(t."left", t."right")))$
-        + *let* $"node", "mrest" = ftpopl(t."middle")$
-        + *return* $(e, Deep(concat("rest", "node"."values"), "mrest", t."right"))$
-  ],
+  figures.finger-tree.alg.popl,
   caption: [Die _Pop_ Operation an der linken Seite eines Fingerbaumes.],
 ) <alg:finger-tree:pop-left>
 ]

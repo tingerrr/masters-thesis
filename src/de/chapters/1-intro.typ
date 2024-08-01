@@ -82,7 +82,23 @@ Diese Konventionen sollen vorallem Konzepte der Persistenz vereinfachen.
 !Landau-Symbole umfassen Symbole zur Klassifizierung der asymptotischen Komplexität von Funktionen und Algorithmen.
 Im folgenden werden Variationen der !Knuth'schen Definitionen verwendet @bib:knu-76[S. 19] @bib:clrs-09[S. 44-48], sprich:
 
-#figures.big-o <eq:big-o>
+$
+  O(f) &= {
+    g : NN -> NN | exists n_0, c > 0
+    quad &&forall n >= n_0
+    quad 0 <= g(n) <= c f(n)
+  } \
+  Omega(f) &= {
+    g : NN -> NN | exists n_0, c > 0
+    quad &&forall n >= n_0
+    quad 0 <= c f(n) <= g(n)
+  } \
+  Theta(f) &= {
+    g : NN -> NN | exists n_0, c_1, c_2 > 0
+    quad &&forall n >= n_0
+    quad c_1 f(n) <= g(n) <= c_2 f(n)
+  }
+$ <eq:big-o>
 
 Bei der Verwendung von !Landau-Symbolen steht die Variable $n$ für die Größe der Daten welche für die Laufzeit eines Algorithmus relevant sind.
 Bei Operationen auf Datenstrukturen entspricht die Größe der Anzahl der verwalteten Elemente in der Struktur.

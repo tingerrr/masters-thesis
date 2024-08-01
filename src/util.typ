@@ -7,8 +7,10 @@
 #import "@preview/cheq:0.1.0"
 #import "@preview/lovelace:0.3.0"
 
+#let i18n(de: none, en: none) = context if text.lang == "de" { de } else { en }
+
 #let algorithm = lovelace.pseudocode-list.with(
-  line-number-supplement: "Zeile",
+  line-number-supplement: i18n(de: [Zeile], en: [Line]),
   booktabs: true,
   booktabs-stroke: 1pt + black,
 )
@@ -53,7 +55,7 @@
   [#metadata(none) <todo>]
   "["
   h(0pt, weak: true)
-  text(red)[Quelle Benötigt]
+  text(red, i18n(de: [Quelle benötigt], en: [citation needed]))
   h(0pt, weak: true)
   "]"
 }
