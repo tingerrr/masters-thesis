@@ -7,14 +7,6 @@
 #import "@preview/cheq:0.1.0"
 #import "@preview/lovelace:0.3.0"
 
-#let i18n(de: none, en: none) = context if text.lang == "de" { de } else { en }
-
-#let algorithm = lovelace.pseudocode-list.with(
-  line-number-supplement: i18n(de: [Zeile], en: [Line]),
-  booktabs: true,
-  booktabs-stroke: 1pt + black,
-)
-
 #let cpp = box([C] + text(0.75em, baseline: -0.175em)[++])
 
 #let _block = block
