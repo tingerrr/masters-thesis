@@ -358,14 +358,14 @@ Welche Seite, hängt davon ab an welcher Seite eine Operation wie _Push_ oder _P
 Wir betrachten den Über- und Unterlauf einer unsicheren Ebene $t$ in eine oder aus einer sicheren Ebene $t + 1$.
  Über- oder Unterlauf von unsicheren Ebenen in bzw. aus unsicheren Ebenen kann rekursiv angewendet werden bis eine sichere Ebene erreicht wird.
 Ähnlich der 2-3-Fingerbäume wird durch die Umwandlung von unsicheren in sichere Ebenen dafür gesorgt, dass nur jede zweite Operation eine Ebene in dem Baum herabsteigen muss, nur jede vierte zwei Ebenen, und so weiter.
-Dieses Konzept nennt sich implizite rekursive Verlangsamung (_eng._ implicit recursive slowdown) @bib:oka-98 und ist Kernbestandteil der amortisierten Komplexität _Deque_-Operationen (_Push_/_Pop_).
+Dieses Konzept nennt sich implizite rekursive Verlangsamung (_engl._ implicit recursive slowdown) @bib:oka-98 und ist Kernbestandteil der amortisierten Komplexität _Deque_-Operationen (_Push_/_Pop_).
 
-Damit die Elemente einer Ebene $t$ in eine andere Ebene $t + 1$ überlaufen können, müssen diese in einen Knoten der Ebene $t + 1$ passen, es gilt
+Damit die _Digits_ einer Ebene $t$ in eine andere Ebene $t + 1$ überlaufen können, müssen diese in einen _Digit_-Knoten der Ebene $t + 1$ passen, es gilt
 $
   k_min <= dd <= k_max \
 $ <eq:node-constraint>
 
-Dabei ist $dd$ die Anzahl der Elemente in $t$ welche in $t + 1$ überlaufen sollen.
+Dabei ist $dd$ die Anzahl der _Digits_ in $t$ welche in $t + 1$ überlaufen sollen.
 Essentiell ist, dass eine unsicher Ebene nach dem Übelauf wieder sicher ist, dazu müssen folgende Ungleichung eingehalten werden.
 Die Ebene $t + 1$, kann dabei sicher bleiben oder unsicher werden.
 $
@@ -379,7 +379,7 @@ $
   t + 1 &: d_min <=& d_(t + 1) &text(#green, - 1)                  &< d_max \
 $
 
-$dd$ und die Zweigfaktoren $d_min$, $d_max$, $k_min$ und $k_max$ sind so zu wählen, die zuvorgenannten Ungleichungen halten.
+$dd$ und die Zweigfaktoren $d_min$, $d_max$, $k_min$ und $k_max$ sind so zu wählen, dass die zuvorgenannten Ungleichungen halten.
 Betrachten wir 2-3-Fingerbäume, gilt $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$, daraus ergibt sich
 
 $
