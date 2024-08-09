@@ -343,7 +343,16 @@ Es wird ein _Digit_ aus der Ebene $t + 1$ entnommen und dessen Kindknoten in $t$
 Der Überlauf einer Ebene $t$ erfolgt, wenn in $t$ zu viele _Digits_ enthalten sind.
 Es werden genug _Digits_ aus $t$ entnommen, sodass diese in einen Knoten verpackt und als _Digit_ in $t + 1$ gelegt werden können.
 Das Verpacken und Entpacken der _Digits_ ist nötig um die erwarteten Baumtiefen pro Ebene zu erhalten, sowie zur Reduzierung der Häufigkeit der Über- und Unterflüsse je tiefer der Baum wird.
-Eine Ebene $t$ mit $d$ _Digits_ gilt als sicher @bib:hp-06[S. 7], wenn
+
+#quote(block: true, attribution: [!Hinze und !Paterson @bib:hp-06])[
+  We classify digits of two or three elements (which are isomorphic to elements of type Node a) as safe, and those of one or four elements as dangerous. A deque operation may only propagate to the next level from a dangerous digit, but in doing so it makes that digit safe, so that the next operation to reach that digit will not propagate. Thus, at most half of the operations descend one level, at most a quarter two levels, and so on. Consequently, in a sequence of operations, the average cost is constant.
+]
+
+#todo[
+  After this quote they start talking how lazy evaluation is needed to makethis work in a persistent setting. This is
+]
+
+Wir erweitern den Begriff der Sicherheit einer Ebene $t$ mit $d$ _Digits_ als
 
 #let dd = $Delta d$
 
