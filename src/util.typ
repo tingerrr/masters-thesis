@@ -7,7 +7,7 @@
 #import "@preview/cheq:0.1.0"
 #import "@preview/lovelace:0.3.0"
 
-#let math-type(ty) = $text(#teal.darken(35%), ty)$
+#let math-type(ty) = $text(#rgb("#407959"), ty)$
 #let math-func(ty) = $op(text(#fuchsia.darken(35%), ty))$
 
 #let cpp = box([C] + text(0.75em, baseline: -0.175em)[++])

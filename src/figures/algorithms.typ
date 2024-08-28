@@ -3,7 +3,6 @@
 #let dd = $Delta d$
 
 #let Maybe = math-type("Maybe")
-#let Some = math-type("Some")
 #let None = math-type("None")
 
 #let Node = math-type("Node")
@@ -11,6 +10,8 @@
 #let Measure = math-type("Measure")
 #let Shallow = math-type("Shallow")
 #let FingerTree = math-type("FingerTree")
+
+#let isempty = math-func("is-empty")
 
 #let popl = math-func("pop-left")
 #let pushl = math-func("push-left")
@@ -31,52 +32,54 @@
       + *return* $Shallow("values")$
     + *let* $"left", "right" = split("values", d_min)$
     + *return* $Deep("left", Shallow(nothing), "right")$
-  + *if* $t$ *is* $Deep$
+  + *else*
     + *let* $"left" = pushl(e, t."left")$
     + *if* $abs("left") <= d_max$
       + *return* $Deep("left", t."middle", t."right")$
     + *let* $"rest", "overflow" = split("left", abs("left") - dd)$
     + *let* $"middle" = ftpushl(Node("overflow"), t."middle")$
-    + *return* $Deep("rest", "middle", t."right")$
+    + *return* $Deep("rest", Shallow("middle"), t."right")$
 ]
 
 #let ftpopl = math-func("ftree-pop-left")
 
-// BUG: this should break nicely with 0.12
 #let finger-tree-alg-pop-left = algorithm(
-  numbered-title: $ftpopl(t): FingerTree -> (Maybe Node, FingerTree)$,
+  numbered-title: $ftpopl(t): FingerTree -> (Node, FingerTree)$,
 )[
   + *if* $t$ *is* $Shallow$
     + *if* $abs(t."values") = 0$
       + *return* $(None, t)$
-    + *let* $e, "rest" = popl(t."values")$
-    + *return* $(Some(e), Shallow("rest"))$
-  + *if* $t$ *is* $Deep$
-    + *let* $e, "rest" = popl(t."left")$
+    + *else*
+      + *let* $e, "rest" = popl(t."values")$
+      + *return* $(e, Shallow("rest"))$
+  + *else*
+    + *let* $e, "rest"_l = popl(t."left")$
     + *if* $abs("rest") >= d_min$
-      + *return* $(Some(e), Deep("rest", t."middle", t."right"))$
-    + *if* $t."middle"$ *is* $Shallow$ *and* $abs(t."middle"."values") = 0$
+      + *return* $(e, Deep("rest", t."middle", t."right"))$
+    + *if not* $isempty(t."middle")$
       + *return* $(e, Shallow(concat(t."left", t."right")))$
-    + *let* $"node", "mrest" = ftpopl(t."middle")$
-    + *return* $(Some(e), Deep(concat("rest", "node"."values"), "mrest", t."right"))$
+    + *else*
+      + *let* $"node", "rest"_m = ftpopl(t."middle")$
+      + *return* $(e, Deep(concat("rest"_l, "node"."values"), "rest"_m, t."right"))$
 ]
 
 #let ftsearch = math-func("ftree-search")
 
 #let finger-tree-alg-search = algorithm(
-  numbered-title: $ftsearch(t, m): (FingerTree, Measure) -> Maybe Node$,
+  numbered-title: $ftsearch(t, m): (FingerTree, Measure) -> Node$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *return* $dsearch(t."values")$
-  + *if* $t$ *is* $Deep$
-    + *if* $t."measure" > m$
+    + *return* $dsearch(t."values", m)$
+  + *else*
+    + *let* $m_l = last(t."left")."measure"$
+    + *let* $m_m = t."middle"."measure"$
+    + *let* $m_r = last(t."right")."measure"$
+    + *if* $n <= m_l$
+      + *return* $dsearch(t."left", m)$
+    + *if* $m_l < m <= m_m$
+      + *return* $ftsearch(t."middle", m)$
+    + *if* $m_m < m <= m_r$
+      + *return* $dsearch(t."right", m)$
+    + *else*
       + *return* $None$
-    + *let* $m_"left" = last(t."left")."measure"$
-    + *let* $m_"deep" = t."deep"."measure"$
-    + *let* $m_"right" = last(t."right")."measure"$
-    + *if* $m_"left" < m <= m_"deep"$
-      + *return* $dsearch(t."left")$
-    + *if* $m_"deep" < m <= m_"right"$
-      + *return* $dsearch(t."right")$
-    + *return* $ftsearch(t."middle", m)$
 ]

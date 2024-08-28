@@ -443,8 +443,8 @@
 
   node((-1.5, 1.75), arraybox(leaf: true, 0, [...], 15, 0, [...], 15), name: <l4-1>)
   node((-0.5, 1.75), arraybox(leaf: true, 0, [...], 15, 16, [...], 31), name: <l4-2>)
-  node((0.5, 1.75), arraybox(leaf: true, 0, [...], 15, 65279, [...], 65295), name: <l4-3>)
-  node((1.5, 1.75), arraybox(leaf: true, 0, [...], 15, 65503, [...], 65519, hl: (2,)), name: <l4-4>)
+  node((0.5, 1.75), arraybox(leaf: true, 0, [...], 15, 65296, [...], 65311), name: <l4-3>)
+  node((1.5, 1.75), arraybox(leaf: true, 0, [...], 15, 65504, [...], 65519, hl: (2,)), name: <l4-4>)
 
   edge(<l3-1>, <l4-1>, "-|>", shift: -10pt)
   edge((rel: (-30pt, 0pt), to: <l3-1>), <l4-2>, "-|>")

@@ -9,7 +9,7 @@ String[Integer] map
 map[42] = "Hello World!"
 
 String[Integer, Integer] nested
-nested[1, 37] = "T4gl is wacky!"
+nested[-1, 37] = "T4gl is wacky!"
 
 String[10] staticArray
 staticArray[9] = "Truly wacky!"

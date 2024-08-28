@@ -13,7 +13,7 @@ T4gl steht bei der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) unter
   - Scheduling von Green Threads
   - Bereitstellung von Maschinen- oder Protokollspezifischen Schnittstellen
 
-Wird ein T4gl-Script dem Compiler übergeben startet dieser zunächst mit der statischen Analyse.
+Wird ein T4gl-Script dem Compiler übergeben, startet dieser zunächst mit der statischen Analyse.
 Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die statische Länge bestimmter Arrays, die Typsicherheit und die syntaktische Korrektheit des Scripts.
 Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ (Atomare Instruktionen) kompiliert.
 Im Anschluss führt des Laufzeitsystem die kompilierten _Microsteps_ aus, verwaltet Speicher und Kontextwechsel der _Microsteps_ und stellt die benötigten Systemschnittstellen zur Verfügung.
@@ -49,17 +49,17 @@ Je nach Strenge der Anforderungen lassen sich Echtzeitsysteme in drei verschiede
   Reduce this to simply mention hard and firm realtime, since they aren't used the definitions can go.
 ]
 
-Für Anwendungsfälle in denen Echtzeitanforderungen an T4gl gestellt werden, gibt es bei Nichteinhaltung keine katastrophalen Folgen, es müssen lediglich Testergibnisse verwofen werden.
-T4gl ist demnach ein weiches Echtzeitsystem.
+Für Anwendungsfälle, in denen Echtzeitanforderungen an T4gl gestellt werden, gibt es bei Nichteinhaltung keine katastrophalen Folgen, es müssen lediglich Testergebnisse verwofen werden.
+T4gl ist demnach nur für weiche Echtzeitsysteme einsetzbar.
 
 = T4gl-Arrays <sec:t4gl:arrays>
 Bei T4gl-Arrays handelt es sich um mehrdimensionale assoziative Arrays mit Schlüsseln, welche eine voll definierte Ordnungsrelation haben.
 Um ein Array in T4gl zu deklarieren, wird mindestens ein Schlüssel- und ein Wertetyp benötigt.
 Auf den Wertetyp folgt in eckigen Klammern eine komma-separierte Liste von Schlüsseltypen.
-Indizierung erfolgt wie in der Deklaration durch eckige Klammern, es muss aber nicht für alle Schlüssel einen Wert angegeben werden.
+Indizierung erfolgt wie in der Deklaration durch eckige Klammern, es muss aber nicht für alle Schlüssel ein Wert angegeben werden.
 Bei Angabe von weniger Schlüsseln als in der Deklaration, wird eine Referenz auf einen Teil des Arrays zurückgegben.
 Sprich, ein Array des Typs `T[U, V, W]` welches mit `[u]` indiziert wird, gibt ein Unter-Array des Typs `T[V, W]` zurück, ein solches Unter-Array kann entnommen aber nicht gesetzt werden.
-Wird in der Deklaration des Arrays ein Ganzzahlwert statt eines Typs angegeben (z.B. `T[10]`), wird das Array mit fester Größe und Standardwerten und durchlaufenden Schlüsseln (`0` bis `9`) angelegt.
+Wird in der Deklaration des Arrays ein Ganzzahlwert statt eines Typs angegeben (z.B. `T[10]`), wird das Array mit fester Größe und durchlaufenden Indizes (`0` bis `9`) als Schlüssel angelegt und mit Standardwerten befüllt.
 Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werden.
 
 #figure(
@@ -82,21 +82,21 @@ Es handelt sich um eine Sonderform des T4gl-Arrays, welches eine dichte festgele
 
 Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird.
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder ein Vektor oder ein geordnetes assoziatives Array angelegt.
-T4gl-Arrays verhalten sich wie Referenztypen, wird eine Array `array2` durch ein anderes Array `array1` initialisiert, teilen sich diese die gleichen Daten.
-Schreibzugriffe in einer Instanz sind auch in der anderen lesbar (Demonstiert in @lst:t4gl-ref).
+T4gl-Arrays verhalten sich wie Referenztypen, wird ein Array `array2` durch ein anderes Array `array1` initialisiert, teilen sich diese die gleichen Daten.
+Schreibzugriffe in einer Instanz sind auch in der anderen lesbar (demonstiert in @lst:t4gl-ref).
 
 #figure(
   figures.t4gl.ex.array2,
   caption: [Demonstration von Referenzverhalten von T4gl-Arrays.],
 ) <lst:t4gl-ref>
 
-Im Gegensatz zu dem Referenzverhalten der Arrays aus sicht des T4gl-Programmieriers steht die Implementierug durch _Qt-Maps_, bei diesen handelt es sich um Copy-On-Write (CoW) Datenstrukturen.
+Im Gegensatz zu dem Referenzverhalten der Arrays aus Sicht des T4gl-Programmierers steht die Implementierug durch _Qt-Maps_, bei diesen handelt es sich um Copy-On-Write (CoW) Datenstrukturen.
 Mehrere Instanzen teilen sich die gleichen Daten und erlauben zunächst nur Lesezugriffe darauf.
 Muss eine Instanz einen Schreibzugriff durchführen, wird vorher sichergestellt, dass diese Instanz der einzige Referent der Daten ist, wenn nötig durch eine Kopie der gesamten Daten.
 Dadurch sind Kopien von _Qt-Maps_ initial sehr effizient, es muss lediglich die Referenzzahl der Daten erhöht werden.
 Die Kosten der Kopie zeigt sich erst dann, wenn ein Scheibzugriff nötig ist.
 
-Damit sch T4gl-Arrays trotzdem wie Referenzdaten verhalten, teilen sie sich nicht direkt die Daten mit CoW-Semantik, sondern _Qt-Maps_ durch eine weitere Indirektionsebene.
+Damit sich T4gl-Arrays trotzdem wie Referenzdaten verhalten, teilen sie sich nicht direkt die Daten mit CoW-Semantik, sondern _Qt-Maps_ durch eine weitere Indirektionsebene.
 T4gl-Arrays bestehen aus Komponenten in drei Ebenen:
 + T4gl: Die Instanzen aus Sicht des T4gl-Programmierers (z.B. die Variable `array1` in @lst:t4gl-ref).
 + Indirektionsebene: Die Daten aus Sicht des T4gl-Programmierers, die Ebene zwischen T4gl-Array Instanzen und deren Daten.
@@ -109,7 +109,7 @@ Wir definieren je nach Teife drei Typen von Kopien:
 / Typ-1 (flache Kopie):
   Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleichen _Qt-Instanz_ zeigt.
   Wird in T4gl durch Initialisierung von Arrays durch existierende Instanzen oder die Übergabe von Arrays an normale Funktionen hervorgerufen.
-  Eine flache Kopie ist immer eine $Theta(1)$ Operation.
+  Eine flache Kopie ist immer eine $Theta(1)$-Operation.
 / Typ-2:
   Eine Kopie der T4gl-Instanz *und* der _Qt-Instanz_, welche beide auf die gleichen Daten zeigen.
   Wird eine tiefe Kopie durch das Laufzeitsystem selbst hervorgerufen, erfolgt die Kopie der Daten verspätet beim nächten Schreibzugriff auf eine der _Qt-Instanzen_.
@@ -120,14 +120,14 @@ Wir definieren je nach Teife drei Typen von Kopien:
   Beim explizitem Aufruf der Methode `clone` durch den T4gl Programmierer werden die Daten ohne Verzögerung kopiert.
   Tiefe Kopien sind Operationen linearer Zeitkomplexität $Theta(n)$.
 
-Bei einer Typ-1 Kopie der Instanz `a` in @fig:t4gl-indirection:new ergibt sich die Instanz `b` in @fig:t4gl-indirection:shallow.
-Eine Typ-2 Kopie hingegen führt zur Instanz `c` in @fig:t4gl-indirection:deep.
-Obwohl eine tiefe Kopie zunächst nur auf Ebene 1 und 2 Instanzen Kopiert, erfolgt die Typ-3 Kopie der Daten auf Ebene 3 beim ersten Schreibzugriff einer der Instanzen (@fig:t4gl-indirection:mut).
+Bei einer Typ-1-Kopie der Instanz `a` in @fig:t4gl-indirection:new ergibt sich die Instanz `b` in @fig:t4gl-indirection:shallow.
+Eine Typ-2-Kopie hingegen führt zur Instanz `c` in @fig:t4gl-indirection:deep.
+Obwohl eine tiefe Kopie zunächst nur auf Ebene 1 und 2 Instanzen Kopiert, erfolgt die Typ-3-Kopie der Daten auf Ebene 3 beim ersten Schreibzugriff einer der Instanzen (@fig:t4gl-indirection:mut).
 
-In seltenen Fällen kann es dazu führen, dass wie in @fig:t4gl-indirection:deep eine Typ-2 Kopie angelegt wurde, aber nie ein Schreibzugriff auf `a` oder `c` durchgeführt wird, während beide Instanzen existieren.
-Sprich, es kommt zur Typ-2 Kopie, aber nicht zur Typ-3 Kopie.
+In seltenen Fällen kann es dazu führen, dass wie in @fig:t4gl-indirection:deep eine Typ-2-Kopie angelegt wurde, aber nie ein Schreibzugriff auf `a` oder `c` durchgeführt wird, während beide Instanzen existieren.
+Sprich, es kommt zur Typ-2-Kopie, aber nicht zur Typ-3-Kopie.
 Diese Fälle sind nicht nur selten, sondern meist auch Fehler der Implementierung.
-Bei korrektem Betrieb des Laufzeitsystems sind Typ-2 Kopien kurzlebig und immer von Typ-3 Kopien gefolgt, daher betrachten wir im folgenden auch Typ-2 Kopien als Operationen linearer Zeitkomplexität $Theta(n)$.
+Bei korrektem Betrieb des Laufzeitsystems sind Typ-2-Kopien kurzlebig und immer von Typ-3-Kopien gefolgt, daher betrachten wir im folgenden auch Typ-2-Kopien als Operationen linearer Zeitkomplexität $Theta(n)$.
 
 #subpar.grid(
   figure(figures.t4gl.layers.new, caption: [
@@ -151,7 +151,7 @@ Bei korrektem Betrieb des Laufzeitsystems sind Typ-2 Kopien kurzlebig und immer 
 ]
 
 Ein kritischer Anwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
-Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine Typ-2 Kopie erstellt.
+Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine Typ-2-Kopie erstellt.
 Die T4gl-Instanz, welche an den Programmierer übergeben wird, sowie die interne _Qt-Instanz_ teilen sich Daten, welche vom Laufzeitsystem zwangsläufig beim nächsten Schreibzugriff kopiert werden müssen.
-Es kommt zur Typ-3 Kopie, und daraus folgend, zu einem nicht-trivialem zeitlichem Aufwand von $Theta(n)$.
+Es kommt zur Typ-3-Kopie, und, daraus folgend, zu einem nicht-trivialem zeitlichem Aufwand von $Theta(n)$.
 Das gilt für jeden ersten Schreibzugriff, welcher nach einer Übergabe der Daten an den T4gl-Programmierer erfolgt.
