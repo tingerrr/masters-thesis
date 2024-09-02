@@ -405,6 +405,34 @@ Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ e
   + Below here should follow the debit analysis, or further down with more context from the push and pop operations.
 ]
 
+== Suche
+Um ein gesuchtes Element in einem Fingerbaum zu finden, werden ähnlich wie bei B-Bäumen Hilfswerte verwendet um die richtigen Teilbäume zu finden.
+In Fingerbäumen sind das die sogenannten _Measures_.
+Ein Unterschied zu B-Bäumen ist, wo diese Werte vorzufinden sind.
+In B-Bäumen sind direkt in den internen Knoten bei $k$ Kindknoten $k - 1$ solcher Hilfswerte zu finden, bei Fingerbäumen sind _Measures_ stattdessen einmal pro internem Knoten vorzufinden.
+Desweiteren sind die _Measures_ in Fingerbäumen die Kombination der _Measures_ ihrer Kindknoten.
+
+Um einen Fingerbaum als Vektor zu verwenden, würde als _Measure_ ein Typ gewählt, für welchen die Kombination durch Addition erfolgt.
+Ein solcher _Measure_ gibt dann den Index eines Wertes an.
+
+Für die Anwendung in T4gl werden geordnete Sequenzen benötigt, ein angebrachter _Measure_ dafür ist der Schlüsselwert und die Kombination durch die Funktion $max$, sodass der _Measure_ interner Knoten den größten Schlüssel des Subbaums angibt.
+Ist der _Measure_ des Subbaums kleiner als der Suchschlüssel, so ist der Schlüssel nicht in diesem Subbaum enthalten.
+
+#let dsearch = math-func("digit-search")
+
+@alg:finger-tree:search zeigt, wie durch _Measures_ ein Fingerbaum durchsucht werden kann.
+Dabei ist $dsearch$ Binärsuche anhand der _Measures_ über eine Sequenz von _Digits_, gefolgt von gewöhnlicher B-Baumsuche (nach @sec:b-tree) der gefundenen _Digit_.
+Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefundenn werden.
+
+#todo[Make it clear that this is an optimized implementation for ordered sequences.]
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.search,
+  caption: [Die _Search_ Operation auf einem Fingerbaum.],
+) <alg:finger-tree:search>
+
 == Push & Pop
 Kernbestandteil von Fingerbäumen sind _Push_ und _Pop_ an beiden Seiten mit amortisierter Zeitkomplexität von $Theta(1)$.
 Die Algorithmen @alg:finger-tree:push-left[] und @alg:finger-tree:pop-left[] beschreiben die Operationen an der linken Seite eines Fingerbaums, durch die Symmetrie von Fingerbäumen lassen sich diese auf die rechte Seite übertragen.
@@ -459,36 +487,6 @@ Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknote
   ) <alg:finger-tree:pop-left>
 ]
 
-== Suche
-Um ein gesuchtes Element in einem Fingerbaum zu finden, werden ähnlich wie bei B-Bäumen Hilfswerte verwendet um die richtigen Teilbäume zu finden.
-In Fingerbäumen sind das die sogenannten _Measures_.
-Ein Unterschied zu B-Bäumen ist, wo diese Werte vorzufinden sind.
-In B-Bäumen sind direkt in den internen Knoten bei $k$ Kindknoten $k - 1$ solcher Hilfswerte zu finden, bei Fingerbäumen sind _Measures_ stattdessen einmal pro internem Knoten vorzufinden.
-Desweiteren sind die _Measures_ in Fingerbäumen die Kombination der _Measures_ ihrer Kindknoten.
-
-Um einen Fingerbaum als Vektor zu verwenden, würde als _Measure_ ein Typ gewählt, für welchen die Kombination durch Addition erfolgt.
-Ein solcher _Measure_ gibt dann den Index eines Wertes an.
-
-Für die Anwendung in T4gl werden geordnete Sequenzen benötigt, ein angebrachter _Measure_ dafür ist der Schlüsselwert und die Kombination durch die Funktion $max$, sodass der _Measure_ interner Knoten den größten Schlüssel des Subbaums angibt.
-Ist der _Measure_ des Subbaums kleiner als der Suchschlüssel, so ist der Schlüssel nicht in diesem Subbaum enthalten.
-
-#let dsearch = math-func("digit-search")
-
-@alg:finger-tree:search zeigt, wie durch _Measures_ ein Fingerbaum durchsucht werden kann.
-Dabei ist $dsearch$ Binärsuche anhand der _Measures_ über eine Sequenz von _Digits_, gefolgt von gewöhnlicher B-Baumsuche (nach @sec:b-tree) der gefundenen _Digit_.
-Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefundenn werden.
-
-#todo[Add the remaining part, ensure the explanantion and algorithm are correct.]
-
-#[
-  #show: show-E
-  #figure(
-    kind: "algorithm",
-    supplement: [Algorithmus],
-    figures.finger-tree.alg.search,
-    caption: [Die _Search_ Operation auf einem Fingerbaum.],
-  ) <alg:finger-tree:search>
-]
 
 == Insert & Remove
 Die Operationen _Insert_ und _Remove_ sind in @bib:hp-06 durch eine Kombination von _Split_, _Push_ bzw. _Pop_ und _Concat_ implementiert.
