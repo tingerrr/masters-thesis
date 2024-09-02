@@ -255,6 +255,10 @@ Im Regelfall wären alle Klassendefinitionen über `T` und `M` per ```cpp templa
 ) <lst:finger-tree>
 
 = Generische Fingerbäume
+#todo[
+  Properly communitcate that we're not concerened with implementing this to be generic over the measure, we're strictly interested in an ordered sequence implementation with better cache locality.
+]
+
 Im Folgenden wird betrachtet, inwiefern die Zweigfaktoren von Fingerbäumen generalisierbar sind, ohne die in @tbl:finger-tree-complex beschriebenen Komplexitäten zu verschlechtern.
 Höhere Zweigfaktoren der Teilbäume eines Fingerbaums reduzieren die Tiefe des Baumes und können die Cache-Effizienz erhöhen.
 
@@ -437,16 +441,6 @@ Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefu
 Kernbestandteil von Fingerbäumen sind _Push_ und _Pop_ an beiden Seiten mit amortisierter Zeitkomplexität von $Theta(1)$.
 Die Algorithmen @alg:finger-tree:push-left[] und @alg:finger-tree:pop-left[] beschreiben die Operationen an der linken Seite eines Fingerbaums, durch die Symmetrie von Fingerbäumen lassen sich diese auf die rechte Seite übertragen.
 
-#let show-E = body => {
-  import "/src/figures.typ": math-type
-  show math.equation: it => {
-    show "E": math-type
-    it
-  }
-
-  body
-}
-
 #let Deep = math-type("Deep")
 #let Shallow = math-type("Shallow")
 
@@ -459,15 +453,12 @@ Sollte der Wirbelknoten $Deep$ sein, wird der neue Knoten $e$ als linke _Digit_ 
 Wird die maximale Anzahl der _Digits_ $d_max$ überschritten, kommt es zum Überlauf.
 Beim Überlauf werden $dd$ _Digits_ in einen Knoten verpackt und in die nächste Ebene verschoben.
 
-#[
-  #show: show-E
-  #figure(
-    kind: "algorithm",
-    supplement: [Algorithmus],
-    figures.finger-tree.alg.pushl,
-    caption: [Die _Push_-Operation an der linken Seite eines Fingerbaumes.],
-  ) <alg:finger-tree:push-left>
-]
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.pushl,
+  caption: [Die _Push_-Operation an der linken Seite eines Fingerbaumes.],
+) <alg:finger-tree:push-left>
 
 @alg:finger-tree:pop-left ist auf ähnliche Weise wie @alg:finger-tree:push-left in zwei Fälle getrennt, $Shallow$ und $Deep$.
 Ist der Wirbelknoten $Shallow$, wird lediglich ein _Digit_ von links abgetrennt und zurückgegeben.
@@ -477,22 +468,73 @@ Bleiben dabei weniger als $d_min$ _Digits_ vorhanden, erzeugt das entweder Unter
 Ist die nächste Ebene selbst $Shallow$ und leer, werden die linken und rechten _Digits_ zusammengenommen und diese Ebene selbst wird $Shallow$.
 Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknoten füllen die linken _Digits_ auf.
 
-#[
-  #show: show-E
-  #figure(
-    kind: "algorithm",
-    supplement: [Algorithmus],
-    figures.finger-tree.alg.popl,
-    caption: [Die _Pop_-Operation an der linken Seite eines Fingerbaumes.],
-  ) <alg:finger-tree:pop-left>
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.popl,
+  caption: [Die _Pop_-Operation an der linken Seite eines Fingerbaumes.],
+) <alg:finger-tree:pop-left>
+
+== Split & Concat
+#let Shallow = math-type("Shallow")
+
+Das Spalten und Zusammenführen zweier Fingerbäume sind fundamentale Operationen, welche vorallem für die Implementierung von _Insert_ und _Remove_ in @sec:insert-remove relevant sind.
+@alg:finger-tree:concat beschreibt wie zwei Fingerbäume zusammen geführt werden, dabei muss in jeder Ebene eine Hilfssequenz $m$ übergeben werden, welche die Zusammenführung der inneren _Digits_ der Bäume beschreibt, nachdem deren Kindknoten entpackt wurden.
+Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
+@alg:finger-tree:concat ruft sich selbst rekursiv auf, bis einer der Bäume $Shallow$ ist, in diesem  Fall degeneriert der Algorithmus zu wiederholtem _Push_ und terminiert.
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.nodes,
+  caption: [Ein Hilfsalgorithmus zum Verpacken von Knoten.],
+) <alg:finger-tree:nodes>
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.concat,
+  caption: [Das Zusammenfügen zweier Fingerbäume zu einem.],
+) <alg:finger-tree:concat>
+
+#todo[
+  This mainly hinges on digit-split, and concat.
+
+  While !Hinze and !Paterson state that their split implementation doens't guarantee returning the first split at which the predicate they use flips from false to true, the practical implementations almost always ensure this by how their elements are ordered.
+
+  It should note here that we also have the additional invariant of now allowing a measure to exist in the tree more than once.
+  Additionally, since the implementation is only concerned with ordered unnique keys and our predicate is inlined to check for the ordering of the keys, we do always get the first (unique) split, if there is one.
+
+  Note also that split returns two trees, the left of which contains all items with measure less than or equal to the queried measure.
 ]
 
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.split,
+  caption: [Die Teilung eines Fingerbaumes Anhand eines _Measures_.],
+)
 
-== Insert & Remove
-Die Operationen _Insert_ und _Remove_ sind in @bib:hp-06 durch eine Kombination von _Split_, _Push_ bzw. _Pop_ und _Concat_ implementiert.
-Dabei sind _Split_ und _Concat_ jeweils Operationen mit logarithmischer Zeitkomplexität $Theta(log n)$.
-Obwhol in @bib:hp-06 von _Concat_ die Rede ist, handelt es sich dabei eher um eine _Merge_-Operation.
-Je nach Implementierung können spezialisierte Varianten von _Insert_ und _Remove_ durch den gleichen Über-/Unterlauf Mechanismus implementiert werden, welcher bei _Push_ und _Pop_ zum Einsatz kommt.
+== Insert & Remove <sec:insert-remove>
+Die Operationen _Insert_ und _Remove_ können als Sequenzen aus _Split_, _Pop_ oder _Push_ und _Concat_ aufgebaut werden.
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.insert,
+  caption: [_Insert_ als Folge von _Split_, _Push_ und _Concat_.],
+)
+
+#todo[
+  Note the invariants of unique keys as for why we remove keys on insert.
+]
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.remove,
+  caption: [_Remove_ als Folge von _Split_, _Pop_ und _Concat_.],
+)
 
 #todo[
   See if this is feasible.

@@ -151,5 +151,21 @@ Diese Konventionen sollen vor allem Konzepte der Persistenz (siehe @chap:persist
 ) <tbl:legend>
 
 == Notation
-#todo[This is too elaborate and needs to be slimmed down to the bare minimum.]
+In Pseudocode werden sowohl mathematische Konvention, wie die Syntax zur Kardinalität von Mengen $abs(M)$, als auch Programmierkonventionen übernommen, zum Beispiel die Syntax für Feldzugriffe $x.y$.
 
+#figure(
+  table(columns: 2, align: (x, y) => horizon + if x == 1 { left },
+    table.header[Syntax][Beschreibung],
+    $x.y$, [
+      Feldzugriff, $x$ ist eine Datenstruktur mit einem Feld $y$, dann gibt $x.y$ den Wert des Feldes $y$ in $x$ zurück.
+    ],
+    $abs(x)$, [
+      Längenzugriff, ist $x$ ein Vektor, ein Baum, eine Hashtabelle, etc. (ein Kontainertyp), gibt $abs(x)$ die Anzahl der Elemente in $x$ zurück.
+    ],
+    $[x, y, ...]$, [
+      Sequenzkonstruktor, erzeugt eine Sequenz aus den Elementen $x$, $y$, usw.
+      Der Type von Sequenzen wird als $["Typ"]$ geschrieben, wobie $"Typ"$ der Typ der Elemente in der Sequenz ist.
+    ],
+  ),
+  caption: [Legende der Notationen in Pseudocode.],
+) <tbl:notation>

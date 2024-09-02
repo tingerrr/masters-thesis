@@ -60,15 +60,21 @@ class Leaf : public Node {
   T value;
 };
 
-class FingerTree {};
+class Digits {
+  M measure;
+  std::array<Node*, 4> children; // 1..4 digits
+};
+
+class FingerTree {
+  M measure;
+};
 class Shallow : public FingerTree {
   Node* value; // 0..1 digits
 };
 class Deep : public FingerTree {
-  M measure;
-  std::array<Node*, 4> left;  // 1..4 digits
+  Digits left;  // 1..4 digits
   FingerTree* middle;
-  std::array<Node*, 4> right; // 1..4 digits
+  Digits right; // 1..4 digits
 };
 ```
 
@@ -85,14 +91,20 @@ class Leaf : public Node {
   T value;
 };
 
-class FingerTree {};
-class Shallow: public FingerTree {
+class Digits {
+  M measure;
+  std::vector<Node*> children;
+};
+
+class FingerTree {
+  M measure;
+};
+class Shallow : public FingerTree {
   std::vector<Node*> values; // 0..(2 d_min - 1) digits
 };
 class Deep : public FingerTree {
-  M measure;
-  std::vector<Node*> left;  // d_min..d_max digits
+  Digits left;  // d_min..d_max digits
   FingerTree* middle;
-  std::vector<Node*> right; // d_min..d_max digits
+  Digits right; // d_min..d_max digits
 };
 ```
