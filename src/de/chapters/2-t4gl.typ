@@ -18,14 +18,6 @@ Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die stati
 Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ (Atomare Instruktionen) kompiliert.
 Im Anschluss führt des Laufzeitsystem die kompilierten _Microsteps_ aus, verwaltet Speicher und Kontextwechsel der _Microsteps_ und stellt die benötigten Systemschnittstellen zur Verfügung.
 
-= Scheduling
-#todo[
-  Introduce t4gl's scheduling and runtime model and how certain operations are or aren't broken into microsteps.
-  This will later be relevant for the realtime analysis of the new storage data structure.
-  Especially with regards to which steps must complete in a certian time and which don't.
-  Maybe include the figure from the wiki explaining the execution model und how latencies introduced by longrunning instructions can break the real time constraints.
-]
-
 = Echtzeitanforderungen <sec:realtime>
 Je nach Anwendungsfall werden an das T4gl-Laufzeitsystem Echtzeitanforderungen gestellt.
 
@@ -44,10 +36,6 @@ Je nach Strenge der Anforderungen lassen sich Echtzeitsysteme in drei verschiede
   Eine geringe Anzahl an Verletzungen der Echtzeitbedingungen hat katastrophale Folgen für das Echtzeitsystem  @bib:lo-11[S. 7].
 / Hartes Echtzeitsystem:
   Eine einzige Verletzung der Echtzeitbedingungen hat katastrophale Folgen für das Echtzeitsystem @bib:lo-11[S. 6].
-
-#todo[
-  Reduce this to simply mention hard and firm realtime, since they aren't used the definitions can go.
-]
 
 Für Anwendungsfälle, in denen Echtzeitanforderungen an T4gl gestellt werden, gibt es bei Nichteinhaltung keine katastrophalen Folgen, es müssen lediglich Testergebnisse verwofen werden.
 T4gl ist demnach nur für weiche Echtzeitsysteme einsetzbar.

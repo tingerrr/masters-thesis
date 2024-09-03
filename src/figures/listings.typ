@@ -79,28 +79,29 @@ class Deep : public FingerTree {
 ```
 
 #let finger-tree-def-new = ```cpp
-using T = ...;
-using M = ...;
+using V = ...;
+using K = ...;
 
 class Node {};
 class Internal : public Node {
-  M measure;
+  K key;
   std::vector<Node*> children; // k_min..k_max children
 };
 class Leaf : public Node {
-  T value;
+  K key;
+  V val;
 };
 
 class Digits {
-  M measure;
+  K key;
   std::vector<Node*> children;
 };
 
 class FingerTree {
-  M measure;
+  K key;
 };
 class Shallow : public FingerTree {
-  std::vector<Node*> values; // 0..(2 d_min - 1) digits
+  Digits children; // 0..(2 d_min - 1) digits
 };
 class Deep : public FingerTree {
   Digits left;  // d_min..d_max digits

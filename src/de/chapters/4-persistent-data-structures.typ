@@ -111,7 +111,7 @@ Zunächst definieren wir Invarianzen von T4gl-Arrays, welche durch eine Änderun
   - Tiefe Kopien von T4gl-Arrays teilen sichtbar keine Daten, ungeachtet, ob die darin enthaltenen Typen selbst Referenztypen sind.
 
 Die Ordnung der Schlüssel schließt ungeordnete assoziative Datenstrukturen wie Hashtabellen aus.
-Das Referenztypenverhalten ist dadurch umzusetzen, dass wie bis dato drei Ebenen verwendet werden (@sec:t4gl:arrays), es werden lediglich die _Qt-Instanzen_ durch neue Datenstrukturen ersetzt.
+Das Referenztypenverhalten ist dadurch umzusetzen, dass wie bis dato drei Ebenen verwendet werden (siehe @sec:t4gl:arrays), es werden lediglich die _Qt-Instanzen_ durch neue Datenstrukturen ersetzt.
 Essentiell für die Verbesserung des _worst-case_ Zeitverhaltens bei Kopien und Schreibzugriffen ist die Reduzierung der Daten, welche bei Schreibzugriffen kopiert werden müssen.
 Hauptproblem bei flachen Kopien, gefolgt von Schreibzugriff auf CoW-Datenstrukturen, ist die tiefe Kopie _aller_ Daten in den Daten der Instanzen, selbst wenn nur ein einziges Element beschrieben oder eingefügt/entfernt wird.
 Ein Großteil der Elemente in den originalen und neuen kopierten Daten sind nach dem Schreibzugriff gleich.
@@ -124,7 +124,7 @@ Da die Schlüsselverteilung in T4gl-Arrays nicht dicht ist, können die Schlüss
 Etwas fundamentaler sind B-Bäume @bib:bm-70 @bib:bay-71, bei persistenten B-Bäumen haben die meisten Operationen eine _worst-_ und _average-case_ Zeitkomplexität von $Theta(log n)$.
 Eine Verbesserung der _average-case_ Zeitkomplexität für bestimmte Sequenzoperationen (_Push_, _Pop_) bieten 2-3-Fingerbäume @bib:hp-06.
 Diese bieten sowohl exzellentes Zeitverhalten, als auch keine Enschränkung auf die Schlüsselverteilung.
-Im folgenden werden 2-3-Fingerbäume als alternative Storage-Datenstrukturen für T4gl-Arrays untersucht.
+Im folgenden werden unter anderem 2-3-Fingerbäume als alternative Storage-Datenstrukturen für T4gl-Arrays untersucht.
 
 #todo[
   The above could go with some examples, especially regarding RRB-Vectors and how they could be used as paired sequences ordered by key on insertion given that it's insert/remove bounds are sublinear.
@@ -254,11 +254,27 @@ Im Regelfall wären alle Klassendefinitionen über `T` und `M` per ```cpp templa
   caption: [Die Definition von 2-3-Fingerbäumen in C++ übersetzt.],
 ) <lst:finger-tree>
 
-= Generische Fingerbäume
-#todo[
-  Properly communitcate that we're not concerened with implementing this to be generic over the measure, we're strictly interested in an ordered sequence implementation with better cache locality.
-]
+Der Typ `M` muss dabei ein Monoid sein, sprich, er benötigt eine assoziative Operation $f : (M, M) -> M$ und ein Identitätselement $m_0$, sodass $f(m_0, m) = m and f(m, m_0) = m$.
+Die Elemente `T` müssen dann eine Abbildung von $g : T -> M$ zur Verfügung stellen um die _Measures_ der Blattknoten zu bestimmen.
 
+Definieren wir `M` als $NN$ mit $f$ und $m_0$ als
+
+$
+  f(l, r) &: (NN, NN) -> NN \
+  f(l, r) &= l + r \
+  m_0 &= 0 \
+$
+
+und $g$ als
+
+$
+  g(t) &: T -> NN \
+  g(t) &= 1 \
+$
+
+so kann dieses _Measure_ die Größe von Unterbäumen beschreiben und für den Fingerbaum Vektor-Operationen wie _SplitAt_, _Index_ oder _Length_ implementiert werden @bib:hp-06[S. 15].
+
+= Generische Fingerbäume
 Im Folgenden wird betrachtet, inwiefern die Zweigfaktoren von Fingerbäumen generalisierbar sind, ohne die in @tbl:finger-tree-complex beschriebenen Komplexitäten zu verschlechtern.
 Höhere Zweigfaktoren der Teilbäume eines Fingerbaums reduzieren die Tiefe des Baumes und können die Cache-Effizienz erhöhen.
 
@@ -283,6 +299,18 @@ Die Definition von `Shallow` wird ebenfalls erweitert, sodass diese mehr als ein
   figures.finger-tree.def.new,
   caption: [Die Definition von generischen Fingerbäumen in C++.],
 ) <lst:gen-finger-tree>
+
+Desweiteren betrachten wir für die Generalisierung lediglich Fingerbäume, welche für T4gl relevant sind.
+Statt generischen _Measures_ für verschiedene Anwendungsfälle wird die Schnittstelle der Operationen auf geordnete einzigartige Schlüssel spezialisiert, aus `measure` wird der `key`, gespeicherte maximale Schlüssel der Unterbäume.
+Kein Schlüssel kommt mehr als einmal vor.
+Während bei der generischen Variante in @lst:finger-tree Schlüssel- und Wertetyp in `T` enthalten sein müssten, sind diese hier direkt in `Node` zu finden.
+
+Die Operationen in den Abschnitten @sec:finger-tree:search[] bis @sec:finger-tree:insert-remove[] verwenden arbeiten in den meisten Fällen mit `Node` variablen als Eingabe oder Ausgabe.
+Dabei müssen alle Eingaben bei initialem Aufruf `Leaf`-Knoten sein um die korrekte Tiefe der Unterbäume zu wahren.
+Gleichermaßen geben die initialen Aufrufe dieser Algorithmen immer `Leaf`-Knoten zurrück.
+In beiden Fällen ermöglicht die Verwendung von `Node` statt der Typen `K` und `V` die Definition der Algorithmen durch simple Rekursion.
+In der Haskell-Definition ergibt sich diese zur Kompilierzeit aus der Definition des nicht-regulären Typen `FingerTree a` @bib:hp-06[S. 3].
+Eine äquivalente C++-Implementierung kann diese als interne Funktionen implementieren, welche die die Eingaben in Knoten verpacken und die Ausgaben entpacken.
 
 #todo[
   A later inequality seems to imply $d_min < k_min$ as well as $k_max < d_max$, so this may be worth mentioning here once proven.
@@ -346,7 +374,7 @@ Das Verpacken und Entpacken der _Digits_ ist nötig, um die erwarteten Baumtiefe
 ]
 
 #todo[
-  After this quote they start talking how lazy evaluation is needed to make this work in a persistent setting.
+  After this quote they start talking about how lazy evaluation is needed to make this work in a persistent setting.
 ]
 
 Wir erweitern den Begriff der Sicherheit einer Ebene $t$ mit $d$ _Digits_ als
@@ -385,7 +413,7 @@ $
   t + 1 &: d_min <=& d_(t + 1) &text(#green, - 1)                  &< d_max \
 $
 
-Die Zweigfaktoren $d_min$, $d_max$, $k_min$ und $k_max$ sind so zu wählen, dass Werte für $dd$ gefunden werden könne, für die die zuvorgenannten Ungleichungen halten.
+Die Zweigfaktoren $d_min$, $d_max$, $k_min$ und $k_max$ sind so zu wählen, dass Werte für $dd$ gefunden werden können, für die die zuvorgenannten Ungleichungen halten.
 Betrachten wir 2-3-Fingerbäume, gilt $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$, daraus ergibt sich
 
 $
@@ -405,11 +433,11 @@ $
 Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ einen validen Fingerbaum beschreiben.
 
 #todo[
-  + Now the quesiton is if @eq:node-constraint is enough on it's own to chose $dd$, this may be related to the relation of $d$ to $k$ noted further up.
+  + Now the question is if @eq:node-constraint is enough on its own to chose $dd$, this may be related to the relation of $d$ to $k$ noted further up.
   + Below here should follow the debit analysis, or further down with more context from the push and pop operations.
 ]
 
-== Suche
+== Suche <sec:finger-tree:search>
 Um ein gesuchtes Element in einem Fingerbaum zu finden, werden ähnlich wie bei B-Bäumen Hilfswerte verwendet um die richtigen Teilbäume zu finden.
 In Fingerbäumen sind das die sogenannten _Measures_.
 Ein Unterschied zu B-Bäumen ist, wo diese Werte vorzufinden sind.
@@ -419,16 +447,14 @@ Desweiteren sind die _Measures_ in Fingerbäumen die Kombination der _Measures_ 
 Um einen Fingerbaum als Vektor zu verwenden, würde als _Measure_ ein Typ gewählt, für welchen die Kombination durch Addition erfolgt.
 Ein solcher _Measure_ gibt dann den Index eines Wertes an.
 
-Für die Anwendung in T4gl werden geordnete Sequenzen benötigt, ein angebrachter _Measure_ dafür ist der Schlüsselwert und die Kombination durch die Funktion $max$, sodass der _Measure_ interner Knoten den größten Schlüssel des Subbaums angibt.
-Ist der _Measure_ des Subbaums kleiner als der Suchschlüssel, so ist der Schlüssel nicht in diesem Subbaum enthalten.
+Für die Anwendung in T4gl werden geordnete Sequenzen benötigt, ein angebrachter _Measure_ dafür ist der Schlüsselwert und die Kombination durch die Funktion $max$, sodass der _Measure_ interner Knoten den größten Schlüssel des Unterbaums angibt.
+Ist der _Measure_ des Unterbaums kleiner als der Suchschlüssel, so ist der Schlüssel nicht in diesem Unterbaum enthalten.
 
 #let dsearch = math-func("digit-search")
 
 @alg:finger-tree:search zeigt, wie durch _Measures_ ein Fingerbaum durchsucht werden kann.
 Dabei ist $dsearch$ Binärsuche anhand der _Measures_ über eine Sequenz von _Digits_, gefolgt von gewöhnlicher B-Baumsuche (nach @sec:b-tree) der gefundenen _Digit_.
-Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefundenn werden.
-
-#todo[Make it clear that this is an optimized implementation for ordered sequences.]
+Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefunden werden.
 
 #figure(
   kind: "algorithm",
@@ -437,7 +463,7 @@ Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefu
   caption: [Die _Search_ Operation auf einem Fingerbaum.],
 ) <alg:finger-tree:search>
 
-== Push & Pop
+== Push & Pop <sec:finger-tree:push-pop>
 Kernbestandteil von Fingerbäumen sind _Push_ und _Pop_ an beiden Seiten mit amortisierter Zeitkomplexität von $Theta(1)$.
 Die Algorithmen @alg:finger-tree:push-left[] und @alg:finger-tree:pop-left[] beschreiben die Operationen an der linken Seite eines Fingerbaums, durch die Symmetrie von Fingerbäumen lassen sich diese auf die rechte Seite übertragen.
 
@@ -452,6 +478,8 @@ In beiden Fällen kommt es nicht zum Überlauf.
 Sollte der Wirbelknoten $Deep$ sein, wird der neue Knoten $e$ als linke _Digit_ angefügt.
 Wird die maximale Anzahl der _Digits_ $d_max$ überschritten, kommt es zum Überlauf.
 Beim Überlauf werden $dd$ _Digits_ in einen Knoten verpackt und in die nächste Ebene verschoben.
+Bei _Push_ Operationen muss außerdem beachtet werden, dass der Schlüssel des eingefügten Knotens die Ordnung der Schlüssel einhält.
+In der Implementierung kann diese Operation entweder als `private` markiert werden, oder die Knoten vor dem Einfügen validieren.
 
 #figure(
   kind: "algorithm",
@@ -475,10 +503,10 @@ Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknote
   caption: [Die _Pop_-Operation an der linken Seite eines Fingerbaumes.],
 ) <alg:finger-tree:pop-left>
 
-== Split & Concat
+== Split & Concat <sec:finger-tree:split-concat>
 #let Shallow = math-type("Shallow")
 
-Das Spalten und Zusammenführen zweier Fingerbäume sind fundamentale Operationen, welche vorallem für die Implementierung von _Insert_ und _Remove_ in @sec:insert-remove relevant sind.
+Das Spalten und Zusammenführen zweier Fingerbäume sind fundamentale Operationen, welche vorallem für die Implementierung von _Insert_ und _Remove_ in @sec:finger-tree:insert-remove relevant sind.
 @alg:finger-tree:concat beschreibt wie zwei Fingerbäume zusammen geführt werden, dabei muss in jeder Ebene eine Hilfssequenz $m$ übergeben werden, welche die Zusammenführung der inneren _Digits_ der Bäume beschreibt, nachdem deren Kindknoten entpackt wurden.
 Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
 @alg:finger-tree:concat ruft sich selbst rekursiv auf, bis einer der Bäume $Shallow$ ist, in diesem  Fall degeneriert der Algorithmus zu wiederholtem _Push_ und terminiert.
@@ -497,15 +525,13 @@ Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
   caption: [Das Zusammenfügen zweier Fingerbäume zu einem.],
 ) <alg:finger-tree:concat>
 
+Einen Fingerbaum zu Teilen ist essentiell um einzelne Elemente mit bestimmten Eigenschaften zu isolieren, wie es für _Insert_ und _Remove_ der Fall ist.
+@alg:finger-tree:split zeigt, wie ein Fingerbaum $t$ so geteilt wird, dass alle Schlüssel welche größer als $k$ sind im rechten Baum und alle anderen im linken Baum landen.
+Das folgt daraus, dass jeder Schlüssel nur einmal im Baum vorkommen darf und alle Schlüssel sortiert sind.
+Die Implementierung in @bib:hp-06 kann weder garantieren dass die zurrückgegeben Teilung die einzige, noch dass diese die erste sein Teilung ist.
+
 #todo[
   This mainly hinges on digit-split, and concat.
-
-  While !Hinze and !Paterson state that their split implementation doens't guarantee returning the first split at which the predicate they use flips from false to true, the practical implementations almost always ensure this by how their elements are ordered.
-
-  It should note here that we also have the additional invariant of now allowing a measure to exist in the tree more than once.
-  Additionally, since the implementation is only concerned with ordered unnique keys and our predicate is inlined to check for the ordering of the keys, we do always get the first (unique) split, if there is one.
-
-  Note also that split returns two trees, the left of which contains all items with measure less than or equal to the queried measure.
 ]
 
 #figure(
@@ -513,32 +539,37 @@ Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
   supplement: [Algorithmus],
   figures.finger-tree.alg.split,
   caption: [Die Teilung eines Fingerbaumes Anhand eines _Measures_.],
-)
+) <alg:finger-tree:split>
 
-== Insert & Remove <sec:insert-remove>
+== Insert & Remove <sec:finger-tree:insert-remove>
 Die Operationen _Insert_ und _Remove_ können als Sequenzen aus _Split_, _Pop_ oder _Push_ und _Concat_ aufgebaut werden.
+@fig:finger-tree:insert zeigt die Implementierung von _Insert_, dabei ist zu beachten, dass wenn ein Schlüssel bereits in $t$ existiert, so muss dessen Wert ersetzt werden, da jeder Schlüssel nur maximal einmal vorhanden sein darf.
+Bei der Implementierung könnte die Sequenz von _Pop_ gefolgt von _Push_ auch durch eine Pfadkopie optimiert werden.
 
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
   figures.finger-tree.alg.insert,
   caption: [_Insert_ als Folge von _Split_, _Push_ und _Concat_.],
-)
+) <fig:finger-tree:insert>
 
-#todo[
-  Note the invariants of unique keys as for why we remove keys on insert.
-]
+In @fig:finger-tree:remove ist zu sehen wie _Remove_ zu implementieren ist, wie auch bei _Insert_ wird geprüft ob der erwünschte Schlüssel im linken Baum ist.
+Ähnlich der Implementierung von Algorithmus @alg:finger-tree:search[] und @alg:finger-tree:pop-left[] muss bei Nichtvorhandensein des Schlüssels $k$ ein $None$-Wert oder eine Fehler zurrückgegeben werden.
 
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
   figures.finger-tree.alg.remove,
   caption: [_Remove_ als Folge von _Split_, _Pop_ und _Concat_.],
-)
+) <fig:finger-tree:remove>
+
+Je nach Besetzung der Unterbäume, können _Insert_ und _Remove_ auch diese Lücken ausnutzen um statt _Split_ und _Concat_ auf simple Pfadkopie zurückzugreifen.
+Die Häufigkeit der Lücken hängt dabei von der Wahl von $dd$ ab, liegt $dd$ näher an $k_min$ können Blattknoten öfter im Nachhinein befüllt werden.
 
 #todo[
   See if this is feasible.
-  Perhaps show pseudo code of how this would be achieved.
+  It may be possible, but I'm afraid it will have unpredictable runtime performance, if a large subtree must has one remaining space on the wrong side, it may need to shove all items by one.
+  This would still be better than insertion cost in a linear sequence, but not great either.
 ]
 
 == Echtzeitanalyse
@@ -597,9 +628,9 @@ Ein simples Beispiel sind vorzeichenbehaftete Schlüssel, welche einfach um ihr 
 Das setzt natürlich voraus, dass ein Minimum existiert, wie es bei Ganzzahlräpresentationen in den meisten Prozessoren der Fall ist.
 
 #todo[
-  Restriktion not needed by interspersing negative values as $2 abs(t) + 1$ and positive values as $2 abs(t)$.
+  Restriction not needed by interspersing negative values as $2 abs(t) + 1$ and positive values as $2 abs(t)$.
 
-  But if there's no minimum/maximum, then this implies a non static known bit width, at which point our guarantees go out the window.
+  But if there's no minimum/maximum, then this implies taht we don't know the bit width before runtime, at which point our guarantees are weakened.
 ]
 
 == Zeitverhalten

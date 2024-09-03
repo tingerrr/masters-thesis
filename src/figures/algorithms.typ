@@ -14,7 +14,7 @@
 
 #let Node = math-type("Node")
 #let Deep = math-type("Deep")
-#let Measure = math-type("Measure")
+#let Key = math-type("Key")
 #let Shallow = math-type("Shallow")
 #let FingerTree = math-type("FingerTree")
 
@@ -47,21 +47,21 @@
   numbered-title: $ftpushl(e, t): (Node, FingerTree) -> FingerTree$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *let* $"children" = pushl(e, t."children")$
+    + *let* $"children" := pushl(e, t."children")$
     + *if* $|"children"| < 2 d_min$
       #comment[no overflow]
       + *return* $Shallow("children")$
-    + *let* $"left", "right" = split("children", d_min)$
+    + *let* $"left", "right" := split("children", d_min)$
       #comment[overflow by left+right split]
     + *return* $Deep("left", Shallow(nothing), "right")$
   + *else*
-    + *let* $"left" = pushl(e, t."left")$
+    + *let* $"left" := pushl(e, t."left")$
     + *if* $abs("left") <= d_max$
       #comment[no overflow]
       + *return* $Deep("left", t."middle", t."right")$
-    + *let* $"rest", "overflow" = split("left", abs("left") - dd)$
+    + *let* $"rest", "overflow" := split("left", abs("left") - dd)$
       #comment[overflow by descent]
-    + *let* $"middle" = ftpushl(Node("overflow"), t."middle")$
+    + *let* $"middle" := ftpushl(Node("overflow"), t."middle")$
     + *return* $Deep("rest", "middle", t."right")$
 ]
 
@@ -72,10 +72,10 @@
     + *if* $abs(t."children") = 0$
       + *return* $(None, t)$
     + *else*
-      + *let* $e, "rest" = popl(t."children")$
+      + *let* $e, "rest" := popl(t."children")$
       + *return* $(e, Shallow("rest"))$
   + *else*
-    + *let* $e, "rest"_l = popl(t."left")$
+    + *let* $e, "rest"_l := popl(t."left")$
     + *if* $abs("rest") >= d_min$
       #comment[no underflow]
       + *return* $(e, Deep("rest", t."middle", t."right"))$
@@ -84,29 +84,29 @@
       + *return* $(e, Shallow(concat(t."left", t."right")))$
     + *else*
       #comment[underflow by descent]
-      + *let* $"node", "rest"_m = ftpopl(t."middle")$
+      + *let* $"node", "rest"_m := ftpopl(t."middle")$
       + *return* $(e, Deep(concat("rest"_l, "node"."children"), "rest"_m, t."right"))$
 ]
 
 #let finger-tree-alg-search = algorithm(
-  numbered-title: $ftsearch(t, m): (FingerTree, Measure) -> Node$,
+  numbered-title: $ftsearch(t, m): (FingerTree, Key) -> Node$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $m <= t."measure"$
+    + *if* $m <= t."key"$
       + *return* $dsearch(t."children", m)$
     + *else*
-      #comment[measure not in this subtree]
+      #comment[key not in this subtree]
       + *return* $None$
   + *else*
     #comment[find suitable branch to descend]
-    + *if* $m <= t."left"."measure"$
+    + *if* $m <= t."left"."key"$
       + *return* $dsearch(t."left", m)$
-    + *if* $m <= t."middle"."measure"$
+    + *if* $m <= t."middle"."key"$
       + *return* $ftsearch(t."middle", m)$
-    + *if* $m <= t."right"."measure"$
+    + *if* $m <= t."right"."key"$
       + *return* $dsearch(t."right", m)$
     + *else*
-      #comment[measure not in this subtree]
+      #comment[key not in this subtree]
       + *return* $None$
 ]
 
@@ -143,7 +143,7 @@
       + $l = ftpushr(l, v)$
     + *return* $l$
   + *else*
-    + *let* $m' = nothing$
+    + *let* $m' := nothing$
     + *for* $e$ *in* $concat(l."right", m, r."left")$
       #comment[lift node children by one layer]
       + $m' = concat(m', e."children")$
@@ -151,21 +151,30 @@
 ]
 
 #let finger-tree-alg-split = algorithm(
-  numbered-title: $ftsplit(t, m): (FingerTree, Measure) -> (FingerTree, FingerTree)$,
+  numbered-title: $ftsplit(t, k): (FingerTree, Key) -> (FingerTree, Node, FingerTree)$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *let* $l, r = dsplit(t."children", m)$
-    + *return* $(Shallow(l), Shallow(r))$
+    + *let* $l, v, r := dsplit(t."children", k)$
+    + *return* $(Shallow(l), v, Shallow(r))$
   + *else*
-    + *if* $m <= t."left"."measure"$
-      + *let* $l, r = dsplit(t."left", m)$
-      // TODO: (l, r + middle + right)
-    + *if* $m <= t."middle"."measure"$
-      + *let* $l, r = ftsplit(t."middle", m)$
+    + *if* $k <= t."left"."key"$
+      + *let* $l, v, r := dsplit(t."left", k)$
+      + *let* $m' := nothing$
+      // TODO: this must be a loop over this layers nodes, not this trees leaf elements
+      + *for* $e$ *in* $t."middle"$
+        #comment[lift node children by one layer]
+        + $m' = concat(m', e."children")$
+      // TODO: this must be expressed better
+      // if |r| < d_min, then we take some children out of t.middle to fill it
+      + *return* $(Shallow(l), v, FingerTree(concat(r, m', t."right")))$
+    + *if* $k <= t."middle"."key"$
+      + *let* $l, v, r := ftsplit(t."middle", k)$
       // TODO
-    + *if* $m <= t."right"."measure"$
-      + *let* $l, r = dsplit(t."right", m)$
+      + #text(red)[*\// TODO*]
+    + *if* $k <= t."right"."key"$
+      + *let* $l, v, r := dsplit(t."right", k)$
       // TODO
+      + #text(red)[*\// TODO*]
     + *else*
       + *return* $(t, Shallow(nothing))$
 ]
@@ -173,26 +182,27 @@
 #let finger-tree-alg-insert = algorithm(
   numbered-title: $ftinsert(t, e): (FingerTree, Node) -> FingerTree$,
 )[
-  + *let* $l, r = ftsplit(t, e."measure")$
-  + *if* $abs(l) eq.not 0 and last(l)."measure" = m$
-    #comment[$e."measure"$ at end of $l$]
-    + *let* $l', "__" = ftpopr(l)$
-    + *return* $ftconcat(ftpushr(l', e), r)$
+  + *let* $l, v, r := ftsplit(t, e."key")$
+  + *if* $v$ *is* $None$
+    #comment[$e."key"$ not in $t$]
+    + *let* $l' := ftpushr(l, v)$
+    + *let* $l'' := ftpushr(l', e)$
+    + *return* $ftconcat(l'', r)$
   + *else*
-    #comment[$m$ not in $t$]
-    + *return* $ftconcat(ftpushr(l, e), r)$
+    #comment[$k$ in $t$]
+    + *let* $l' := ftpushr(l, e)$
+    + *return* $ftconcat(l', r)$
 ]
 
 #let finger-tree-alg-remove = algorithm(
-  numbered-title: $ftremove(t, m): (FingerTree, Measure) -> (FingerTree, Node)$,
+  numbered-title: $ftremove(t, k): (FingerTree, Key) -> (FingerTree, Node)$,
 )[
-  + *let* $l, r = ftsplit(t, m)$
-  + *if* $abs(l) eq.not 0 and last(l)."measure" = m$
-    #comment[$m$ at end of $l$]
-    + *let* $l', e = ftpopr(l)$
-    + *let* $t' = ftconcat(l', r)$
-    + *return* $(t', e)$
-  + *else*
-    #comment[$m$ not in $t$]
+  + *let* $l, v, r := ftsplit(t, k)$
+  + *if* $v$ *is* $None$
+    #comment[$k$ not in $t$]
     + *return* $(t, None)$
+  + *else*
+    #comment[$k$ in $t$]
+    + *let* $t' := ftconcat(l, r)$
+    + *return* $(t', v)$
 ]

@@ -24,6 +24,9 @@
   let annotation = annotation.pos().at(0, default: none)
 
   [#metadata(body) <todo>]
+
+  set par.line(numbering: none)
+
   showybox.showybox(
     title: [TODO] + if annotation != none [: #annotation], 
     title-style: (
