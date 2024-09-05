@@ -9,8 +9,8 @@
 
 #let dd = $Delta d$
 
+#let Int = math-type("Int")
 #let None = math-type("None")
-#let Predicate = math-type("Predicate")
 
 #let Node = math-type("Node")
 #let Deep = math-type("Deep")
@@ -32,22 +32,51 @@
 
 #let pnodes = math-func("pack-nodes")
 
+#let ftsearch = math-func("ftree-search")
+
 #let ftpushl = math-func("ftree-push-left")
 #let ftpushr = math-func("ftree-push-right")
 #let ftpopl = math-func("ftree-pop-left")
 #let ftpopr = math-func("ftree-pop-right")
-#let ftsearch = math-func("ftree-search")
+
+#let ftappendl = math-func("ftree-append-left")
+#let fttakel = math-func("ftree-take-left")
+#let ftappendr = math-func("ftree-append-right")
+#let fttaker = math-func("ftree-take-right")
+
 #let ftsplit = math-func("ftree-split")
-#let ftinsert = math-func("ftree-insert")
 #let ftconcat = math-func("ftree-concat")
+
+#let ftinsert = math-func("ftree-insert")
 #let ftremove = math-func("ftree-remove")
 
-
-#let finger-tree-alg-push-left = algorithm(
-  numbered-title: $ftpushl(e, t): (Node, FingerTree) -> FingerTree$,
+#let finger-tree-alg-search = algorithm(
+  numbered-title: $ftsearch(t, m): (FingerTree, Key) -> Node$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *let* $"children" := pushl(e, t."children")$
+    + *if* $m <= t."key"$
+      + *return* $dsearch(t."children", m)$
+    + *else*
+      #comment[key not in this subtree]
+      + *return* $None$
+  + *else*
+    #comment[find suitable branch to descend]
+    + *if* $m <= t."left"."key"$
+      + *return* $dsearch(t."left", m)$
+    + *if* $m <= t."middle"."key"$
+      + *return* $ftsearch(t."middle", m)$
+    + *if* $m <= t."right"."key"$
+      + *return* $dsearch(t."right", m)$
+    + *else*
+      #comment[key not in this subtree]
+      + *return* $None$
+]
+
+#let finger-tree-alg-push-left = algorithm(
+  numbered-title: $ftpushl(t, e): (FingerTree, Node) -> FingerTree$,
+)[
+  + *if* $t$ *is* $Shallow$
+    + *let* $"children" := pushl(t."children", e)$
     + *if* $|"children"| < 2 d_min$
       #comment[no overflow]
       + *return* $Shallow("children")$
@@ -55,13 +84,13 @@
       #comment[overflow by left+right split]
     + *return* $Deep("left", Shallow(nothing), "right")$
   + *else*
-    + *let* $"left" := pushl(e, t."left")$
+    + *let* $"left" := pushl(t."left", e)$
     + *if* $abs("left") <= d_max$
       #comment[no overflow]
       + *return* $Deep("left", t."middle", t."right")$
     + *let* $"rest", "overflow" := split("left", abs("left") - dd)$
       #comment[overflow by descent]
-    + *let* $"middle" := ftpushl(Node("overflow"), t."middle")$
+    + *let* $"middle" := ftpushl(t."middle", Node("overflow"))$
     + *return* $Deep("rest", "middle", t."right")$
 ]
 
@@ -88,26 +117,30 @@
       + *return* $(e, Deep(concat("rest"_l, "node"."children"), "rest"_m, t."right"))$
 ]
 
-#let finger-tree-alg-search = algorithm(
-  numbered-title: $ftsearch(t, m): (FingerTree, Key) -> Node$,
+#let finger-tree-alg-append-left = algorithm(
+  numbered-title: $ftappendl(t, "nodes"): (FingerTree, [Node]) -> FingerTree$,
 )[
-  + *if* $t$ *is* $Shallow$
-    + *if* $m <= t."key"$
-      + *return* $dsearch(t."children", m)$
+  + *for* $e$ *in* $"nodes"$
+    #comment[simply push all values one by one]
+    + $t = ftpushl(t, e)$
+
+  + *return* $t$
+]
+
+#let finger-tree-alg-take-left = algorithm(
+  numbered-title: $fttakel(t, "count"): (FingerTree, Int) -> ([Node], FingerTree)$,
+)[
+  + *let* $n' = nothing$
+  + *for* $"__"$ *in* $1.."count"$
+    + *if* $abs(t) = 0$
+      #comment[no more values left]
+      + *break*
     + *else*
-      #comment[key not in this subtree]
-      + *return* $None$
-  + *else*
-    #comment[find suitable branch to descend]
-    + *if* $m <= t."left"."key"$
-      + *return* $dsearch(t."left", m)$
-    + *if* $m <= t."middle"."key"$
-      + *return* $ftsearch(t."middle", m)$
-    + *if* $m <= t."right"."key"$
-      + *return* $dsearch(t."right", m)$
-    + *else*
-      #comment[key not in this subtree]
-      + *return* $None$
+      + *let* $e, t' = ftpopl(t)$
+      + $t = t'$
+      + $n' = pushr(n', e)$
+
+  + *return* $t$
 ]
 
 #let finger-tree-alg-nodes = algorithm(
@@ -115,17 +148,21 @@
 )[
   + *if* $abs(n) < k_min$
     #comment[can't form a single node]
-    + *return*  $None$
+    + *return* $None$
   + *else*
     + *let* $n' := nothing$
-    + *while* $abs(n) eq.not 0$
-      // TODO: chose split such that we can always fit the remainder into nodes,
-      // if this is even possible, it definitly works for 2..3, but does it
-      // always work for floor(k / 2)..k?
-      + *let* $k, "rest" = split(k, ...)$
+    + *while* $abs(n) - k_max >= k_min$
+      #comment[push max size nodes as long as it goes]
+      + *let* $k, "rest" = split(n, k_max)$
       + $n = "rest"$
       + $n' = pushr(n', Node(k))$
-        #comment[pack nodes into nodes]
+    + *if* $abs(n) - k_min >= k_min$
+      #comment[push the remaining 1 or 2 nodes]
+      + *let* $a, b = split(n, k_min)$
+      + $n' = pushr(n', Node(a))$
+      + $n' = pushr(n', Node(b))$
+    + *else*
+      + $n' = pushr(n', Node(n))$
     + *return* $n'$
 ]
 
@@ -133,20 +170,12 @@
   numbered-title: $ftconcat(l, m, r): (FingerTree, [Node], FingerTree) -> FingerTree$,
 )[
   + *if* $l$ *is* $Shallow$
-    #comment[left is either empty or list of nodes]
-    + *for* $v$ *in* $rev(concat(l."children", m))$
-      + $r = ftpushl(v, r)$
-    + *return* $r$
+    + *return* $ftappendl(r, concat(l."children", m))$
   + *if* $r$ *is* $Shallow$
-    #comment[right is either empty or list of nodes]
-    + *for* $v$ *in* $concat(m, r."children")$
-      + $l = ftpushr(l, v)$
-    + *return* $l$
+    + *return* $ftappendr(l, concat(m, r."children"))$
   + *else*
-    + *let* $m' := nothing$
-    + *for* $e$ *in* $concat(l."right", m, r."left")$
-      #comment[lift node children by one layer]
-      + $m' = concat(m', e."children")$
+    + *let* $m' := pnodes(concat(l."right", m, r."left"))$
+      #comment[pack nodes for the next layer]
     + *return* $Deep(l."left", ftconcat(l."middle", m', r."middle"), r."right")$
 ]
 

@@ -332,7 +332,7 @@ $
   1 &<= d &<= 4 \
 $
 
-== Baumtiefe
+== Baumtiefe <sec:finger-tree:depth>
 Sei $n(t)$ die Anzahl $n$ der Elemente einer Ebene $t$, also die Anzahl aller Elemente in allen Teilbäumen der Digits eines Wirbelknotens, so gibt es ebenfalls die minimale und maximale mögliche Anzahl für diesen Wirbelknoten.
 Diese ergeben sich jeweils aus den minimalen und maximalen Anzahlen der _Digits_, welche Teilbäme mit minimal bzw. maximal belegten Knoten enthalten.
 
@@ -400,7 +400,7 @@ $
 $ <eq:node-constraint>
 
 Dabei ist $dd$ die Anzahl der _Digits_ in $t$, welche in $t + 1$ überlaufen sollen.
-Essentiell ist, dass eine unsiche Ebene nach dem Überlauf wieder sicher ist, dazu muss $dd$ folgende Ungleichungen einhalten.
+Essentiell ist, dass eine unsichere Ebene nach dem Überlauf wieder sicher ist, dazu muss $dd$ folgende Ungleichungen einhalten.
 Die Ebene $t + 1$, kann dabei sicher bleiben oder unsicher werden.
 $
   t     &: d_min <& d_max     &text(#green, - dd) text(#red, + 1) &<  d_max \
@@ -463,6 +463,11 @@ Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefu
   caption: [Die _Search_ Operation auf einem Fingerbaum.],
 ) <alg:finger-tree:search>
 
+Das Zeitverhalten von @alg:finger-tree:search hängt von der Tiefe des Baumes ab, da im _worst-case_ der gesuchte Schlüssel im letzten Wirbelknoten vorzufinden ist.
+Die Baumtiefe steigt logarithmisch mit der Anzahl der Elemente in Abhängigkeit von den Zweigfaktoren (siehe @sec:finger-tree:depth).
+Je weiter ein Schlüssel von den beiden Enden entfernt ist, desto tiefer muss die Suche in den Baum vordringen.
+Dabei ist ein Schlüssel, welcher $d$ Positionen vom nächsten Ende entfernt ist $Theta(log d)$ Ebenen tief im Baum vorzufinden @bib:hp-06[S. 5], also effektiv $Theta(log n)$.
+
 == Push & Pop <sec:finger-tree:push-pop>
 Kernbestandteil von Fingerbäumen sind _Push_ und _Pop_ an beiden Seiten mit amortisierter Zeitkomplexität von $Theta(1)$.
 Die Algorithmen @alg:finger-tree:push-left[] und @alg:finger-tree:pop-left[] beschreiben die Operationen an der linken Seite eines Fingerbaums, durch die Symmetrie von Fingerbäumen lassen sich diese auf die rechte Seite übertragen.
@@ -496,12 +501,35 @@ Bleiben dabei weniger als $d_min$ _Digits_ vorhanden, erzeugt das entweder Unter
 Ist die nächste Ebene selbst $Shallow$ und leer, werden die linken und rechten _Digits_ zusammengenommen und diese Ebene selbst wird $Shallow$.
 Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknoten füllen die linken _Digits_ auf.
 
+Sowohl _Push_ als auch _Pop_ geht nach dem gleichen rekursiven Über/Unterfluss-Prinzip vor und hängt daher von der Baumtiefe ab, im _worst-case_ ist jede Ebene unsicher und sorgt für einen Über- oder Unterfluss, daher ergibt sich eine Komplexität von $Theta(log n)$.
+
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
   figures.finger-tree.alg.popl,
   caption: [Die _Pop_-Operation an der linken Seite eines Fingerbaumes.],
 ) <alg:finger-tree:pop-left>
+
+Außerdem Definieren wie _Append_ und _Take_ als wiederholte Versionen von _Push_ und _Pop_, diese sind gleicherwiese symmetrisch für die rechte Seite zu definieren.
+Die Operation _Take_ nimmt dabei soviele Elemente aus $t$ wie möglich, aber nicht mehr als $n$.
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.appendl,
+  caption: [Die _Append_-Operation an der linken Seite eines Fingerbaumes.],
+) <alg:finger-tree:append-left>
+
+Die Komplexität von @alg:finger-tree:concat ergibt sich aus der Anzahl der Elemente im Baum $n$ und derer in der Sequenz $"nodes"$ @alg:finger-tree:push-left als $Theta(abs("nodes") log n)$.
+
+#figure(
+  kind: "algorithm",
+  supplement: [Algorithmus],
+  figures.finger-tree.alg.takel,
+  caption: [Die _Take_-Operation an der linken Seite eines Fingerbaumes.],
+) <alg:finger-tree:take-left>
+
+Da @alg:finger-tree:take-left nur so viele Elemente entfernen kann wie im Baum vorhanden sind, ist der Faktor das Minimum aus der Anzahl der Elemente $n$ und dem Argument $"count"$, die Komplexität von _Take_ ist demnach $Theta(min("count", n) log n)$.
 
 == Split & Concat <sec:finger-tree:split-concat>
 #let Shallow = math-type("Shallow")
@@ -510,6 +538,7 @@ Das Spalten und Zusammenführen zweier Fingerbäume sind fundamentale Operatione
 @alg:finger-tree:concat beschreibt wie zwei Fingerbäume zusammen geführt werden, dabei muss in jeder Ebene eine Hilfssequenz $m$ übergeben werden, welche die Zusammenführung der inneren _Digits_ der Bäume beschreibt, nachdem deren Kindknoten entpackt wurden.
 Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
 @alg:finger-tree:concat ruft sich selbst rekursiv auf, bis einer der Bäume $Shallow$ ist, in diesem  Fall degeneriert der Algorithmus zu wiederholtem _Push_ und terminiert.
+Ähnlich wie bei @alg:finger-tree:push-left, muss beachtet werden, dass die Zusammenführung der zwei Bäume die Ordnung der Schlüssel einhält.
 
 #figure(
   kind: "algorithm",
@@ -517,6 +546,45 @@ Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
   figures.finger-tree.alg.nodes,
   caption: [Ein Hilfsalgorithmus zum Verpacken von Knoten.],
 ) <alg:finger-tree:nodes>
+
+Der Hilfsalgortihmus @alg:finger-tree:nodes[] verpackt Knoten für die Rekursion in the nächste Ebene in @alg:finger-tree:concat.
+Die Größe der zurückgegebenen Sequenz von verpackten Knoten, hat dabei direkten Einfluss auf die eigene Komplexität (durch den Rekursiven Aufruf in @alg:finger-tree:concat) und auf die Komplexität der der nicht rekursiven Basisfälle in @alg:finger-tree:concat.
+
+Dazu betrachten man, ob die Sequenz eine asymptotische Obergrenze hat.
+Im _worst-case_ sind auf allen Ebenen $t$ links und rechts volle _Digits_ und die höhste mögliche Anzahl der vorherigen Ebene $t - 1$.
+Die Sequenz $m$ hat demnach für jede Ebene $t$ die Obergrenze
+
+#let rr = $$
+
+$
+  r &= 2d_max + abs(m_(t - 1))_max \
+  abs(m_t)_max & = floor(r / k_max) + cases(
+    0 &bold("wenn") r mod k_max &&= 0,
+    1 &bold("wenn") r mod k_max &&= k_min,
+    2 &bold("sonst"),
+  )
+$
+
+mit $abs(m_0) = 0$ durch den initialen Aufruf.
+
+#todo[
+  !Hinze and !Paterson claim that the result of @alg:finger-tree:nodes is bounded by 4 ($d_max$) for 2-3-FingerTrees.
+  This is another indicator that $k$ and $d$ have a very direct relationship.
+
+  My intuition goes like this, we assume the maximum number of digits ($d_max = 4$) in left and right and maximum number of $m$ from the previous layer:
+  0. $=> 0$, by definition we start with 0
+  1. $4 + 0 + 4 => 3$, by definition we start with 0
+  2. $4 + 3 + 4 => 4$, 3 from the previous raises this to 4
+  3. $4 + 4 + 4 => 4$, 4 does not raise this any further
+  4. ad infinitum
+
+  Therefore $abs(m)$ is bounded by $d_max$ for $d_min = 3$ and $d_max = 4$.
+
+  This must be generalized, such that for generic $d$, $abs(m)$ stays bounded by some constant defined in terms of only $k$ and $d$.
+  Otherwise, if this can't be bounded in such a way, @alg:finger-tree:concat cannot be proven to run in $Theta(log min(n_l, n_r))$ time.
+
+  Separately, we must also ensure that $abs(m)$ has a lower bound of $k_min$ or the special case of $0$, they don't talk about this at all in @bib:hp-06.
+]
 
 #figure(
   kind: "algorithm",
@@ -528,7 +596,7 @@ Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
 Einen Fingerbaum zu Teilen ist essentiell um einzelne Elemente mit bestimmten Eigenschaften zu isolieren, wie es für _Insert_ und _Remove_ der Fall ist.
 @alg:finger-tree:split zeigt, wie ein Fingerbaum $t$ so geteilt wird, dass alle Schlüssel welche größer als $k$ sind im rechten Baum und alle anderen im linken Baum landen.
 Das folgt daraus, dass jeder Schlüssel nur einmal im Baum vorkommen darf und alle Schlüssel sortiert sind.
-Die Implementierung in @bib:hp-06 kann weder garantieren dass die zurrückgegeben Teilung die einzige, noch dass diese die erste sein Teilung ist.
+Die Implementierung in @bib:hp-06 kann weder garantieren, dass die zurrückgegeben Teilung die einzige, noch dass diese die erste sein Teilung ist.
 
 #todo[
   This mainly hinges on digit-split, and concat.
@@ -538,7 +606,7 @@ Die Implementierung in @bib:hp-06 kann weder garantieren dass die zurrückgegebe
   kind: "algorithm",
   supplement: [Algorithmus],
   figures.finger-tree.alg.split,
-  caption: [Die Teilung eines Fingerbaumes Anhand eines _Measures_.],
+  caption: [Die Teilung eines Fingerbaumes um einen Schlüssel.],
 ) <alg:finger-tree:split>
 
 == Insert & Remove <sec:finger-tree:insert-remove>

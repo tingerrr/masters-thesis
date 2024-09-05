@@ -54,12 +54,18 @@
         new: finger-tree-def-new,
       ),
       alg: (
+        search: finger-tree-alg-search,
+
         pushl: finger-tree-alg-push-left,
         popl: finger-tree-alg-pop-left,
-        search: finger-tree-alg-search,
+
+        appendl: finger-tree-alg-append-left,
+        takel: finger-tree-alg-take-left,
+
         nodes: finger-tree-alg-nodes,
         concat: finger-tree-alg-concat,
         split: finger-tree-alg-split,
+
         insert: finger-tree-alg-insert,
         remove: finger-tree-alg-remove,
       ),
