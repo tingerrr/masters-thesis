@@ -285,15 +285,11 @@ $
   d_min &<= d &<= d_max \
 $
 
-Die Teilbäume, welche in den _Digits_ liegen, werden auf B-Bäume generalisiert, daher gilt für deren interne Knoten außerdem
-
-$
-  ceil(k_max / 2) = k_min \
-$
+Die Teilbäume, welche in den _Digits_ liegen, werden auf B-Bäume generalisiert, daher gilt für deren interne Knoten außerdem $k_min = ceil(k_max / 2)$, sowie $k_min = 2$ für deren Wurzelknoten.
 
 Die in @lst:finger-tree gegebene Definition lässt sich dadurch erweitern, das `std::array` durch `std::vector` ersetzt wird, um die wählbaren Zweigfaktoren zu ermöglichen.
 Diese können ebenfalls mit ```cpp template``` Parametern zur Kompilierzeit gesetzt werden, um den Wechsel auf Vektoren zu vermeiden.
-Die Definition von `Shallow` wird ebenfalls erweitert, sodass diese mehr als ein _Sonderdigit_ enthalten kann.
+Die Definition von `Shallow` bleibt durch $d_min = 1$ wie zuvor bestehen.
 
 #figure(
   figures.finger-tree.def.new,
@@ -312,16 +308,12 @@ In beiden Fällen ermöglicht die Verwendung von `Node` statt der Typen `K` und 
 In der Haskell-Definition ergibt sich diese zur Kompilierzeit aus der Definition des nicht-regulären Typen `FingerTree a` @bib:hp-06[S. 3].
 Eine äquivalente C++-Implementierung kann diese als interne Funktionen implementieren, welche die die Eingaben in Knoten verpacken und die Ausgaben entpacken.
 
-#todo[
-  A later inequality seems to imply $d_min < k_min$ as well as $k_max < d_max$, so this may be worth mentioning here once proven.
-]
-
-Da Wirbelknoten mindestens $2 d_min$ _Digits_ enthalten, muss die Bildung dieser Minimalanzahl der Elemente im letzten Wirbelknoten überbrückt werden.
+Da Wirbelknoten mindestens $2d_min$ _Digits_ enthalten, muss die Bildung dieser Minimalanzahl der Elemente im letzten Wirbelknoten überbrückt werden.
 Das erzielt man durch das Einhängen von _Sonderdigits_ in den letzten Wirbelknoten, bis genug für beide Seiten vorhanden sind.
 Prinzipiell gilt für den letzten Wirbelknoten
 
 $
-  0 <= d < 2 d_min
+  0 <= d < 2d_min
 $
 
 Ein generischer Fingerbaum ist dann durch diese Minima und Maxima beschrieben.
@@ -361,7 +353,7 @@ Dabei zeigen die horizontalen Linien das kumulative Minimum $n'_min$ und Maximum
   caption: [Die möglichen Tiefen $t$ für einen 2-3-Fingerbaum mit $n$ Blattknoten.],
 ) <fig:cum-depth>
 
-== Über- & Unterlaufsicherheit
+== Über- & Unterlaufsicherheit <sec:over-under>
 Über- bzw. Unterlauf einer Ebene $t$ ist der Wechsel von _Digits_ zwischen der Ebene $t$ und der Ebene $t + 1$.
 Beim Unterlauf der Ebene $t$ sind nicht genug _Digits_ in $t$ enthalten.
 Es wird ein _Digit_ aus der Ebene $t + 1$ entnommen und dessen Kindknoten in $t$ gelegt.
@@ -405,37 +397,36 @@ Die Ebene $t + 1$, kann dabei sicher bleiben oder unsicher werden.
 $
   t     &: d_min <& d_max     &text(#green, - dd) text(#red, + 1) &<  d_max \
   t + 1 &: d_min <& d_(t + 1) &text(#green, + 1)                  &<= d_max \
-$
+$ <eq:over>
 
 Gleichermaßen gelten für den Unterlauf folgende Ungleichungen.
 $
   t     &: d_min <&  d_min     &text(#green, + dd) text(#red, - 1) &< d_max \
   t + 1 &: d_min <=& d_(t + 1) &text(#green, - 1)                  &< d_max \
-$
+$ <eq:under>
 
-Die Zweigfaktoren $d_min$, $d_max$, $k_min$ und $k_max$ sind so zu wählen, dass Werte für $dd$ gefunden werden können, für die die zuvorgenannten Ungleichungen halten.
-Betrachten wir 2-3-Fingerbäume, gilt $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$, daraus ergibt sich
+Betrachtet man die Extrema von $dd$ in @eq:node-constraint, folgt aus deren Subtitution in den Gleichungen @eq:over[] und @eq:under[] eine Beziehung zwischen $d$ und $k$.
 
 $
-  "Überlauf" &: 2 <= dd <= 3 \
-  "Unterlauf" &: 1 < dd < 4 \
-$
+  d_max - d_min + 1 > k_max
+$ <eq:constraint>
 
-!Hinze und !Paterson entschieden sich bei Überlauf für $dd = 3$, gaben aber an, dass $dd = 2$ ebenfalls funktioniert @bib:hp-06[S. 8].
-Aus den oben genannten Ungleichungen lassen sich Fingerbäume mit anderen $d$ und $k$ wählen, welche die gleichen asymptotischen Komplexitäten für _Deque_-Operationen aufweisen.
-Zum Beispiel 2-4-Fingerbäume mit $d_min = 1$:
-$
-  2 <= dd <= 4 \
-  dd < d_max \
-  4 < d_max \
-$
-
-Daraus ergibt sich, dass $d_min = 1$, $d_max = 5$, $k_min = 2$ und $k_max = 4$ einen validen Fingerbaum beschreiben.
+Für eine effiziente Implementierung von _Deque_-Operationen haben !Hinze und !Paterson die Zweigfaktoren der _Digits_ von denen der Knoten um $plus.minus 1$ erweitert @bib:hp-06[S. 4].
+Die Definitionen $d_min = k_min - 1$ und $d_max = d_max + 1$ halten nicht generell, werden diese in @eq:constraint eingesetzt, ergibt sich $k_min < 3$ und folglich $floor(k_max \/ 2) < 3$.
+Unter diesen Definitionen von $d$ in Abhängigkeit von $k$ können Zweigfaktoren ab $k_max > 7$ nicht dargestellt werden.
+Wählt man stattdessen $d_min$ fest als 1, ergibt sich $d_max > k_max$, die Definition $d_max = k_max + 1$ kann also übernommen werden.
 
 #todo[
-  + Now the question is if @eq:node-constraint is enough on its own to chose $dd$, this may be related to the relation of $d$ to $k$ noted further up.
-  + Below here should follow the debit analysis, or further down with more context from the push and pop operations.
+  In fact, it seems that this is the most sensible option to prove that @alg:finger-tree:nodes can run in bounded constant time (in terms of $k$ and $d$). It is unclear if this is enough to prove an upper bound.
 ]
+
+Die Zweigfaktoren $d_max$ und $k_max$ sind so zu wählen, dass Werte für $dd$ gefunden werden können, für die zuvorgenannten Ungleichungen halten.
+Betrachten wir 2-3-Fingerbäume, gilt $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$, daraus ergibt sich trivialerweise $4 > 3$.
+
+!Hinze und !Paterson entschieden sich bei Überlauf für $dd = 3$, gaben aber an, dass $dd = 2$ ebenfalls funktioniert @bib:hp-06[S. 8], für generische Fingerbäume zeigt sich das in @eq:node-constraint.
+Beim Unterlauf hängt $dd$ von dem Zustand der Datenstruktur ab und kann nicht frei gewählt werden.
+Aus den oben genannten Ungleichungen lassen sich Fingerbäume mit anderen $d_max$ und $k_max$ wählen, welche die gleichen asymptotischen Komplexitäten für _Deque_-Operationen aufweisen.
+Für jeden $k_min$-$k_max$-Baum lässt sich eine unendliche Familie von Fingerbäumen definieren, insofern $d_max > k_max$.
 
 == Suche <sec:finger-tree:search>
 Um ein gesuchtes Element in einem Fingerbaum zu finden, werden ähnlich wie bei B-Bäumen Hilfswerte verwendet um die richtigen Teilbäume zu finden.
@@ -503,6 +494,10 @@ Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknote
 
 Sowohl _Push_ als auch _Pop_ geht nach dem gleichen rekursiven Über/Unterfluss-Prinzip vor und hängt daher von der Baumtiefe ab, im _worst-case_ ist jede Ebene unsicher und sorgt für einen Über- oder Unterfluss, daher ergibt sich eine Komplexität von $Theta(log n)$.
 
+#todo[
+  Below should follow the debit analysis for the amortized bounds of Push and Pop, ideally we can keep the constant bounds on average as a bonus over regular b-trees.
+]
+
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
@@ -543,55 +538,100 @@ Beim initalen Aufruf wird die leere Sequenz $nothing$ übergeben.
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
-  figures.finger-tree.alg.nodes,
-  caption: [Ein Hilfsalgorithmus zum Verpacken von Knoten.],
-) <alg:finger-tree:nodes>
+  figures.finger-tree.alg.concat,
+  caption: [Das Zusammenfügen zweier Fingerbäume zu einem.],
+) <alg:finger-tree:concat>
 
 Der Hilfsalgortihmus @alg:finger-tree:nodes[] verpackt Knoten für die Rekursion in the nächste Ebene in @alg:finger-tree:concat.
-Die Größe der zurückgegebenen Sequenz von verpackten Knoten, hat dabei direkten Einfluss auf die eigene Komplexität (durch den Rekursiven Aufruf in @alg:finger-tree:concat) und auf die Komplexität der der nicht rekursiven Basisfälle in @alg:finger-tree:concat.
-
-Dazu betrachten man, ob die Sequenz eine asymptotische Obergrenze hat.
-Im _worst-case_ sind auf allen Ebenen $t$ links und rechts volle _Digits_ und die höhste mögliche Anzahl der vorherigen Ebene $t - 1$.
-Die Sequenz $m$ hat demnach für jede Ebene $t$ die Obergrenze
-
-#let rr = $$
-
-$
-  r &= 2d_max + abs(m_(t - 1))_max \
-  abs(m_t)_max & = floor(r / k_max) + cases(
-    0 &bold("wenn") r mod k_max &&= 0,
-    1 &bold("wenn") r mod k_max &&= k_min,
-    2 &bold("sonst"),
-  )
-$
-
-mit $abs(m_0) = 0$ durch den initialen Aufruf.
-
-#todo[
-  !Hinze and !Paterson claim that the result of @alg:finger-tree:nodes is bounded by 4 ($d_max$) for 2-3-FingerTrees.
-  This is another indicator that $k$ and $d$ have a very direct relationship.
-
-  My intuition goes like this, we assume the maximum number of digits ($d_max = 4$) in left and right and maximum number of $m$ from the previous layer:
-  0. $=> 0$, by definition we start with 0
-  1. $4 + 0 + 4 => 3$, by definition we start with 0
-  2. $4 + 3 + 4 => 4$, 3 from the previous raises this to 4
-  3. $4 + 4 + 4 => 4$, 4 does not raise this any further
-  4. ad infinitum
-
-  Therefore $abs(m)$ is bounded by $d_max$ for $d_min = 3$ and $d_max = 4$.
-
-  This must be generalized, such that for generic $d$, $abs(m)$ stays bounded by some constant defined in terms of only $k$ and $d$.
-  Otherwise, if this can't be bounded in such a way, @alg:finger-tree:concat cannot be proven to run in $Theta(log min(n_l, n_r))$ time.
-
-  Separately, we must also ensure that $abs(m)$ has a lower bound of $k_min$ or the special case of $0$, they don't talk about this at all in @bib:hp-06.
-]
+Die Größe der zurückgegebenen Sequenz von verpackten Knoten, hat dabei direkten Einfluss auf die eigene Komplexität (durch den Rekursiven Aufruf in @alg:finger-tree:concat) und auf die Komplexität der nicht rekursiven Basisfälle in @alg:finger-tree:concat.
 
 #figure(
   kind: "algorithm",
   supplement: [Algorithmus],
-  figures.finger-tree.alg.concat,
-  caption: [Das Zusammenfügen zweier Fingerbäume zu einem.],
-) <alg:finger-tree:concat>
+  figures.finger-tree.alg.nodes,
+  caption: [Ein Hilfsalgorithmus zum Verpacken von Knoten.],
+) <alg:finger-tree:nodes>
+
+Bei 2-3-Fingerbäumen lässt sich zeigen, dass die mittlere Sequenz $m$ eine Obergrenze von 4 und eine Untergrenze von 1 hat.
+Zunächst betrachtet man wie das Verpacken der Knote sich auf deren Anzahl auswirkt.
+
+Sei $m_t$ die Anzahl verpackten Knoten bei Rekursionstiefe $t$, gilt
+
+$
+  n_t &= k_t + m_(t - 1) \
+  m_t &= cases(
+          &n \/ k_max            &    &bold("wenn") n_t mod k_max = 0,
+    floor(&n \/ k_max)           &+ 1 &bold("wenn") n_t mod k_max >= k_min,
+    floor(&(n - k_min) \/ k_max) &+ 2 &bold("wenn") n_t mod k_max < k_min,
+  )
+$
+
+// #pagebreak()
+
+// Annahme $d_min = ceil(k_min / 2)$, $k_min = floor(k_max / 2)$, $d_max = k_max + 1$
+
+// $
+//   n_t &= 2d_max + m_(t - 1) \
+//   m_t &= cases(
+//           &n \/ k_max            &    &bold("wenn") n_t mod k_max = 0,
+//     floor(&n \/ k_max)           &+ 1 &bold("wenn") n_t mod k_max >= k_min,
+//     floor(&(n - k_min) \/ k_max) &+ 2 &bold("wenn") n_t mod k_max < k_min,
+//   )
+// $
+
+// + Wenn $(2k_max + m + 2) mod k_max = 0$, dann
+//   $
+//     m &= (2k_max + m + 2) / k_max \
+//       &= (m + 2) / k_max + 2 \
+//   $
+
+// + Wenn $(2k_max + m + 2) mod k_max >= k_min$, dann
+//   $
+//     m &= floor((2k_max + m + 2) / k_max) + 1 \
+//       &= floor((m + 2) / k_max + 2) + 1 \
+//       &= floor((m + 2) / k_max) + 3 \
+//   $
+
+// + Wenn $(2k_max + m + 2) mod k_max < k_min$
+//   $
+//     m &= floor((2k_max + m - floor(k_max / 2) + 2) / k_max) + 2 \
+//       &= floor((m - floor(k_max / 2) + 2) / k_max + 2) + 2 \
+//       &= floor((m - floor(k_max / 2) + 2) / k_max) + 4 \
+//   $
+
+// #pagebreak()
+
+dabei ist $k_t$ die Summe der Knoten links und rechts und $m_(t - 1)$ die Größe der Sequenz aus der vorherigen Tiefe.
+Beim initialen Aufruf ist die Sequenz leer, daher gilt $m_0 = 0$.
+
+Für 2-3-Fingerbäume verhält sich die Sequenz wiefolgt, auf jeder Ebene können zwischen $2d_min = 2$ und $2d_max = 8$ Elemente zu den verpackten Elementen der vorherigen Ebene hinzukommen.
+#figure(
+  table(columns: 3, align: right,
+    table.header[$t$][$min n_t => min m_t$][$max n_t => max m_t$],
+    $0$, $0 => 0$, $0 => 0$,
+    $1$, $2 + 0 => 1$, $8 + 0 => 3$,
+    $2$, $2 + 1 => 1$, $8 + 3 => 4$,
+    $3$, text(gray)[$2 + 1 => 1$], $8 + 4 => 4$,
+    $4$, text(gray)[$2 + 1 => 1$], text(gray)[$8 + 4 => 4$],
+    [...], [ad infinitum], [ad infinitum],
+  ),
+  caption: [
+    Beim Verpacken der Knoten ergibt sich eine Obergrenze für die Anzahl der Verpackten Knoten.
+  ],
+) <tbl:nodes-term>
+
+Damit $n_t$ Knoten verpackt werden können, muss die übergebene Sequenz mindestens $k_min$ Knoten enthalten, bei 2-3-Fingerbäumen reicht $k_min = 2d_min$ aus um in jeder Ebene beim Zusammenführen der inneren _Digits_ mindestens einen Knoten bilden zu können.
+@tbl:nodes-term zeigt, dass die Länge der mittleren Sequenz, je nach Belegung der inneren _Digits_, zwischen 1 und 4 liegt.
+Im generischen Fall muss aus $2d_min$ mindestens ein Knoten gebildet werden, daraus folgt
+
+$
+  k_min >= 2d_min
+$
+
+Andernfalls können Fingerbäume nicht zusammengefügt werden.
+Experimentelle Ergebnisse deuten darauf hin, dass bei $k_max > 5$ and $d_max = k_max + 1$ eine Obergrenze ab $m_2 = 3$ existiert, aber ein Beweise konnte nicht formuliert werden.
+Ohne eine Beweise für die Obergrenze dieser Sequenz kann nicht nachgewiesen werden, dass @alg:finger-tree:concat in logarithmische Zeit läuft, da über diese Sequenz im Basisfall der Rekursion iteriert wird.
+Stellt sich heraus, dass diese Sequenz sich in die Größenordnung von $Theta(n)$ bewegt, tut das auch die Komplexität von @alg:finger-tree:concat.
 
 Einen Fingerbaum zu Teilen ist essentiell um einzelne Elemente mit bestimmten Eigenschaften zu isolieren, wie es für _Insert_ und _Remove_ der Fall ist.
 @alg:finger-tree:split zeigt, wie ein Fingerbaum $t$ so geteilt wird, dass alle Schlüssel welche größer als $k$ sind im rechten Baum und alle anderen im linken Baum landen.
@@ -610,7 +650,10 @@ Die Implementierung in @bib:hp-06 kann weder garantieren, dass die zurrückgegeb
 ) <alg:finger-tree:split>
 
 == Insert & Remove <sec:finger-tree:insert-remove>
-Die Operationen _Insert_ und _Remove_ können als Sequenzen aus _Split_, _Pop_ oder _Push_ und _Concat_ aufgebaut werden.
+!Hinze und !Paterson entschieden sich _Insert_ und _Remove_ für geordnete Sequenzen durch _Split_, _Push_, und _Concat_ zu implementieren.
+
+Da in @sec:finger-tree:split-concat kein Beweis vorliegt, dass @alg:finger-tree:concat in logarithmischer Komplexität läuft, können _Insert_ und _Remove_ ebenfalls nicht nachweislich auf diese Art mit logarithmischer Laufzeit implementiert werden.
+Unter der Annahme, dass so ein Beweise möglich ist, könnten _Insert_ und _Remove_ wie folgt implementiert werden.
 @fig:finger-tree:insert zeigt die Implementierung von _Insert_, dabei ist zu beachten, dass wenn ein Schlüssel bereits in $t$ existiert, so muss dessen Wert ersetzt werden, da jeder Schlüssel nur maximal einmal vorhanden sein darf.
 Bei der Implementierung könnte die Sequenz von _Pop_ gefolgt von _Push_ auch durch eine Pfadkopie optimiert werden.
 
@@ -621,7 +664,8 @@ Bei der Implementierung könnte die Sequenz von _Pop_ gefolgt von _Push_ auch du
   caption: [_Insert_ als Folge von _Split_, _Push_ und _Concat_.],
 ) <fig:finger-tree:insert>
 
-In @fig:finger-tree:remove ist zu sehen wie _Remove_ zu implementieren ist, wie auch bei _Insert_ wird geprüft ob der erwünschte Schlüssel im linken Baum ist.
+In @fig:finger-tree:remove ist zu sehen wie _Remove_ zu implementieren ist.
+Wie auch bei _Insert_ wird geprüft ob der erwünschte Schlüssel im linken Baum ist.
 Ähnlich der Implementierung von Algorithmus @alg:finger-tree:search[] und @alg:finger-tree:pop-left[] muss bei Nichtvorhandensein des Schlüssels $k$ ein $None$-Wert oder eine Fehler zurrückgegeben werden.
 
 #figure(
@@ -631,24 +675,21 @@ In @fig:finger-tree:remove ist zu sehen wie _Remove_ zu implementieren ist, wie 
   caption: [_Remove_ als Folge von _Split_, _Pop_ und _Concat_.],
 ) <fig:finger-tree:remove>
 
-Je nach Besetzung der Unterbäume, können _Insert_ und _Remove_ auch diese Lücken ausnutzen um statt _Split_ und _Concat_ auf simple Pfadkopie zurückzugreifen.
+Alternative Implementierungen wurden nicht untersucht, aber je nach Besetzung der Unterbäume können _Insert_ und _Remove_ auch diese Lücken ausnutzen um statt _Split_ und _Concat_ auf simple Pfadkopie zurückzugreifen.
 Die Häufigkeit der Lücken hängt dabei von der Wahl von $dd$ ab, liegt $dd$ näher an $k_min$ können Blattknoten öfter im Nachhinein befüllt werden.
 
-#todo[
-  See if this is feasible.
-  It may be possible, but I'm afraid it will have unpredictable runtime performance, if a large subtree must has one remaining space on the wrong side, it may need to shove all items by one.
-  This would still be better than insertion cost in a linear sequence, but not great either.
-]
-
 == Echtzeitanalyse
-Das amortisierte Zeitverhalten der verschiedenen Operationen hat für die Echtzeitanalyse keinen Belang.
-Dennoch bieten Fingerbäume sublineares Zeitverhalten für alle Operationen im _worst-case_ und sind daher gewöhnlichen CoW-Datenstrukturen ohne granulare Persistenz vorzuziehen.
-Je nach Anforderungen des Systems können für verschiedene Operationen zulässige Höchstlaufzeiten festegelegt werden.
-Granular persistente Baumstrukturen wie Fingerbäume können prinzipell mehr Elemente enthalten bevor diese Höchstlaufzeiten pro Operationen erreicht werden.
+Die Einhaltung verschiedener Ungleichungen in @sec:over-under hat vorallem Einfluss auf die amortisierten Komplexitäten der _Deque_-Operationen.
+Das amortisierte Zeitverhalten hat für die Echtzeitanalyse keinen Belang.
+Allerdings kann ohne einen Beweis in @sec:finger-tree:split-concat keine Aussage darüber gemacht werden, ob die Operationen bei generischen Zweigfaktoren in ihren Komplexitätsklassen bleiben oder sogar schlechteres Verhalten als persistente B-Bäume vorweisen.
+
+Sollte ein Beweis für logarihmische Laufzeit von @alg:finger-tree:concat gefunden werden, können Fingerbäume exzellentes Zeitverhalten im vergleich zu gewöhnlichen CoW-Datenstrukturen ohne granulare Persistenz vorweisen.
+Je nach Anforderungen des Systems könnten für verschiedene Operationen zulässige Höchstlaufzeiten festegelegt werden.
+Granular persistente Baumstrukturen wie Fingerbäume könnten prinzipell mehr Elemente enthalten bevor diese Höchstlaufzeiten pro Operationen erreicht werden.
 Aus Sicht der Echtzeitanforderungen an die Operationen auf der Datenstruktur selbst, ist jede Datenstruktur mit logarithmischem Zeitverhalten vorzuziehen.
 Die Wahl von Fingerbäumen über B-Bäumen ist daher eher eine Optimierung als eine Notwendigkeit.
 
-#todo[Perhaps talk about the constant factors introduced by the choice of the branching factors.]
+Ohne den zuvorgenannten Beweis sind jedoch entweder 2-3-Fingerbäume oder B-Bäume generischen Fingerbäumen vorzuziehen.
 
 = SRB-Bäume
 RRB-Bäume (engl. _Relaxed Radix Balanced Trees_) sind beinahe perfekt balancierte Suchbäume, welche für Sequenzdatenstrukturen wie Vektoren verwendet werden, und wurden von !Bagwell _et al._ eingeführt @bib:br-11 @bib:brsu-15 @bib:stu-15.

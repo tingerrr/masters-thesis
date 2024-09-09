@@ -69,7 +69,7 @@ class FingerTree {
   M measure;
 };
 class Shallow : public FingerTree {
-  Node* value; // 0..1 digits
+  Node* digit; // 0..1 digits
 };
 class Deep : public FingerTree {
   Digits left;  // 1..4 digits
@@ -101,7 +101,7 @@ class FingerTree {
   K key;
 };
 class Shallow : public FingerTree {
-  Digits children; // 0..(2 d_min - 1) digits
+  Node* digit; // 0..1 digits
 };
 class Deep : public FingerTree {
   Digits left;  // d_min..d_max digits

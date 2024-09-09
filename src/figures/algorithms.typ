@@ -27,6 +27,9 @@
 #let last = math-func("last")
 #let rev = math-func("rev")
 
+#let btsearch = math-func("btree-search")
+#let btsplit = math-func("btree-split")
+
 #let dsearch = math-func("digit-search")
 #let dsplit = math-func("digit-split")
 
@@ -54,8 +57,8 @@
   numbered-title: $ftsearch(t, m): (FingerTree, Key) -> Node$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $m <= t."key"$
-      + *return* $dsearch(t."children", m)$
+    + *if* $m <= t."digit"."key"$
+      + *return* $btsearch(t."", m)$
     + *else*
       #comment[key not in this subtree]
       + *return* $None$
@@ -63,9 +66,9 @@
     #comment[find suitable branch to descend]
     + *if* $m <= t."left"."key"$
       + *return* $dsearch(t."left", m)$
-    + *if* $m <= t."middle"."key"$
+    + *else if* $m <= t."middle"."key"$
       + *return* $ftsearch(t."middle", m)$
-    + *if* $m <= t."right"."key"$
+    + *else if* $m <= t."right"."key"$
       + *return* $dsearch(t."right", m)$
     + *else*
       #comment[key not in this subtree]
@@ -76,41 +79,40 @@
   numbered-title: $ftpushl(t, e): (FingerTree, Node) -> FingerTree$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *let* $"children" := pushl(t."children", e)$
-    + *if* $|"children"| < 2 d_min$
-      #comment[no overflow]
-      + *return* $Shallow("children")$
-    + *let* $"left", "right" := split("children", d_min)$
-      #comment[overflow by left+right split]
-    + *return* $Deep("left", Shallow(nothing), "right")$
+      #comment[overflow by split into]
+    + *return* $Deep([e], Shallow(None), [t."digit"])$
   + *else*
     + *let* $"left" := pushl(t."left", e)$
     + *if* $abs("left") <= d_max$
       #comment[no overflow]
       + *return* $Deep("left", t."middle", t."right")$
-    + *let* $"rest", "overflow" := split("left", abs("left") - dd)$
-      #comment[overflow by descent]
-    + *let* $"middle" := ftpushl(t."middle", Node("overflow"))$
-    + *return* $Deep("rest", "middle", t."right")$
+    + *else*
+      + *let* $"rest", "overflow" := split("left", abs("left") - dd)$
+        #comment[overflow by descent]
+      + *let* $"middle" := ftpushl(t."middle", Node("overflow"))$
+      + *return* $Deep("rest", "middle", t."right")$
 ]
 
 #let finger-tree-alg-pop-left = algorithm(
   numbered-title: $ftpopl(t): FingerTree -> (Node, FingerTree)$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $abs(t."children") = 0$
+    + *if* $t."digit" = None$
       + *return* $(None, t)$
     + *else*
-      + *let* $e, "rest" := popl(t."children")$
-      + *return* $(e, Shallow("rest"))$
+      + *return* $(t."digit", Shallow(None))$
   + *else*
     + *let* $e, "rest"_l := popl(t."left")$
-    + *if* $abs("rest") >= d_min$
+    + *if* $abs("rest"_l) >= d_min$
       #comment[no underflow]
       + *return* $(e, Deep("rest", t."middle", t."right"))$
-    + *if* $abs(t."middle") = 0$
+    + *else if* $abs(t."middle") = 0$
       #comment[underflow by left+right merge]
-      + *return* $(e, Shallow(concat(t."left", t."right")))$
+      + *if* $abs(t."right") = d_min$
+        + *return* $(e, Shallow(t."right"))$
+      + *else*
+        + *let* $"left", "right" = split(t."right", floor(abs(t."right") \/ 2))$
+        + *return* $(e, Deep("left", Shallow(None), "right"))$
     + *else*
       #comment[underflow by descent]
       + *let* $"node", "rest"_m := ftpopl(t."middle")$
@@ -170,9 +172,9 @@
   numbered-title: $ftconcat(l, m, r): (FingerTree, [Node], FingerTree) -> FingerTree$,
 )[
   + *if* $l$ *is* $Shallow$
-    + *return* $ftappendl(r, concat(l."children", m))$
-  + *if* $r$ *is* $Shallow$
-    + *return* $ftappendr(l, concat(m, r."children"))$
+    + *return* $ftappendl(r, pushl(m, l."digit"))$
+  + *else if* $r$ *is* $Shallow$
+    + *return* $ftappendr(l, pushr(m, r."digit"))$
   + *else*
     + *let* $m' := pnodes(concat(l."right", m, r."left"))$
       #comment[pack nodes for the next layer]
@@ -196,11 +198,11 @@
       // TODO: this must be expressed better
       // if |r| < d_min, then we take some children out of t.middle to fill it
       + *return* $(Shallow(l), v, FingerTree(concat(r, m', t."right")))$
-    + *if* $k <= t."middle"."key"$
+    + *else if* $k <= t."middle"."key"$
       + *let* $l, v, r := ftsplit(t."middle", k)$
       // TODO
       + #text(red)[*\// TODO*]
-    + *if* $k <= t."right"."key"$
+    + *else if* $k <= t."right"."key"$
       + *let* $l, v, r := dsplit(t."right", k)$
       // TODO
       + #text(red)[*\// TODO*]
