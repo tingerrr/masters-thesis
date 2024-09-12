@@ -108,11 +108,12 @@
       + *return* $(e, Deep("rest", t."middle", t."right"))$
     + *else if* $abs(t."middle") = 0$
       #comment[underflow by left+right merge]
-      + *if* $abs(t."right") = d_min$
-        + *return* $(e, Shallow(t."right"))$
-      + *else*
-        + *let* $"left", "right" = split(t."right", floor(abs(t."right") \/ 2))$
+      + *let* $"middle" = concat(t."left", t."right")$
+      + *if* $abs("middle") >= 2d_min$
+        + *let* $"left", "right" = split("middle", floor(abs("middle") \/ 2))$
         + *return* $(e, Deep("left", Shallow(None), "right"))$
+      + *else*
+        + *return* $(e, Shallow("middle"))$
     + *else*
       #comment[underflow by descent]
       + *let* $"node", "rest"_m := ftpopl(t."middle")$
@@ -122,7 +123,7 @@
 #let finger-tree-alg-append-left = algorithm(
   numbered-title: $ftappendl(t, "nodes"): (FingerTree, [Node]) -> FingerTree$,
 )[
-  + *for* $e$ *in* $"nodes"$
+  + *for* $e$ *in* $rev("nodes")$
     #comment[simply push all values one by one]
     + $t = ftpushl(t, e)$
 
