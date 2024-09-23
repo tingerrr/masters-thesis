@@ -274,7 +274,7 @@ $
 
 so kann dieses _Measure_ die Größe von Unterbäumen beschreiben und für den Fingerbaum Vektor-Operationen wie _SplitAt_, _Index_ oder _Length_ implementiert werden @bib:hp-06[S. 15].
 
-= Generische Fingerbäume
+= Generische Fingerbäume <sec:finger-tree:generic>
 Im Folgenden wird betrachtet, inwiefern die Zweigfaktoren von Fingerbäumen generalisierbar sind, ohne die in @tbl:finger-tree-complex beschriebenen Komplexitäten zu verschlechtern.
 Höhere Zweigfaktoren der Teilbäume eines Fingerbaums reduzieren die Tiefe des Baumes und können die Cache-Effizienz erhöhen.
 

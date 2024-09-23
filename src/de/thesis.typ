@@ -54,8 +54,8 @@
 #chapter[Persistente Datastrukturen] <chap:persistence>
 #include "chapters/4-persistent-data-structures.typ"
 
-#chapter[Implementierung & Optimierungen] <chap:impl>
-#include "chapters/5-implementation-optimizations.typ"
+#chapter[Implementierung] <chap:impl>
+#include "chapters/5-implementation.typ"
 
 #chapter[Analyse & Vergleich] <chap:benchmarks>
 #include "chapters/6-benchmarks.typ"

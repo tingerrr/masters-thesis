@@ -109,3 +109,53 @@ class Deep : public FingerTree {
   Digits right; // d_min..d_max digits
 };
 ```
+
+#let finger-tree-def-illegal = ```cpp
+template <typename K, typename V>
+class Node { K key; };
+class Internal : public Node { std::vector<Node*> children; };
+class Leaf : public Node { V val; };
+
+// ...
+
+template <typename K, typename V>
+class Deep : public FingerTree {
+  FingerTree<Node<T>> middle;
+};
+```
+
+#let finger-tree-def-initial = ```cpp
+class Node {};
+using SharedNode = std::shared_ptr<Node<K, V>>;
+class Internal : public Node {
+  K key;
+  std::array<SharedNode<K, V>, 3> children;
+};
+class Leaf : public Node { K key; V val; };
+
+class Digits {
+  K key;
+  std::array<SharedNode<K, V>, 4> children;
+};
+
+class FingerTree {};
+using SharedTree = std::shared_ptr<FingerTree<K, V>>;
+class Shallow : public FingerTree { SharedNode<K, V> digit; };
+class Deep : public FingerTree {
+  Digits<K, V> left;
+  SharedTree<K, V> middle;
+  Digits<K, V> right;
+};
+```
+
+#let finger-tree-def-enum = ```cpp
+class Shallow { SharedNode digit; };
+class Deep { 
+  Digits<K, V> left;
+  SharedTree<K, V> middle;
+  Digits<K, V> right;
+};
+class FingerTree {
+  std::shared_ptr<std::variant<Deep<K, V>, Shallow<K, V>> repr;
+};
+```

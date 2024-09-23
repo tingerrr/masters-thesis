@@ -52,6 +52,9 @@
       def: (
         old: finger-tree-def-old,
         new: finger-tree-def-new,
+        illegal: finger-tree-def-illegal,
+        initial: finger-tree-def-initial,
+        enum: finger-tree-def-enum,
       ),
       alg: (
         search: finger-tree-alg-search,
