@@ -42,23 +42,26 @@
 
 #set raw(syntaxes: "/assets/t4gl.sublime-syntax")
 
-#chapter[Einleitung] <chap:intro>
+// TODO: ensure this will right come out right when printed and bound
+#let chapter = chapter.with(to: "even")
+
+#chapter(label: <chap:intro>)[Einleitung]
 #include "chapters/1-intro.typ"
 
-#chapter[T4gl] <chap:t4gl>
+#chapter(label: <chap:t4gl>)[T4gl]
 #include "chapters/2-t4gl.typ"
 
-#chapter[Lösungsansätze] <chap:non-solutions>
+#chapter(label: <chap:non-solutions>)[Lösungsansätze]
 #include "chapters/3-non-solutions.typ"
 
-#chapter[Persistente Datastrukturen] <chap:persistence>
+#chapter(label: <chap:persistence>)[Persistente Datastrukturen]
 #include "chapters/4-persistent-data-structures.typ"
 
-#chapter[Implementierung] <chap:impl>
+#chapter(label: <chap:impl>)[Implementierung]
 #include "chapters/5-implementation.typ"
 
-#chapter[Analyse & Vergleich] <chap:benchmarks>
+#chapter(label: <chap:benchmarks>)[Analyse & Vergleich]
 #include "chapters/6-benchmarks.typ"
 
-#chapter[Fazit] <chap:conclusion>
+#chapter(label: <chap:conclusion>)[Fazit]
 #include "chapters/7-conclusion.typ"
