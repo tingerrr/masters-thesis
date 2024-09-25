@@ -53,8 +53,10 @@
         old: finger-tree-def-old,
         new: finger-tree-def-new,
         illegal: finger-tree-def-illegal,
-        initial: finger-tree-def-initial,
-        enum: finger-tree-def-enum,
+
+        node: finger-tree-def-node,
+        digits: finger-tree-def-digits,
+        self: finger-tree-def-self,
       ),
       alg: (
         search: finger-tree-alg-search,

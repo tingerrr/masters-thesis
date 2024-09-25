@@ -245,7 +245,7 @@ Ein wichtiger Bestandteil der Komplexitätsanalyse der _Push_- und _Pop_-Operati
   My assumption was that the rebalancing simply happens less and less often as it always creates safe layers when it happens, each time it gets deeper it creates it leaves only safe layers.
 ]
 
-Die Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben.
+Eine simplifizierte Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben.
 `T` sind die im Baum gespeicherten Elemente und `M` die Suchinformationen für interne Knoten.
 Im Regelfall wären alle Klassendefinitionen über `T` und `M` per ```cpp template``` parametriert, darauf wurde verzichtet, um die Definition im Rahmen zu halten.
 

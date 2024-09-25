@@ -111,51 +111,60 @@ class Deep : public FingerTree {
 ```
 
 #let finger-tree-def-illegal = ```cpp
-template <typename K, typename V>
-class Node { K key; };
-class Internal : public Node { std::vector<Node*> children; };
-class Leaf : public Node { V val; };
+template <typename T>
+class Node2 : public Node { T* a; T* b; };
+
+template <typename T>
+class Node3 : public Node { T* a; T* b; T* c; };
 
 // ...
 
-template <typename K, typename V>
+template <typename T>
 class Deep : public FingerTree {
   FingerTree<Node<T>> middle;
 };
 ```
 
-#let finger-tree-def-initial = ```cpp
-class Node {};
-using SharedNode = std::shared_ptr<Node<K, V>>;
-class Internal : public Node {
-  K key;
-  std::array<SharedNode<K, V>, 3> children;
+#let finger-tree-def-node = ```cpp
+enum class Kind { Deep, Leaf };
+class NodeBase {};
+class Node {
+  Kind _kind;
+  std::shared_ptr<NodeBase<K, V>> _repr;
 };
-class Leaf : public Node { K key; V val; };
+class NodeDeep: public NodeBase {
+  uint _size;
+  K _key;
+  std::vector<Node<K, V>> _children;
+};
+class NodeLeaf : public NodeBase { K _key; V _val; };
+```
 
+#let finger-tree-def-digits = ```cpp
+class DigitsBase {
+  uint _size;
+  K _key;
+  std::vector<SharedNode<K, V>> _digits;
+};
 class Digits {
-  K key;
-  std::array<SharedNode<K, V>, 4> children;
-};
-
-class FingerTree {};
-using SharedTree = std::shared_ptr<FingerTree<K, V>>;
-class Shallow : public FingerTree { SharedNode<K, V> digit; };
-class Deep : public FingerTree {
-  Digits<K, V> left;
-  SharedTree<K, V> middle;
-  Digits<K, V> right;
+  std::shared_ptr<DigitsBase<K, V>> _repr;
 };
 ```
 
-#let finger-tree-def-enum = ```cpp
-class Shallow { SharedNode digit; };
-class Deep { 
-  Digits<K, V> left;
-  SharedTree<K, V> middle;
-  Digits<K, V> right;
-};
+#let finger-tree-def-self = ```cpp
+enum class Kind { Empty, Single, Deep };
+class FingerTreeBase {};
 class FingerTree {
-  std::shared_ptr<std::variant<Deep<K, V>, Shallow<K, V>> repr;
+  Kind _kind;
+  std::shared_ptr<FingerTreeBase<K, V>> _repr;
+};
+class FingerTreeEmpty : public FingerTreeBase {};
+class FingerTreeSingle : public FingerTreeBase {
+  Node<K, V> _node;
+};
+class FingerTreeDeep : public FingerTreeBase {
+  Digits<K, V> _left;
+  FingerTree<K, V> _middle;
+  Digits<K, V> _right;
 };
 ```

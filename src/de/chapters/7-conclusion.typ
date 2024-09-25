@@ -49,16 +49,10 @@ Ersteres ist unergonomisch und Fehlerbehaftet, `FingerTree` wird zwangsläufig z
 - dass für abstrakte Methoden _virtual dispatch_ verwendet werden muss
 - und dass jeder Zurgriff auf einen `FingerTree` zunächst die Indirektion auflösen muss (Pointerdereferenzierung).
 
-Um zu vermeiden, dass jeder Aufruf essentieller Funktionen wie `pop` und `pop` auf _virtual dispatch_ zurückgreifen muss, können statt Vererbung eine ```cpp union``` (durch `std::variant`) der einzelnen Varianten als Feld gespeichert.
-Somit können die verschiedenen Implementierungen der Algorithmen anhand eines Diskriminators zur Laufzeit ausgewählt werden anstatt durch einen _virtual table_ und besonders häufige Pfade wie die der `Deep`-Variante können dem CPU als heiß vorgeschlagen werden, um diese bei der _branch-prediction_ zu bevorzugen.
-
-@lst:finger-tree-enum zeigt eine neuen Definitionen von `Shallow`, `Deep` und `FingerTree`.
-Die gleiche Optimierung könnte für die Verschiedenen Varianten der `Node`-Klasse durchgeführt werden, ähnlich wie bei @lst:finger-tree-initial wurden ```cpp template``` Argument ausgelassen.
-
-#figure(
-  figures.finger-tree.def.enum,
-  caption: [Die Definition von `FingerTree` mit `std::variant` statt Verberung.],
-) <lst:finger-tree-enum>
+Um zu vermeiden, dass jeder Aufruf essentieller Funktionen wie `pop` und `pop` auf _virtual dispatch_ zurückgreifen muss, können statt abstrakten Methoden durch gezieltes _casten_ auf die korrekte vererbenden Variante dire korrekte Implementierung ausgeführt werden.
+Die Auswahl der Klasse kann durch das mitführen eines Diskriminators erfolgen welcher angibt auf welche Variante verwiesen wird.
+Damit wird sowhol die Existenz des _virtual table_ Pointers in allen Instanzen, sowie auch die doppelte Indirektion dadurch vermieden.
+Besonders häufige Pfade wie die der `Deep`-Variante können dem CPU als heiß vorgeschlagen werden, um diese bei der _branch-prediction_ zu bevorzugen.
 
 == Memory-Layout
 Bei C++ hat jeder Datentyp für den Speicher zwei relevante Metriken, dessen Größe und dessen Alignment.
@@ -80,3 +74,15 @@ Das steht gegen das Konzept der Pfadkopie in persistenten Bäumen.
 
 Eine Alternative, welche die KNoten eines Baumes nah bei einander im Speicher anelgen könnten ohne die Struktur der Bäume zu zerstören sind Allokatoren welche einen kleinen Speicherbereich für die Knoten der Bäume verwalten.
 Somit könnte die Cache-Effizienz von 2-3-Fingerbäumen erhöht werden ohne besonders große Änderungen an deren Implementierung vorzunehmen.
+
+== Unsichtbare Persistenz <sec:invis-pers>
+Da die Persistenz von 2-3-Fingerbäumen durch die API der Klassen versteckt wird können diese auch auf Persistenz verzichten, wenn es sich nicht auf andere Instanzen auswirken kann.
+Wenn eine Instanz des Typs `T` der einzige Referent auf die in `_repr` verwiesene Instanz ist kann diese Problemlos direkt in diese Instanz schreiben ohne vorher eine Kopie anzufertigen.
+Das ist das Kernprinzip von vielen Datenstrukuren, welche auf CoW-Persisten basieren.
+Dazu gehören auch die Qt-Datenstrukturen, welche ursprünglich in T4gl zu Einsatz kamen.
+
+Das hat allerdings einen Einfluss auf die Art auf welche eine solche Klasse verwendet werden kann.
+Wird eine Instanz `t1` angelegt und eine reference `&t1` wird an einen anderen Thread übergeben kann zwischen dem Abgleich von `_repr.use_count() == 1` und der direkten Beschreibung der Instanz in `_repr` eine Kopie von `t1` auf dem anderen Thread angelget werden.
+Das hat zur Folge das der Schreibzugriff in beiden Instanzen `t1` und `t2` sichtbar wird, obwohl der Schreibzugriff nach der Kopie von `t1` stattfand.
+Um diese Einzigartikgeit auszunutzen, dürfen keine Referenzen oder Pointer zu Instanzen von `T` an andere Threads gesendet werden
+Stattdessen sollten diese auf einem Thread kopiert werden bevor sie an einen anderen Thread gesendet werden.
