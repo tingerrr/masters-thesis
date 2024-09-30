@@ -6,6 +6,7 @@
 #import "@preview/showybox:2.0.1"
 #import "@preview/cheq:0.1.0"
 #import "@preview/lovelace:0.3.0"
+#import "@preview/oxifmt:0.2.1"
 
 #let math-type(ty) = $text(#rgb("#407959"), ty)$
 #let math-func(ty) = $op(text(#fuchsia.darken(35%), ty))$
