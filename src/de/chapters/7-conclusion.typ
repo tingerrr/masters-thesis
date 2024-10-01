@@ -12,53 +12,52 @@ Verschiedene Optimierungen können die Performance der 2-3-Fingerbaum-Implementi
 Allerdings ist unklar ob diese ausreichen um die Performance der persistenten B-Baum-Implementierung zu erreichen, welche ähnlich unoptimiert implementiert wurden.
 
 == Pfadkopie
-DIe Implementierung von _Insert_ der 2-3-Fingerbäume stützt sich auf eine simple, aber langsame Abfolge von _Split_, _Push_ und _Concat_.
+DIe Implementierung von Insert der 2-3-Fingerbäume stützt sich auf eine simple, aber langsame Abfolge von Split, Push und Concat.
 Es ist allerdings möglich stattdessen eine Variente mit Pfadkopie und internem Überlauf zu implementieren.
-Bie Einfügen eines Blattknotens in einer Ebene, welche voll ist kann das maximal zu einem neuen Knoten pro Ebene folgen, ähnlich dem worst-case von _Push_.
+Bie Einfügen eines Blattknotens in einer Ebene, welche voll ist kann das maximal zu einem neuen Knoten pro Ebene folgen, ähnlich dem worst-case von Push.
 
 == Lazy-Evaluation
-Das Aufschieben von Operationen druch _lazy evaluation_ hat einen direkten Einfluss auf die amortisierten Komplexitäten der _Deque_-Operationen @bib:hp-06[S. 7].
-Da für die Echzeitanalyse der Datenstruktur nur die _worst-case_ Komplexitäten relevant sind, wurde diese allderings vernachlässigt.
+Das Aufschieben von Operationen druch Lazy Evaluation hat einen direkten Einfluss auf die amortisierten Komplexitäten der Deque-Operationen @bib:hp-06[S. 7].
+Da für die Echzeitanalyse der Datenstruktur nur die worst-case Komplexitäten relevant sind, wurde diese allderings vernachlässigt.
 
-Zur generellen Verbersserung der durschnittlichen Komplexitäten der Implementierung ist die Verwendung von _lazy evaluation_ unabdingbar.
+Zur generellen Verbersserung der durschnittlichen Komplexitäten der Implementierung ist die Verwendung von Lazy Evaluation unabdingbar.
 
 == Generalisierung & Cache-Effizienz
-Die _Cache_ eines CPU ist ein kleiner Speicher, zwischen CPU und RAM, welcher generell schneller zu lesen und schreiben ist.
-Ist ein Wert nicht in der CPU-_Cache_, wird in den meisten Fällen beim Lesen einer Addresse im RAM der umliegende Speicher mit in die _Cache_ gelesen.
-Das ist einer der Gründe warum Arrays als besonders schnelle Datenstrukturen gelten, wiederholte Lese- und Schreibzugriffe im gleichen Speicherbereich können häufig auf die _Cache_ zurückgreifen.
-In Präsenz von Indirektion, also der Verwendung von Pointern wie bei Baumstrukturen können Lese- und Schreibzugriffen in den Speicher öfter auf Bereiche zeigen, welche nicht in der _Cache_ liegen, dabei spricht man von einem _Cache-Miss_.
+Die Cache eines CPU ist ein kleiner Speicher, zwischen CPU und RAM, welcher generell schneller zu lesen und schreiben ist.
+Ist ein Wert nicht in der CPU-Cache, wird in den meisten Fällen beim Lesen einer Addresse im RAM der umliegende Speicher mit in die Cache gelesen.
+Das ist einer der Gründe warum Arrays als besonders schnelle Datenstrukturen gelten, wiederholte Lese- und Schreibzugriffe im gleichen Speicherbereich können häufig auf die Cache zurückgreifen.
+In Präsenz von Indirektion, also der Verwendung von Pointern wie bei Baumstrukturen können Lese- und Schreibzugriffen in den Speicher öfter auf Bereiche zeigen, welche nicht in der Cache liegen, dabei spricht man von einem Cache-Miss.
 
-@sec:finger-tree:generic beschreibt einen Versuch die _Cache_-Effizienz von 2-3-Fingerbäumen zu erhöhen, in dem durch höhere Zweigfakotren die Tiefe der Bäume reduziert werden soll.
-Durch die geringere Tiefe sollen die rekursiven Algorithmen welche den Baumknoten folgen weniger oft _Cache-Misses_ verursachen.
+@sec:finger-tree:generic beschreibt einen Versuch die Cache-Effizienz von 2-3-Fingerbäumen zu erhöhen, in dem durch höhere Zweigfakotren die Tiefe der Bäume reduziert werden soll.
+Durch die geringere Tiefe sollen die rekursiven Algorithmen welche den Baumknoten folgen weniger oft Cache-Misses verursachen.
 
 Für verschiedene Teile der generalisierten Zweigfaktoren von Fingerbäumen konnten keine Beweise vorgelegt werden.
 Es wurden allerdings auch keine Beweise gefunden oder erarbeitet welche die generalisierung auf höhere Zweigfaktoren gänzlich ausschließen.
 Je nach Stand der Beweise könnten generalisierte Varianten von Fingerbäumen in Zukunft in T4gl eingesetzt werden.
-Unklar ist, ob der Aufwand der Generalisierung sich mit der verbesserten _Cache-Effizienz_ aufwiegen lässt.
+Unklar ist, ob der Aufwand der Generalisierung sich mit der verbesserten Cache-Effizienz aufwiegen lässt.
 
-Die schlechten Ergebnisse der 2-3-Fingerbaum lassen sich nicht direkt auf die Generalisierung schließen, sondern scheinen eher direkte Folge der Implementierung zu sein, da die in @bib:hp-06[S. 20] gegebenen Benchmarks exzellente Performance vorweisen.
-Dabei ist allerdings unklar, wie stark der Einfluss von _lazy evaluation_ in Haskell sich auf die Ergebnisse der Benchmarks auswirkt.
-
+Die schlechten Ergebnisse der 2-3-Fingerbaum scheinen eine direkte Folge der naiven Implementierung zu sein, da die in @bib:hp-06[S. 20] gegebenen Benchmarks exzellente Performance vorweisen.
+Dabei ist allerdings unklar, wie stark der Einfluss von Lazy Evaluation in Haskell sich auf die Ergebnisse der Benchmarks auswirkt.
 
 == Vererbung & Virtual Dispatch
-Wird eine Klasse in C++ vererbt, und besitzt Methoden, welche überschreibbar sind, gilt diese als _virtuell_.
-Hat eine vererbare Klasse eine Methode ohne eine Implementierung, gilt diese als _abstrakt_.
+Wird eine Klasse in C++ vererbt, und besitzt Methoden, welche überschreibbar sind, gilt diese als virtuell.
+Hat eine vererbare Klasse eine Methode ohne eine Implementierung, gilt diese als abstrakt.
 Abstrakten Methoden (diese ohne Implementierung) müssen bei ihrem Aufruf zur Laufzeit zunächst die richtige Implementierung der Methode finden.
-Das erfolgt durch einen sogenannten _virtual table_, auf welchen jede abstrakte Klasse und deren vererbende Klassen verweisen.
-Dabei werden für den CPU wichtige Optimierung erschwert, wie _branch-prediction_, _instruction caching_ oder _instruction prefetching_.
+Das erfolgt durch eine sogenannte Virtual Table, auf welchen jede abstrakte Klasse und deren vererbende Klassen verweisen.
+Dabei werden für den CPU wichtige Optimierung erschwert, wie Branch Prediction, Instruction Caching oder Instruction Prefetching.
 
 Die in @lst:finger-tree gegebene Definition verwendet Vererbung der Klasse `FingerTree`zur Darstellung der verschiedenen Varianten.
 Daraus folgt das Fingerbäume nicht mehr direkt verwendet werden können, eine `FingerTree`-Instanz selbst ist nutzlos ohne die Felder und Implementierung der vererbenden Varianten.
 Instanzen von `FingerTree` müssen durch Indirektion übergeben werden, da diese generell auf deren vererbenden Varianten verweisen.
-Die Operationen auf den verschiedenen Varianten von `FingerTree` müssten entweder durch vorsichtiges _casten_ der Pointer oder durch einheitliche API anhand abstrakter Methoden erfolgen.
+Die Operationen auf den verschiedenen Varianten von `FingerTree` müssten entweder durch vorsichtiges casten der Pointer oder durch einheitliche API anhand abstrakter Methoden erfolgen.
 Ersteres ist unergonomisch und Fehlerbehaftet, `FingerTree` wird zwangsläufig zur abstrakten Klasse, daraus folgt,
-- dass für abstrakte Methoden _virtual dispatch_ verwendet werden muss
+- dass für abstrakte Methoden Virtual Dispatch verwendet werden muss
 - und dass jeder Zurgriff auf einen `FingerTree` zunächst die Indirektion auflösen muss (Pointerdereferenzierung).
 
-Um zu vermeiden, dass jeder Aufruf essentieller Funktionen wie `pop` und `pop` auf _virtual dispatch_ zurückgreifen muss, können statt abstrakten Methoden durch gezieltes _casten_ auf die korrekte vererbenden Variante dire korrekte Implementierung ausgeführt werden.
+Um zu vermeiden, dass jeder Aufruf essentieller Funktionen wie `pop` und `pop` auf Virtual Dispatch zurückgreifen muss, können statt abstrakten Methoden durch gezieltes casten auf die korrekte vererbenden Variante dire korrekte Implementierung ausgeführt werden.
 Die Auswahl der Klasse kann durch das mitführen eines Diskriminators erfolgen welcher angibt auf welche Variante verwiesen wird.
-Damit wird sowhol die Existenz des _virtual table_ Pointers in allen Instanzen, sowie auch die doppelte Indirektion dadurch vermieden.
-Besonders häufige Pfade wie die der `Deep`-Variante können dem CPU als heiß vorgeschlagen werden, um diese bei der _branch-prediction_ zu bevorzugen.
+Damit wird sowhol die Existenz des Virtual Table Pointers in allen Instanzen, sowie auch die doppelte Indirektion dadurch vermieden.
+Besonders häufige Pfade wie die der `Deep`-Variante können dem CPU als heiß vorgeschlagen werden, um diese bei der Branch Prediction zu bevorzugen.
 
 == Memory-Layout
 Bei C++ hat jeder Datentyp für den Speicher zwei relevante Metriken, dessen Größe und dessen Alignment.

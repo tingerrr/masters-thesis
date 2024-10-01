@@ -2,7 +2,7 @@
 #import "/src/figures.typ"
 
 Initial wurden zur Reduzierung der Latenzen im T4gl-Laufzeitsystem verschiedene Veränderungen auf Sprachebene, wie die Einführung von Move-Semantik oder neuer Syntax/Annotationen in T4gl-Arrays, in Erwägung gezogen.
-In den folgenden Abschnitten werden diese kurz umrissen, ferner warum diese für das Problem unzureichend sind und wie diese Erkenntnisse zum Lösungsansatz in @chap:persistence führten.
+In den folgenden Abschnitten werden diese kurz umrissen, warum diese für das Problem unzureichend sind und wie diese Erkenntnisse zum Lösungsansatz in @chap:persistence führten.
 
 = Move-Semantik <sec:move>
 Eine der möglichen Lösungen zur Reduzierung von Array-Kopien in T4gl ist die Einführung einer Move-Semantik ähnlich derer in Rust oder `std::move` in C++.
@@ -46,7 +46,7 @@ Zuweisungen in T4gl würden weiterhin intern Daten teilen, statt direkt Kopien a
 Neue Skripte können durch explizitem _Move_ von Instanzen Kopien vermeiden.
 Daraus folgt aber auch, das alte Skripte keinen Nutzen daraus ziehen, ohne dass diese überarbeitet werden müssen.
 Bei Unachtsamkeit durch den T4gl-Programmierer können fälschlicherweise Instanzen verwendet werden, welche durch einen _Move_ deinitialisiert wurden.
-Die Rust-Variante verhindert durch die Invalidierung von Variablen, welche auf der rechten Seite eines _Move-Assignements_ standen, dass solche Instanzen verwendet werden, kann aber durch diese Restriktion Migrationsaufwand von Projekten vorraussetzen, welcher bei der C++-Variante optional wäre.
+Die Rust-Variante verhindert durch die Invalidierung von Variablen, welche auf der rechten Seite eines _Move-Assignments_ standen, dass solche Instanzen verwendet werden, kann aber durch diese Restriktion Migrationsaufwand von Projekten vorraussetzen, welcher bei der C++-Variante optional wäre.
 In beiden Fällen sind also Codeänderungen bei T4gl-Projekten vonnöten, um von der verringerten Anzahl an Kopien zu profitieren.
 Ungeachtet dessen löst dieses veränderte Verhalten nicht das eigentliche Problem, wenn eine Kopie durchgeführt werden muss, ist diese immer noch teuer.
 Außerdem benötigt die Rust-Variante nicht-triviale Änderungen an der Analyse-Stufe des T4gl-Kompilers.
@@ -74,7 +74,7 @@ Es gibt verschiedene Möglichkeiten, solche Annotationen zu implementieren:
 
 Das Verhalten von statischen Arrays ist verhältnismäßig simpel, die Funktionen `insert` oder `remove` können zu Kompilizerzeit schon nicht aufgerufen werden und Elemente sind durchgängig initialisiert.
 Um die Überschreitung der Maximallänge zur Analyse-Stufe zu überprüfen, müsste der Kompiler zur Analyse-Stufe Annahmen über unbekannte Größen treffen von welchen die Anzahl der Elemente abhingen.
-Hängen diese von Laufzeitwerten wie _I/O_ ab, dann ist die Analyse in den meisten Fällen zur Analyse-Stufe unmöglich.
+Hängen diese von Laufzeitwerten wie _I/O_ ab, dann ist die Analyse in den meisten Fällen zur unmöglich.
 Es ist auch nicht trivial zu überprüfen, wann ein T4gl-Array durch ein anderes intialisiert wurde, welches eine solche Annotation hat.
 Die Zuweisung von verschiedenen T4gl-Instanzen kann ebenfalls von Laufzeitvariablen abhängen.
 

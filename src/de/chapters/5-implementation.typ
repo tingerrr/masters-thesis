@@ -30,8 +30,8 @@ Die internen rekursiven Algorithmen werden als `private` markiert und nur von sp
   caption: [Nicht-reguläre Definition von Fingerbäumen.],
 ) <lst:illegal-recursive-type>
 
-In der simplifizierten Definition in @lst:gen-finger-tree ist bereits zu sehen, dass die Elemente `a` und deren generische _Mesures_ `v` durch die expliziten Typen `K` und `V` ersetzt wurden, für T4gl sind andere _Measures_ als `Key` über Schlüssel-Wert-Paare nicht relevant und wurden daher direkt eingesetzt.
-Diese Ersetzung zeigt sich auch in den Algorithmen, welche einerseits direkt auf die Invarianzen von `Key` und dessen Ordnungsrelation zurückgreifen, sowie auch diese Algorithmen enthalten, welche nur für geordnete Sequenzen sinnvoll sind (_Insert_ und _Remove_).
+In der simplifizierten Definition in @lst:gen-finger-tree ist bereits zu sehen, dass die Elemente `a` und deren generische Mesures `v` durch die expliziten Typen `K` und `V` ersetzt wurden, für T4gl sind andere Measures als `Key` über Schlüssel-Wert-Paare nicht relevant und wurden daher direkt eingesetzt.
+Diese Ersetzung zeigt sich auch in den Algorithmen, welche einerseits direkt auf die Invarianzen von `Key` und dessen Ordnungsrelation zurückgreifen, sowie auch diese Algorithmen enthalten, welche nur für geordnete Sequenzen sinnvoll sind (Insert und Remove).
 
 Da die Implementierung des 2-3-Fingerbaums persistent sein soll, werden statt gewöhnlichen Pointern `std::shared_ptr` verwendet um auf geteilte Knoten und Unterbäume zu zeigen.
 Jeder in Haskell definierte Typ `T` wird hier durch einen Klasse `T` direkt abgebildet, welche zwei Felder enthält:

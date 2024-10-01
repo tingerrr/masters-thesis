@@ -16,8 +16,8 @@ staticArray[9] = "Truly wacky!"
 ```
 
 #let t4gl-ex-array2 = ```t4gl
-String[10] array1
-String[10] array2 = array1
+String[10] a1
+String[10] a2 = a1
 
 array1[0] = "Hello World!"
 // array1[0] == array2[0]
@@ -101,7 +101,7 @@ class FingerTree {
   K key;
 };
 class Shallow : public FingerTree {
-  Node* digit; // 0..1 digits
+  std::vector<Node*> digits; // 0..2d_min digits
 };
 class Deep : public FingerTree {
   Digits left;  // d_min..d_max digits

@@ -1,7 +1,7 @@
 #import "/src/util.typ": *
 #import "/src/figures.typ"
 
-T4gl (_engl._ #strong[T]esting #strong[4]th #strong[G]eneration #strong[L]anguage) ist ein proprietäres Softwareprodukt zur Entwicklung von Testsoftware für Industrieprüfanlagen wie die  LUB (#strong[L]ow Speed #strong[U]niformity and #strong[B]alance) oder HSU (#strong[H]igh #strong[S]peed #strong[U]niformity and Balance).
+T4gl (_engl._ #strong[T]esting #strong[4]th #strong[G]eneration #strong[L]anguage) ist ein proprietäres Softwareprodukt zur Entwicklung von Testsoftware für Industrieprüfanlagen wie die LUB (#strong[L]ow Speed #strong[U]niformity and #strong[B]alance) oder HSU (#strong[H]igh #strong[S]peed #strong[U]niformity and Balance).
 T4gl steht bei der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) unter Entwicklung und umfasst die folgenden Komponenten:
 - Programmiersprache
   - Anwendungsspezifische Features
@@ -57,7 +57,8 @@ Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werd
   ],
 ) <lst:t4gl-ex>
 
-Bei den in @lst:t4gl-ex gegebenen Deklarationen werden je nach den angegebenen Typen verschiedene Datenstrukturen vom Laufzeitsystem gewählt, diese ähneln den analogen C++ Varianten in @tbl:t4gl-array-analogies, wobei `T` und `U` Typen sind und `N` eine Zahl aus $NN^+$.
+Bei den in @lst:t4gl-ex gegebenen Deklarationen werden, je nach den angegebenen Typen, verschiedene Datenstrukturen vom Laufzeitsystem gewählt.
+Diese ähneln den C++-Varianten in @tbl:t4gl-array-analogies, wobei `T` und `U` Typen sind und `N` eine Zahl aus $NN^+$.
 Die Deklaration von `static` enthält 10 Standardwerte für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9.
 Es handelt sich um eine Sonderform des T4gl-Arrays, welches eine dichte festgelegte Schlüsselverteilung hat (es entspricht einem gewöhnlichen Array).
 
@@ -70,7 +71,7 @@ Es handelt sich um eine Sonderform des T4gl-Arrays, welches eine dichte festgele
 
 Die Datenspeicherung im Laufzeitsystem kann nicht direkt ein statisches Array (`std::array<T, 10>`) verwenden, da T4gl nicht direkt in C++ übersetzt und kompiliert wird.
 Intern werden, je nach Schlüsseltyp, pro Dimension entweder ein Vektor oder ein geordnetes assoziatives Array angelegt.
-T4gl-Arrays verhalten sich wie Referenztypen, wird ein Array `array2` durch ein anderes Array `array1` initialisiert, teilen sich diese die gleichen Daten.
+T4gl-Arrays verhalten sich wie Referenztypen, wird ein Array `a2` durch ein anderes Array `a1` initialisiert, teilen sich diese die gleichen Daten.
 Schreibzugriffe in einer Instanz sind auch in der anderen lesbar (demonstiert in @lst:t4gl-ref).
 
 #figure(
@@ -78,33 +79,33 @@ Schreibzugriffe in einer Instanz sind auch in der anderen lesbar (demonstiert in
   caption: [Demonstration von Referenzverhalten von T4gl-Arrays.],
 ) <lst:t4gl-ref>
 
-Im Gegensatz zu dem Referenzverhalten der Arrays aus Sicht des T4gl-Programmierers steht die Implementierug durch _Qt-Maps_, bei diesen handelt es sich um Copy-On-Write (CoW) Datenstrukturen.
+Im Gegensatz zu dem Referenzverhalten der Arrays aus Sicht des T4gl-Programmierers steht die Implementierug durch QMaps, bei diesen handelt es sich um Copy-On-Write (CoW) Datenstrukturen.
 Mehrere Instanzen teilen sich die gleichen Daten und erlauben zunächst nur Lesezugriffe darauf.
 Muss eine Instanz einen Schreibzugriff durchführen, wird vorher sichergestellt, dass diese Instanz der einzige Referent der Daten ist, wenn nötig durch eine Kopie der gesamten Daten.
-Dadurch sind Kopien von _Qt-Maps_ initial sehr effizient, es muss lediglich die Referenzzahl der Daten erhöht werden.
+Dadurch sind Kopien von QMaps initial sehr effizient, es muss lediglich die Referenzzahl der Daten erhöht werden.
 Die Kosten der Kopie zeigt sich erst dann, wenn ein Scheibzugriff nötig ist.
 
-Damit sich T4gl-Arrays trotzdem wie Referenzdaten verhalten, teilen sie sich nicht direkt die Daten mit CoW-Semantik, sondern _Qt-Maps_ durch eine weitere Indirektionsebene.
+Damit sich T4gl-Arrays trotzdem wie Referenzdaten verhalten, teilen sie sich nicht direkt die Daten mit CoW-Semantik, sondern QMaps durch eine weitere Indirektionsebene.
 T4gl-Arrays bestehen aus Komponenten in drei Ebenen:
-+ T4gl: Die Instanzen aus Sicht des T4gl-Programmierers (z.B. die Variable `array1` in @lst:t4gl-ref).
++ T4gl: Die Instanzen aus Sicht des T4gl-Programmierers (z.B. die Variable `a1` in @lst:t4gl-ref).
 + Indirektionsebene: Die Daten aus Sicht des T4gl-Programmierers, die Ebene zwischen T4gl-Array Instanzen und deren Daten.
-  Dabei handelt es sich um _Qt-Datentypen_ wie _Qt-Maps_ oder _Qt-Vectors_.
+  Dabei handelt es sich um Qt-Datentypen wie QMap oder QVector.
 + Speicherebene: Die Daten aus Sicht des T4gl-Laufzeitsystems. Diese Ebene ist für den T4gl-Programmierer unsichtbar.
 
-Zwischen den Ebenen 1 und 2 kommt geteilte Schreibfähigkeit durch Referenzzählung zum Einsatz, mehrere T4gl-Instanzen teilen sich eine _Qt-Instanz_ und können von dieser lesen, als auch in sie schreiben, ungeachtet der Anzahl der Referenten.
-Zwischen den Ebenen 2 und 3 kommt CoW + Referenzzählung zum Einsatz, mehrere _Qt-Instanz_ teilen sich die gleichen Daten, Schreibzugriffe auf die Daten sorgen vorher dafür, dass die _Qt-Instanz_ der einzige Referent ist, wenn nötig durch eine Kopie.
+Zwischen den Ebenen 1 und 2 kommt geteilte Schreibfähigkeit durch Referenzzählung zum Einsatz, mehrere T4gl-Instanzen teilen sich eine Qt-Instanz und können von dieser lesen, als auch in sie schreiben, ungeachtet der Anzahl der Referenten.
+Zwischen den Ebenen 2 und 3 kommt CoW + Referenzzählung zum Einsatz, mehrere Qt-Instanz teilen sich die gleichen Daten, Schreibzugriffe auf die Daten sorgen vorher dafür, dass die Qt-Instanz der einzige Referent ist, wenn nötig durch eine Kopie.
 Wir definieren je nach Teife drei Typen von Kopien:
 / Typ-1 (flache Kopie):
-  Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleichen _Qt-Instanz_ zeigt.
+  Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleichen Qt-Instanz zeigt.
   Wird in T4gl durch Initialisierung von Arrays durch existierende Instanzen oder die Übergabe von Arrays an normale Funktionen hervorgerufen.
   Eine flache Kopie ist immer eine $Theta(1)$-Operation.
 / Typ-2:
-  Eine Kopie der T4gl-Instanz *und* der _Qt-Instanz_, welche beide auf die gleichen Daten zeigen.
-  Wird eine tiefe Kopie durch das Laufzeitsystem selbst hervorgerufen, erfolgt die Kopie der Daten verspätet beim nächten Schreibzugriff auf eine der _Qt-Instanzen_.
+  Eine Kopie der T4gl-Instanz *und* der Qt-Instanz, welche beide auf die gleichen Daten zeigen.
+  Wird eine tiefe Kopie durch das Laufzeitsystem selbst hervorgerufen, erfolgt die Kopie der Daten verspätet beim nächten Schreibzugriff auf eine der Qt-Instanzen.
   Halbtiefe Kopien sind Operationen konstanter Zeitkomplexität $Theta(1)$.
   Aus einer halbtiefen Kopie und einem Schreibzugriff folgt eine volltiefe Kopie.
 / Typ-3 (tiefe Kopie):
-  Eine Kopie der T4gl-Instanz, der _Qt-Instanz_ *und* der Daten.
+  Eine Kopie der T4gl-Instanz, der Qt-Instanz *und* der Daten.
   Beim explizitem Aufruf der Methode `clone` durch den T4gl Programmierer werden die Daten ohne Verzögerung kopiert.
   Tiefe Kopien sind Operationen linearer Zeitkomplexität $Theta(n)$.
 
@@ -115,20 +116,20 @@ Obwohl eine tiefe Kopie zunächst nur auf Ebene 1 und 2 Instanzen Kopiert, erfol
 In seltenen Fällen kann es dazu führen, dass wie in @fig:t4gl-indirection:deep eine Typ-2-Kopie angelegt wurde, aber nie ein Schreibzugriff auf `a` oder `c` durchgeführt wird, während beide Instanzen existieren.
 Sprich, es kommt zur Typ-2-Kopie, aber nicht zur Typ-3-Kopie.
 Diese Fälle sind nicht nur selten, sondern meist auch Fehler der Implementierung.
-Bei korrektem Betrieb des Laufzeitsystems sind Typ-2-Kopien kurzlebig und immer von Typ-3-Kopien gefolgt, daher betrachten wir im folgenden auch Typ-2-Kopien als Operationen linearer Zeitkomplexität $Theta(n)$.
+Bei korrektem Betrieb des Laufzeitsystems sind Typ-2-Kopien kurzlebig und immer von Typ-3-Kopien gefolgt, daher betrachten wir im folgenden auch Typ-2-Kopien als Operationen linearer Zeitkomplexität $Theta(n)$, da diese bei korrektem Betrieb fast immer zu Typ-3 Kopien führen.
 
 #subpar.grid(
   figure(figures.t4gl.layers.new, caption: [
     Ein T4gl Array nach Initalisierung. \ \
   ]), <fig:t4gl-indirection:new>,
   figure(figures.t4gl.layers.shallow, caption: [
-    Zwei T4gl-Arrays teilen sich eine C++ Instanz nach flacher Kopie.
+    Zwei T4gl-Arrays teilen sich eine C++ Instanz nach Typ-1 Kopie.
   ]), <fig:t4gl-indirection:shallow>,
   figure(figures.t4gl.layers.deep-new, caption: [
-    Zwei T4gl-Arrays teilen sich die gleichen Daten nach tiefer Kopie. \ \
+    Zwei T4gl-Arrays teilen sich die gleichen Daten nach Typ-2 Kopie. \ \
   ]), <fig:t4gl-indirection:deep>,
   figure(figures.t4gl.layers.deep-mut, caption: [
-    Zwei T4gl-Arrays teilen sich keine Daten nach tiefer Kopie und Schreibzugriff.
+    Zwei T4gl-Arrays teilen sich keine Daten nach Typ-2 Kopie und Schreibzugriff.
   ]), <fig:t4gl-indirection:mut>,
   columns: 2,
   caption: [Die drei Ebenen von T4gl-Arrays in verschiedenen Stadien der Datenteilung.],
@@ -137,6 +138,6 @@ Bei korrektem Betrieb des Laufzeitsystems sind Typ-2-Kopien kurzlebig und immer 
 
 Ein kritischer Anwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
 Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine Typ-2-Kopie erstellt.
-Die T4gl-Instanz, welche an den Programmierer übergeben wird, sowie die interne _Qt-Instanz_ teilen sich Daten, welche vom Laufzeitsystem zwangsläufig beim nächsten Schreibzugriff kopiert werden müssen.
+Die T4gl-Instanz, welche an den Programmierer übergeben wird, sowie die interne Qt-Instanz teilen sich Daten, welche vom Laufzeitsystem zwangsläufig beim nächsten Schreibzugriff kopiert werden müssen.
 Es kommt zur Typ-3-Kopie, und, daraus folgend, zu einem nicht-trivialem zeitlichem Aufwand von $Theta(n)$.
 Das gilt für jeden ersten Schreibzugriff, welcher nach einer Übergabe der Daten an den T4gl-Programmierer erfolgt.

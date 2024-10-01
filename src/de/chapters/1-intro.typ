@@ -2,14 +2,14 @@
 #import "/src/figures.typ"
 
 = Motivation
-In der Automobilindustrie gibt es verschiedene Systeme, welche die Automation von Prüfständen erleichtern oder gar ganz übernehmen.
+In der Automobilindustrie gibt es verschiedene Systeme, welche die Automation von Prüfständen erleichtern oder ganz übernehmen.
 Eines dieser Systeme ist T4gl, eine Programmiersprache und gleichnamiges Laufzeitsystem zur Interpretation von Testskripten in Reifenprüfständen.
 Bei diesen Reifenprüfständen werden verschiedene Tests und Messvorgänge durchgeführt, welche bestimmte Zeitanforderungen aufweisen.
 Können diese Zeitanforderungen nicht eingehalten werden, müssen Testvorgänge verworfen und wiederholt werden.
 Daher ist es essentiell, dass das T4gl-Laufzeitsystem in der Lage ist, die erwarteten Testvorgänge innerhalb einer festgelgeten Zeit abzuarbeiten, ungeachtet der anfallenden Testdatenmengen.
 T4gl is eine Hochlevel-Programmiersprache, Speicherverwaltung oder Synchronization werden vom Laufzeitsystem übernommen und müssen in den meisten Fällen nicht vom Programmierer beachtet werden.
 Wie in fast allen Hochlevel-Programmiersprachen, gibt es in T4gl dynamische Datenstrukturen zur Verwaltung von mehreren Elementen.
-Diese werden in T4gl als Arrays bezeichnet und bieten eine generische Datenstruktur für Sequenzen, Tabellen, _ND-Arrays_ oder _Queues_.
+Diese werden in T4gl als Arrays bezeichnet und bieten eine generische Datenstruktur für Sequenzen, Tabellen, ND-Arrays oder Queues.
 Intern wird die gleiche Datenstruktur für alle Anwendungsfälle verwendet, in welchen ein T4gl-Programmierer eine dynamische Datenstruktur benötigt, ungeachtet der individuellen Anforderungen.
 Aus der Interaktion verschiedener Features des Laufzeitsystems und der Standardbibliothek der Programmiersprache kommt es, zusätzlich dazu, zu unnötig häufigen Kopien von Daten.
 Schlimmer noch, durch die jetzige Implementierung wächst die Länge von Kopiervorgängen der T4gl-Arrays proportional zur Anzahl der darin verwalteten Elemente.
@@ -21,12 +21,14 @@ Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsys
 Dabei werden verschiedene Lösungsansätze evaluiert, teilweise implementiert, getestet und verglichen.
 
 = Aufbau der Arbeit
+Dieses Kapitel führt das zu Lösende Problem ein und beschreibt die Arbeit selbst.
+Dabei werden Notation und Konventionen sowie fachspezifisches Grundwissen vermittelt.
 @chap:t4gl beschreibt T4gl und dessen Komponenten genauer, sowie die Implementierung der T4gl-Arrays.
 Darin wird erarbeitet, wie es zu den meist unnötigen Kopiervorgängen kommt und in welchen Fällen diese auftreten.
 In @chap:non-solutions werden verschiedene Veränderungen an der Programmiersprache selbst erörtert und warum diese unzureichend oder anderweitig unerwünscht sind.
 Dazu zählen verschiedene neue syntaktische Konstrukte zur statischen Analyse oder optimierten Implementierung, sowie die Veränderung bestehender Semantik existierender Sprachkonstrukte.
 @chap:persistence fürt einen Begriff der Persistenz im Sinne von Datenstrukuren ein und befasst sich mit verschiedenen Datenstrukuren, durch welche die zeitliche Komplexität von Kopien der T4gl-Arrays reduziert werden kann.
-Im Anschluss werden in @chap:impl implementierungspezifische Optimierungen beschreiben.
+Im Anschluss wird in @chap:impl die Implementierung einer ausgewählten Datenstruktur beschreiben.
 Die daraus folgenden Implementierungen werden in @chap:benchmarks getestet und verglichen.
 Zu guter Letzt wird in @chap:conclusion das Resultat der Arbeit evaluiert und weiterführende Arbeit beschrieben.
 
@@ -134,7 +136,7 @@ Diese Konventionen sollen vor allem Konzepte der Persistenz (siehe @chap:persist
       Geteilte Knoten, d.h. Knoten, welche mehr als einen Referenten haben.
     ],
     fdiag(node(stroke: red)), [
-      Kopierte (nicht geteilte) Knoten, d.h. Knoten, welche durch eine Operation kopiert wurden statt geteilt zu werden, z.B. durch _path copying_.
+      Kopierte (nicht geteilte) Knoten, d.h. Knoten, welche durch eine Operation kopiert wurden statt geteilt zu werden, z.B. durch eine Pfadkopie.
     ],
     fdiag(node(stroke: (paint: gray, dash: "dashed"))), [
       Visuelle Orientierungshilfe für folgende Abbildungen, kann hypothetischen oder gelöschten Knoten darstellen.
@@ -150,6 +152,8 @@ Diese Konventionen sollen vor allem Konzepte der Persistenz (siehe @chap:persist
 == Notation
 In Pseudocode werden sowohl mathematische Konvention, wie die Syntax zur Kardinalität von Mengen $abs(M)$, als auch Programmierkonventionen übernommen, zum Beispiel die Syntax für Feldzugriffe $x.y$.
 
+#let Typ = math-type("Typ")
+
 #figure(
   table(columns: 2, align: (x, y) => horizon + if x == 1 { left },
     table.header[Syntax][Beschreibung],
@@ -161,7 +165,7 @@ In Pseudocode werden sowohl mathematische Konvention, wie die Syntax zur Kardina
     ],
     $[x, y, ...]$, [
       Sequenzkonstruktor, erzeugt eine Sequenz aus den Elementen $x$, $y$, usw.
-      Der Type von Sequenzen wird als $["Typ"]$ geschrieben, wobie $"Typ"$ der Typ der Elemente in der Sequenz ist.
+      Der Typ von Sequenzen wird als $[Typ]$ geschrieben, wobei $Typ$ der Typ der Elemente in der Sequenz ist.
     ],
   ),
   caption: [Legende der Notationen in Pseudocode.],

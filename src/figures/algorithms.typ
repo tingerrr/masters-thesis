@@ -57,8 +57,8 @@
   numbered-title: $ftsearch(t, m): (FingerTree, Key) -> Node$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $m <= t."digit"."key"$
-      + *return* $btsearch(t."", m)$
+    + *if* $m <= t."digits"."key"$
+      + *return* $dsearch(t."digits", m)$
     + *else*
       #comment[key not in this subtree]
       + *return* $None$
@@ -80,7 +80,13 @@
 )[
   + *if* $t$ *is* $Shallow$
       #comment[overflow by split into]
-    + *return* $Deep([e], Shallow(None), [t."digit"])$
+    + *let* $"digits" = pushl(t."digits", e)$
+    + *if* $abs("digits") <= 2d_min$
+      #comment[no split]
+      + *return* $Shallow("digits")$
+    + *else*
+      + *let* $"left", "right" := split("digits", d_min)$
+    + *return* $Deep("left", None, "right")$
   + *else*
     + *let* $"left" := pushl(t."left", e)$
     + *if* $abs("left") <= d_max$
@@ -97,10 +103,11 @@
   numbered-title: $ftpopl(t): FingerTree -> (Node, FingerTree)$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $t."digit" = None$
+    + *if* $abs(t."digits")$
       + *return* $(None, t)$
     + *else*
-      + *return* $(t."digit", Shallow(None))$
+      + *let* $e, "rest" := popl(t."digits")$
+      + *return* $(e, Shallow("rest"))$
   + *else*
     + *let* $e, "rest"_l := popl(t."left")$
     + *if* $abs("rest"_l) >= d_min$
@@ -173,9 +180,9 @@
   numbered-title: $ftconcat(l, m, r): (FingerTree, [Node], FingerTree) -> FingerTree$,
 )[
   + *if* $l$ *is* $Shallow$
-    + *return* $ftappendl(r, pushl(m, l."digit"))$
+    + *return* $ftappendl(r, pushl(m, l."digits"))$
   + *else if* $r$ *is* $Shallow$
-    + *return* $ftappendr(l, pushr(m, r."digit"))$
+    + *return* $ftappendr(l, pushr(m, r."digits"))$
   + *else*
     + *let* $m' := pnodes(concat(l."right", m, r."left"))$
       #comment[pack nodes for the next layer]
@@ -186,7 +193,7 @@
   numbered-title: $ftsplit(t, k): (FingerTree, Key) -> (FingerTree, Node, FingerTree)$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *let* $l, v, r := dsplit(t."children", k)$
+    + *let* $l, v, r := dsplit(t."digits", k)$
     + *return* $(Shallow(l), v, Shallow(r))$
   + *else*
     + *if* $k <= t."left"."key"$

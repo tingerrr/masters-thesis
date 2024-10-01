@@ -13,6 +13,8 @@
 
 #let cpp = box([C] + text(0.75em, baseline: -0.175em)[++])
 
+#let cbox(color) = box(rect(stroke: black + 0.75pt, fill: color, height: 0.5em, width: 0.5em))
+ 
 #let _block = block
 
 #let todo(..annotation, body) = {
