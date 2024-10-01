@@ -191,22 +191,15 @@
   + *else*
     + *if* $k <= t."left"."key"$
       + *let* $l, v, r := dsplit(t."left", k)$
-      + *let* $m' := nothing$
-      // TODO: this must be a loop over this layers nodes, not this trees leaf elements
-      + *for* $e$ *in* $t."middle"$
-        #comment[lift node children by one layer]
-        + $m' = concat(m', e."children")$
-      // TODO: this must be expressed better
-      // if |r| < d_min, then we take some children out of t.middle to fill it
-      + *return* $(Shallow(l), v, FingerTree(concat(r, m', t."right")))$
+      + *return* $(Shallow(l), v, Deep(r, t."middle", t."right"))$
     + *else if* $k <= t."middle"."key"$
       + *let* $l, v, r := ftsplit(t."middle", k)$
-      // TODO
-      + #text(red)[*\// TODO*]
+        #comment[descend and unpack]
+      + *let* $l', v', r' := dsplit(v, k)$
+      + *return* $(Deep(t."left", l, l'), v', Deep(r', r, t."right"))$
     + *else if* $k <= t."right"."key"$
       + *let* $l, v, r := dsplit(t."right", k)$
-      // TODO
-      + #text(red)[*\// TODO*]
+      + *return* $(Deep(t."left", t."middle", l), v, Shallow(r))$
     + *else*
       + *return* $(t, Shallow(nothing))$
 ]

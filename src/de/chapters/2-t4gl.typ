@@ -131,12 +131,9 @@ Bei korrektem Betrieb des Laufzeitsystems sind Typ-2-Kopien kurzlebig und immer 
     Zwei T4gl-Arrays teilen sich keine Daten nach tiefer Kopie und Schreibzugriff.
   ]), <fig:t4gl-indirection:mut>,
   columns: 2,
-  caption: [T4gl-Arrays in verschiedenen Stadien der Datenteilung.],
+  caption: [Die drei Ebenen von T4gl-Arrays in verschiedenen Stadien der Datenteilung.],
   label: <fig:t4gl-indirection>,
 )
-#todo[
-  Annotate the levels in the above figure to show which level manages which part of the system.
-]
 
 Ein kritischer Anwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
 Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine Typ-2-Kopie erstellt.

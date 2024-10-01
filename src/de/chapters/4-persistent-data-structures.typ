@@ -74,7 +74,7 @@ Im Folgenden werden durch die Datenteilung _Instanzen_ und _Daten_ semantische g
 
 Persistenz zeigt vor allem bei Baumstrukturen ihre Vorteile, bei der Kopie der Daten eines persistenten Baums können je nach Tiefe und Balance des Baumes Großteile des Baumes geteilt werden.
 Ähnlich wie bei persistenten einfach verketteten Listen, werden bei Schreibzugriffen auf persistente Bäume nur die Knoten des Baumes kopiert, welche zwischen Wurzel und dem veränderten Knoten liegen.
-Dass nennt sich eine Pfadkopie (_engl._ path copying).
+Das nennt sich eine Pfadkopie (_engl._ path copying).
 Betrachten wir partielle Persistenz von Bäume am Beispiel eines Binärbaums, sprich eines Baums mit Zweigfaktoren (ausgehendem Knotengrad) zwischen $0$ und $2$.
 @fig:tree-sharing illustriert, wie am Binärbaum `t` ein Knoten `X` angefügt werden kann, ohne dessen partielle Persistenz aufzugeben.
 Es wird eine neue Instanz angelegt und eine Kopie der Knoten `A` und `C` angelegt, der neue Knoten `X` wird in `C` eingehängt und der Knoten `B` wird von beiden `A` Knoten geteilt.
@@ -125,10 +125,6 @@ Etwas fundamentaler sind B-Bäume @bib:bm-70 @bib:bay-71, bei persistenten B-Bä
 Eine Verbesserung der _average-case_ Zeitkomplexität für bestimmte Sequenzoperationen (_Push_, _Pop_) bieten 2-3-Fingerbäume @bib:hp-06.
 Diese bieten sowohl exzellentes Zeitverhalten, als auch keine Enschränkung auf die Schlüsselverteilung.
 Im folgenden werden unter anderem 2-3-Fingerbäume als alternative Storage-Datenstrukturen für T4gl-Arrays untersucht.
-
-#todo[
-  The above could go with some examples, especially regarding RRB-Vectors and how they could be used as paired sequences ordered by key on insertion given that it's insert/remove bounds are sublinear.
-]
 
 = B-Bäume <sec:b-tree>
 Eine für die Persistenz besonders gut geeignete Datenstruktur sind B-Bäume @bib:bm-70 @bib:bay-71, da diese durch ihren Aufbau und Operationen generell balanciert sind.
@@ -238,14 +234,9 @@ Fingerbäume sind symmetrische Datenstrukturen, _Push_ und _Pop_ kann problemlos
 ) <tbl:finger-tree-complex>
 
 Ein wichtiger Bestandteil der Komplexitätsanalyse der _Push_- und _Pop_-Operationen von 2-3-Fingerbäumen ist die Suspension der Wirbelknoten durch _lazy evaluation_.
+Bei der amortisierten Komplexitätsanalyse werden diesen Suspensionen Credits in höher ihrer sicheren Knoten zugewiesen werden, welche für die Auswertung der Suspension in einem späteren Zeitpunkt verwendet wird.
 
-#todo[
-  They argue that rebalancing is paid for by the previous cheap operations using Okasakis debit analysis.
-  I'm unsure how to properly write this down without stating something incorrect, so I probably don't understand it completely yet.
-  My assumption was that the rebalancing simply happens less and less often as it always creates safe layers when it happens, each time it gets deeper it creates it leaves only safe layers.
-]
-
-Eine simplifizierte Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben.
+Eine naive C++-Definition von 2-3-Fingerbäumen ist in @lst:finger-tree beschrieben.
 `T` sind die im Baum gespeicherten Elemente und `M` die Suchinformationen für interne Knoten.
 Im Regelfall wären alle Klassendefinitionen über `T` und `M` per ```cpp template``` parametriert, darauf wurde verzichtet, um die Definition im Rahmen zu halten.
 
@@ -361,13 +352,23 @@ Der Überlauf einer Ebene $t$ erfolgt, wenn in $t$ zu viele _Digits_ enthalten s
 Es werden genug _Digits_ aus $t$ entnommen, sodass diese in einen Knoten verpackt und als _Digit_ in $t + 1$ gelegt werden können.
 Das Verpacken und Entpacken der _Digits_ ist nötig, um die erwarteten Baumtiefen pro Ebene zu erhalten, sowie zur Reduzierung der Häufigkeit der Über- und Unterflüsse je tiefer der Baum wird.
 
-#quote(block: true, attribution: [!Hinze und !Paterson @bib:hp-06])[
-  We classify digits of two or three elements (which are isomorphic to elements of type Node a) as safe, and those of one or four elements as dangerous. A deque operation may only propagate to the next level from a dangerous digit, but in doing so it makes that digit safe, so that the next operation to reach that digit will not propagate. Thus, at most half of the operations descend one level, at most a quarter two levels, and so on. Consequently, in a sequence of operations, the average cost is constant.
+Die Anzahl der _Digits_ hat dabei einen direkten Einfluss auf die amortisierten Komplexitäten von _Push_- und _Pop_-Operationen.
+
+#quote(block: true, attribution: [!Hinze und !Paterson @bib:hp-06[S. 7]])[
+  We classify digits of two or three elements (which are isomorphic to elements of type Node a) as safe, and those of one or four elements as dangerous.
+  A deque operation may only propagate to the next level from a dangerous digit, but in doing so it makes that digit safe, so that the next operation to reach that digit will not propagate.
+  Thus, at most half of the operations descend one level, at most a quarter two levels, and so on.
+  Consequently, in a sequence of operations, the average cost is constant.
+
+  The same bounds hold in a persistent setting if subtrees are suspended using lazy evaluation.
+  [...]
+  Because of the above properties of safe and dangerous digits, by that time enough cheap shallow operations will have been performed to pay for this expensive evaluation. 
 ]
 
-#todo[
-  After this quote they start talking about how lazy evaluation is needed to make this work in a persistent setting.
-]
+Die Analyse !Hinze und !Paterson stützt sich darauf, dass persistente 2-3-Fingerbäume deren Unterbäume durch _lazy evaluation_ suspendieren und erst dann auswerten, wenn eine weitere Operation bis in diese Tiefe vorgehen muss.
+Für die Debit-Analyse von _Push_ und _Pop_ werden dabei den Unterbäumen so viele Credits zugewiesen wie diese sichere Knoten haben.
+Diese Credits werden für die spätere Auswertung verwendet, sodass die amortisierten Kosten über den realen Kosten bleiben.
+Damit sich die gleiche Analyse auf generische Fingerbäume übertragen lässt, müssen generische Fingerbäume ebenfalls bei jeder Operation auf einer unsicheren Ebene eine sichere Ebene zurücklassen.
 
 Wir erweitern den Begriff der Sicherheit einer Ebene $t$ mit $d$ _Digits_ als
 
@@ -415,10 +416,6 @@ Für eine effiziente Implementierung von _Deque_-Operationen haben !Hinze und !P
 Die Definitionen $d_min = k_min - 1$ und $d_max = d_max + 1$ halten nicht generell, werden diese in @eq:constraint eingesetzt, ergibt sich $k_min < 3$ und folglich $floor(k_max \/ 2) < 3$.
 Unter diesen Definitionen von $d$ in Abhängigkeit von $k$ können Zweigfaktoren ab $k_max > 7$ nicht dargestellt werden.
 Wählt man stattdessen $d_min$ fest als 1, ergibt sich $d_max > k_max$, die Definition $d_max = k_max + 1$ kann also übernommen werden.
-
-#todo[
-  In fact, it seems that this is the most sensible option to prove that @alg:finger-tree:nodes can run in bounded constant time (in terms of $k$ and $d$). It is unclear if this is enough to prove an upper bound.
-]
 
 Die Zweigfaktoren $d_max$ und $k_max$ sind so zu wählen, dass Werte für $dd$ gefunden werden können, für die zuvorgenannten Ungleichungen halten.
 Betrachten wir 2-3-Fingerbäume, gilt $d_min = 1$, $d_max = 4$, $k_min = 2$ und $k_max = 3$, daraus ergibt sich trivialerweise $4 > 3$.
@@ -492,11 +489,8 @@ Bleiben dabei weniger als $d_min$ _Digits_ vorhanden, erzeugt das entweder Unter
 Ist die nächste Ebene selbst $Shallow$ und leer, werden die linken und rechten _Digits_ zusammengenommen und diese Ebene selbst wird $Shallow$.
 Ist die nächste Ebene nicht leer, wird ein Knoten entommen und dessen Kindknoten füllen die linken _Digits_ auf.
 
-Sowohl _Push_ als auch _Pop_ geht nach dem gleichen rekursiven Über/Unterfluss-Prinzip vor und hängt daher von der Baumtiefe ab, im _worst-case_ ist jede Ebene unsicher und sorgt für einen Über- oder Unterfluss, daher ergibt sich eine Komplexität von $Theta(log n)$.
-
-#todo[
-  Below should follow the debit analysis for the amortized bounds of Push and Pop, ideally we can keep the constant bounds on average as a bonus over regular b-trees.
-]
+Sowohl _Push_ als auch _Pop_ gehen nach dem gleichen rekursiven Über/Unterfluss-Prinzip vor und hängen daher von der Baumtiefe ab, im _worst-case_ ist jede Ebene unsicher und sorgt für einen Über- oder Unterfluss, daher ergibt sich eine Komplexität von $Theta(log n)$.
+Die amortisierte Komplexität stützt sich auf die gleiche Analyse wie diese von 2-3-Fingerbäumen, insofern Unterbäume mit _lazy evaluation_ suspendiert werden und korrekte Zweigfaktoren gewählt wurden, können auch generische Fingerbüme _Push_ und _Pop_ in amortisiert $Theta(1)$ ausführen.
 
 #figure(
   kind: "algorithm",
@@ -564,42 +558,7 @@ $
     floor(&n \/ k_max)           &+ 1 &bold("wenn") n_t mod k_max >= k_min,
     floor(&(n - k_min) \/ k_max) &+ 2 &bold("wenn") n_t mod k_max < k_min,
   )
-$
-
-// #pagebreak()
-
-// Annahme $d_min = ceil(k_min / 2)$, $k_min = floor(k_max / 2)$, $d_max = k_max + 1$
-
-// $
-//   n_t &= 2d_max + m_(t - 1) \
-//   m_t &= cases(
-//           &n \/ k_max            &    &bold("wenn") n_t mod k_max = 0,
-//     floor(&n \/ k_max)           &+ 1 &bold("wenn") n_t mod k_max >= k_min,
-//     floor(&(n - k_min) \/ k_max) &+ 2 &bold("wenn") n_t mod k_max < k_min,
-//   )
-// $
-
-// + Wenn $(2k_max + m + 2) mod k_max = 0$, dann
-//   $
-//     m &= (2k_max + m + 2) / k_max \
-//       &= (m + 2) / k_max + 2 \
-//   $
-
-// + Wenn $(2k_max + m + 2) mod k_max >= k_min$, dann
-//   $
-//     m &= floor((2k_max + m + 2) / k_max) + 1 \
-//       &= floor((m + 2) / k_max + 2) + 1 \
-//       &= floor((m + 2) / k_max) + 3 \
-//   $
-
-// + Wenn $(2k_max + m + 2) mod k_max < k_min$
-//   $
-//     m &= floor((2k_max + m - floor(k_max / 2) + 2) / k_max) + 2 \
-//       &= floor((m - floor(k_max / 2) + 2) / k_max + 2) + 2 \
-//       &= floor((m - floor(k_max / 2) + 2) / k_max) + 4 \
-//   $
-
-// #pagebreak()
+$ <eq:nodes>
 
 dabei ist $k_t$ die Summe der Knoten links und rechts und $m_(t - 1)$ die Größe der Sequenz aus der vorherigen Tiefe.
 Beim initialen Aufruf ist die Sequenz leer, daher gilt $m_0 = 0$.
@@ -625,22 +584,20 @@ Damit $n_t$ Knoten verpackt werden können, muss die übergebene Sequenz mindest
 Im generischen Fall muss aus $2d_min$ mindestens ein Knoten gebildet werden, daraus folgt
 
 $
-  k_min >= 2d_min
+  k_min <= 2d_min
 $
 
 Andernfalls können Fingerbäume nicht zusammengefügt werden.
 Experimentelle Ergebnisse deuten darauf hin, dass bei $k_max > 5$ and $d_max = k_max + 1$ eine Obergrenze ab $m_2 = 3$ existiert, aber ein Beweise konnte nicht formuliert werden.
-Ohne eine Beweise für die Obergrenze dieser Sequenz kann nicht nachgewiesen werden, dass @alg:finger-tree:concat in logarithmische Zeit läuft, da über diese Sequenz im Basisfall der Rekursion iteriert wird.
+Ohne einen Beweise für die Obergrenze dieser Sequenz kann nicht nachgewiesen werden, dass @alg:finger-tree:concat in logarithmische Zeit läuft, da über diese Sequenz im Basisfall der Rekursion iteriert wird.
+Es ist unklar, ob die Sequenz, welche durch @eq:nodes erzeugt wird eine obere asymptotische Grenze von $Theta(1)$ hat.
 Stellt sich heraus, dass diese Sequenz sich in die Größenordnung von $Theta(n)$ bewegt, tut das auch die Komplexität von @alg:finger-tree:concat.
+Wird allerdings ein $t$ gefunden, ab welche diese Sequenz für gewählte Zweigfaktoren nicht weiter ansteigt, ist der Fingerbaum valide.
 
 Einen Fingerbaum zu Teilen ist essentiell um einzelne Elemente mit bestimmten Eigenschaften zu isolieren, wie es für _Insert_ und _Remove_ der Fall ist.
 @alg:finger-tree:split zeigt, wie ein Fingerbaum $t$ so geteilt wird, dass alle Schlüssel welche größer als $k$ sind im rechten Baum und alle anderen im linken Baum landen.
 Das folgt daraus, dass jeder Schlüssel nur einmal im Baum vorkommen darf und alle Schlüssel sortiert sind.
 Die Implementierung in @bib:hp-06 kann weder garantieren, dass die zurrückgegeben Teilung die einzige, noch dass diese die erste sein Teilung ist.
-
-#todo[
-  This mainly hinges on digit-split, and concat.
-]
 
 #figure(
   kind: "algorithm",
@@ -735,12 +692,7 @@ $
 dann kann durch diese Abbildungen auch der Schlüsseltyp $T$ durch einen SRB-Baum verwaltet werden.
 Ein simples Beispiel sind vorzeichenbehaftete Schlüssel, welche einfach um ihr Minimum verschoben werden, so dass alle möglichen Werte vorzeichenunbehaftet sind.
 Das setzt natürlich voraus, dass ein Minimum existiert, wie es bei Ganzzahlräpresentationen in den meisten Prozessoren der Fall ist.
-
-#todo[
-  Restriction not needed by interspersing negative values as $2 abs(t) + 1$ and positive values as $2 abs(t)$.
-
-  But if there's no minimum/maximum, then this implies taht we don't know the bit width before runtime, at which point our guarantees are weakened.
-]
+Ein Minimum und Maximum für die Schlüssel dieser Bäume bedeutet auch, dass die maximale Tiefe vor der Laufzeit bekannt ist.
 
 == Zeitverhalten
 Um zur Laufzeit den Blattknoten zu finden, in welchem sich ein Schlüssel befindet, wird pro Ebene per Radixsuche der Index dieser Ebene errechnet und geprüft ob dieser Index besetzt ist.
@@ -749,10 +701,7 @@ Durch die perfekte Balancierung ist die Baumtiefe nur von der Schlüsselbreite a
 Operationen wie _Insert_, _Remove_ oder _Search_ haben daher eine Zeitkomplexität von $Theta(d)$ mit $d$ aus @eq:srb-tree:depth.
 
 Gerade unter Echzeitbedingungen erleichtert das die Analyse enorm, durch die Wahl von Höchstschlüsselbreiten kann SRB-Bäumen konstantes _worst-case_ Zeitverhalten für alle Operationen zugewiesen werden.
-
-#todo[
-  Elaborate on examples of this in the implementation chapter, notably we only expect integral keys of size $[8, 16, 32, 64]$ bit.
-]
+Diese Schlüsselbreiten sind in den meisten Fällen von der Hardware vorgegeben und kömmen in den ü·lichen Größen von 8, 16, 32, 64 und in experimentellen CPUs bis zu 128.
 
 == Speicherauslastung
 Sei $v$ der benötigte Speicher eines Werts und $p$ der benötigte Speicher eines Pointers in einem SRB-Baum.
@@ -781,9 +730,4 @@ $
   s_U (p, v) = (k^(d - 1) v) / (k^d v + sum_(n = 1)^(d - 1) k^n p)
 $
 
-#todo[
-  It remains to be seen, whether this is actually a problem.
-
-  Perhaps nodes can be interned in some way, to reduce duplication.
-  This could be beneficial especially for smaller branching factors.
-]
+Gerade wegen dieser potentiell hohen Speicherverschwendung wurden SRB-Bäume als Implementierung für T4gl-Arrays nicht weiter verfolgt.

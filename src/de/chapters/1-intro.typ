@@ -91,9 +91,6 @@ In dieser Arbeit wird sich an diese Konvention gehalten.
 @tbl:landau zeigt verschiedene Komplexitäten in aufsteigender Ordnung der Funktion $f(n)$.
 Unter Betrachtung der asymptotischen Komplexität werden konstante Faktoren und Terme geringerer Ordnung generell ignoriert, sprich $g(n) = 2n^2 + n = O(n^2)$.
 
-
-#todo[If necessary add a glossary and refer to it here.]
-
 = Legende & Konventionen
 Die folgenden Konventionen und Notationen werden während der Arbeit verwendet.
 Sollten bestimmte Teile der Arbeit diesen Konventionen nicht folgen, sind diese Abweichungen im umliegenden Text beschrieben.

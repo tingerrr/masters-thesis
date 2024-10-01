@@ -1,6 +1,9 @@
 #import "/src/util.typ": *
 #import "/src/figures.typ"
 
+Da keine eindeutigen Beweise gefunden werden konnten, welche eine sichere API der C++-Implementierung generischer Fingerbäume auf Typ-Ebene umsetzten können, wurden 2-3-Fingerbäume in C++ übersetzt um deren Verhlaten mit dem von QMap zu vergleichen.
+Auf eine Implementierung von SRB-Bäumen wird Anhand des Speicherverbrauchs verzichtet.
+
 = Von Haskell zu C++
 Die Implementierung von 2-3-Fingerbäumen, sowie deren Benchmarks mit Tests von `QMap` und einer persistenten B-Baum-Implementierung zur Kontrolle können unter #link("https://github.com/tingerrr/finger-tree")[GitHub:tingerrr/FingerTree] eingesehen werden.
 Verweise auf die Implementierung beziehen sich auf den letzten Stand dieses Repositories, welches mit Abgabe dieser Arbeit archiviert wird.
