@@ -2,11 +2,20 @@
 #import "/src/figures.typ"
 
 = Ergebnis
-#todo[
-  It seems the curent implementation of finger trees is horrendously slow and prematurely optimized, the control-implementation of b-trees performas much better and only one order of magnitude worse then q-map without the presence of clones.
-]
+Aus den Benchmarks in @chap:benchmarks kann geschlossen werden das persistente Baumdatenstrukturen vorallem im Schlimmstfall bessere Performance liefern können.
+In ihrere jetzigen Implementierung sind 2-3-Fingerbäume keine gute Wahl für die Storage-Datenstrukturel von T4gl-Arrays.
+Eine simple B-Baum Implementierung ohne Optimierung war in der Lage in den Untersuchten Szenarios vergleichbare oder bessere Performance als QMaps zu bieten.
+Unter Betrachtung weiterer Szenarien wird davon ausgegangen das dieser Trend vortbesteht und das worst-case Zeitverhalten von T4gl-Arrays drastisch verbessern kann.
 
-= Weitere Arbeit
+= Optimierungen
+Verschiedene Optimierungen können die Performance der 2-3-Fingerbaum-Implementierung verbessern.
+Allerdings ist unklar ob diese ausreichen um die Performance der persistenten B-Baum-Implementierung zu erreichen, welche ähnlich unoptimiert implementiert wurden.
+
+== Pfadkopie
+DIe Implementierung von _Insert_ der 2-3-Fingerbäume stützt sich auf eine simple, aber langsame Abfolge von _Split_, _Push_ und _Concat_.
+Es ist allerdings möglich stattdessen eine Variente mit Pfadkopie und internem Überlauf zu implementieren.
+Bie Einfügen eines Blattknotens in einer Ebene, welche voll ist kann das maximal zu einem neuen Knoten pro Ebene folgen, ähnlich dem worst-case von _Push_.
+
 == Lazy-Evaluation
 Das Aufschieben von Operationen druch _lazy evaluation_ hat einen direkten Einfluss auf die amortisierten Komplexitäten der _Deque_-Operationen @bib:hp-06[S. 7].
 Da für die Echzeitanalyse der Datenstruktur nur die _worst-case_ Komplexitäten relevant sind, wurde diese allderings vernachlässigt.
@@ -14,9 +23,6 @@ Da für die Echzeitanalyse der Datenstruktur nur die _worst-case_ Komplexitäten
 Zur generellen Verbersserung der durschnittlichen Komplexitäten der Implementierung ist die Verwendung von _lazy evaluation_ unabdingbar.
 
 == Generalisierung & Cache-Effizienz
-#todo[
-  move this forward to the generalize section.
-]
 Die _Cache_ eines CPU ist ein kleiner Speicher, zwischen CPU und RAM, welcher generell schneller zu lesen und schreiben ist.
 Ist ein Wert nicht in der CPU-_Cache_, wird in den meisten Fällen beim Lesen einer Addresse im RAM der umliegende Speicher mit in die _Cache_ gelesen.
 Das ist einer der Gründe warum Arrays als besonders schnelle Datenstrukturen gelten, wiederholte Lese- und Schreibzugriffe im gleichen Speicherbereich können häufig auf die _Cache_ zurückgreifen.
@@ -72,7 +78,7 @@ Da Bäume lediglich Sonderformen von Graphen sind kann das auch auf die meisten 
 Das bedeutet aber auch das alle Knoten kopiert werden müssten welche von einem Graph erwaltet werden wenn dieser kopiert wird.
 Das steht gegen das Konzept der Pfadkopie in persistenten Bäumen.
 
-Eine Alternative, welche die KNoten eines Baumes nah bei einander im Speicher anelgen könnten ohne die Struktur der Bäume zu zerstören sind Allokatoren welche einen kleinen Speicherbereich für die Knoten der Bäume verwalten.
+Eine Alternative, welche die Knoten eines Baumes nah bei einander im Speicher anelgen könnten ohne die Struktur der Bäume zu zerstören sind Allokatoren welche einen kleinen Speicherbereich für die Knoten der Bäume verwalten.
 Somit könnte die Cache-Effizienz von 2-3-Fingerbäumen erhöht werden ohne besonders große Änderungen an deren Implementierung vorzunehmen.
 
 == Unsichtbare Persistenz <sec:invis-pers>

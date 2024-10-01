@@ -89,10 +89,6 @@ Da 2-3-Fingerbäume von 2-3-Bäumen abgeleitet wurden und keine generalisiernug 
 @tbl:bench-btree zeigt zwei Szenarien, ähnlich wie bei QMap wird der durschnittliche Lesezugriff sowie das Einfügen von Werten gemessen.
 Da die B-Baum Implementierung generell eine Pfadkopie bei einem Schreibzugriff erzeugt, selbst wenn diese Instanz der einzige Referent ist, ist für das Einfügen nur ein Szenario vorhanden.
 
-#todo[
-  The benchmark might be incorrectly measured, one should expect logarithmic growth in complexity.
-]
-
 = 2-3-Fingerbäume
 Für 2-3-Fingerbäume wurden verschiedene Szenarien getestet, aber nicht direkt Szenarien für das Einfügen von Werten in den Baum.
 Da die Implementierung von 2-3-Fingerbäumen als geordnete Sequenzen `insert` durch `split`, gefolgt von `push` und dann `concat` implementiert ist, kann dabei nicht ohne Weiteres ein worst-case für alle drei Operationen erzeugt werden, da diese von einander abhängen.
@@ -109,17 +105,13 @@ Die Szenarien `split` und `concat` testen dabei mit Bäumen welche gezielt aufge
 Bei `split` werden zufällige Werte zwischen `INT_MIN` und `INT_MAX` durch `std::rand()` generiert und eingefügt.
 Gleichermaßen werden diese Werte behalten und deren Median verwendet um bei einem möglichst tiefen Punkt im Baum die Trennung zuerzwingen.
 Das geschiet unter der Annahme, dass die gleichmäßig verteilten Werte von `std::rand()` einen relativ balancierten Baum erzeugen in welchem der Median im tiefesten Knoten liegt.
-Die Schlüssel für das Szenario `get` werden ebenfalls auf diese Weise ausgesucht um möglcisht tief in den Baum gehen zumüssen.
+Die Schlüssel für das Szenario `get` werden ebenfalls auf diese Weise ausgesucht um möglichst tief in den Baum gehen zumüssen.
 Im Szenario `concat` wird ein 2-3-Fingerbaum mit sich selbst verknüpft.
 Dabei wird zwar zwangsläufig die Ordnungsrelation der Schlüssel ignoriert, diese hat aber keinen Einfluss auf die Implementierung von `concat` oder anderweitige Implementierungsdetails des Benchmarkszenarios.
 Die Verknüpfung mit sich selbst ermögicht dabei ein Szenario, in welchem kein seichterer Baum exisitert, welcher die Rekursion frühzeitig stoppen würde.
 
 Die Szenarios `push_worst` und `push_avg` zeigen jeweils die worst-case und average-case Szenarien von `push`.
 Zur Erstellung des worst-case Szenarios wurden Bäume erstellt, bei welchen einem weiterer `push` bis in die tiefste Ebene überläuft.
-
-#todo[
-  - Note the discrepancy in the `push_worst` tree sizes due to the specific structural constraints.
-]
 
 Das Szenario `push_avg` zeigt warum es nicht einfach ist direkt `insert` zu testen.
 Es müssten Bäume erstellt werden, welche nach ihrer Trennung genau so aufgebaut sind, das auch die `push`-Operation danach den Schlimmstfall zeigt, sowie `concat` nach dieser.
@@ -133,11 +125,13 @@ Daher wird zum Einordnen von `insert` die individuellen worst-case Ergebnisse vo
 ) <tbl:bench-finger-tree>
 
 Die zuvorgenannten Szenarien sind in @tbl:bench-finger-tree zu sehen.
+Aufällig sind dabei direkt die Sprünge in `get` bei 65536 und 524288, es ist unklar ob es sich um ein Implementierungsproblem handelt, oder ein inherentes Problem mit 2-3-Fingerbäumen.
+Mehrere Durchläufe der Benchmarks zeigten ähnliche Sprünge bei den gleichen Werten auf.
+
 
 = Vergleich
-Bei Lesezugrifffen bewegen sich alle drei Datenstrukturen in ähnlichen Bereichen, die benötigte Zeit pro Zugriff steigt in allen drei Fällen etwa logarithmisch an (siehe @fig:bench-get).
-Das stimmt mit den theoretischen Ergebnissen überein.
-Die Abweichungen zwischen den verschiedenen Datenstrukturen sind sehr klein und können auf die verschiedenen Implementierungen und Grade der Optimierung zurückgeführt werden.
+Bei Lesezugriffen auf steigt $t$ für alle Datenstrukturen etwa linear mit der Verdopplung der $n$, jedoch mit verschiedenen Faktoren.
+Das stimmt mit den theoretischen Ergebnissen überein, während die zuvorerwähnten Sprünge der 2-3-Fingerbäume noch unerklärt bleiben.
 
 #let plot-operation(type, op) = cetz.plot.add(
   op.pairs().map(((arg, entry)) => (int(arg), entry.real_time)),
@@ -152,7 +146,7 @@ Die Abweichungen zwischen den verschiedenen Datenstrukturen sind sehr klein und 
     cetz.draw.set-style(axes: (bottom: (tick: (label: (angle: 45deg, anchor: "north-east")))))
 
     plot.plot(
-      size: (8, 8),
+      size: (9, 7),
       x-label: $n$,
       y-label: $t$,
       y-unit: "ns",
@@ -179,7 +173,7 @@ Die Summierung aller worst-case Werte gibt daher eine besonders pessimistische, 
     cetz.draw.set-style(axes: (bottom: (tick: (label: (angle: 45deg, anchor: "north-east")))))
 
     plot.plot(
-      size: (8, 8),
+      size: (9, 7),
       x-label: $n$,
       y-label: $t$,
       y-unit: "ns",
@@ -213,5 +207,7 @@ Die Summierung aller worst-case Werte gibt daher eine besonders pessimistische, 
   caption: [Vergleich der Schreibzugriffe in Abhängigkeit der Anzahl der Elemente $n$.],
 ) <fig:bench-insert>
 
-@fig:bench-insert zeigt für B-Baum dads Senario `insert`, für QMap das Szenario `insert_unique` und für 2-3-Fingerbaum die Summe der Szenarien `spit`, `push_worst` und `concat`.
+@fig:bench-insert zeigt für B-Baum das Senario `insert`, für QMap das Szenario `insert_unique` und für 2-3-Fingerbaum die Summe der Szenarien `spit`, `push_worst` und `concat`.
 Dabei ist zu beachten, dass das worst-case QMap Szenario so hohe Werte erziehlt, dass die Werte von B-Baum und 2-3-Fingerbaum gleich aussehen.
+Die Abbildung zeigt, dass 2-3-Fingerbäume in ihrer jetzigen Implementierung deutlich schlechter abschließen als QMap im best-case Szenario und die B-Baum Implementierung generell.
+Allerdings schließen beide Baum Implementierungen weitaus besser als QMap ab sobald mehr als ein Referent existiert, wie es in T4gl oft der Fall ist.

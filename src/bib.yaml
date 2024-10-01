@@ -166,7 +166,7 @@ bib:hp-06:
     issue: 2
     date: 2006-03-01
 
-# TODO: get ahold of the actual standard without paying 200 swiss francs lmao
+# NOTE: yeah, I'm not paying 200 swiss francs for one citation
 bib:iso-cpp-20:
   type: manuscript
   title: Working Draft, Standard for Programming Language C++

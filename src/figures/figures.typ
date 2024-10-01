@@ -56,15 +56,6 @@
 // t4gl arrays
 //
 
-#let _t4gl(..args) = fdiag(..args, render: (grid, nodes, edges, options) => {
-  fletcher.cetz.canvas({
-    fletcher.draw-diagram(grid, nodes, edges, debug: options.debug)
-    import fletcher.cetz.draw: *
-
-    // TODO: draw groups and group names manually here if need be
-  })
-})
-
 #let t4gl-layers-new = fdiag({
   instance((0, 0), `a`, name: <i>)
   edge("-|>")
