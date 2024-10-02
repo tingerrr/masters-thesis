@@ -20,6 +20,7 @@
     date: datetime(year: 2024, month: 10, day: 09),
     field: [Angewandte Informatik],
   ),
+  draft: false,
   abstracts: (
     (title: [Kurzfassung], body: [
       Die Verwendung dynamischer Datenstrukturen unter Echtzeitbedingungen muss genau geprüft werden um sicher zustellen, dass ein Echtzeitsystem dessen vorgegebene Aufgaben in der erwarteten Zeit erfüllen kann.
@@ -59,9 +60,6 @@
 #show figure.where(kind: "algorithm"): set par(justify: false)
 
 #set raw(syntaxes: "/assets/t4gl.sublime-syntax")
-
-// TODO: ensure this will right come out right when printed and bound
-#let chapter = chapter.with(to: "even")
 
 #chapter(label: <chap:intro>)[Einleitung]
 #include "chapters/1-intro.typ"
