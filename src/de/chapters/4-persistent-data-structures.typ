@@ -78,8 +78,9 @@ Im Folgenden werden durch die Datenteilung _Instanzen_ und _Daten_ semantische g
 / Daten:
   Die Teile einer Datenstruktur, welche die eigentlichen Elemente enthält, in @fig:linked-sharing beschreibt das die Knoten mit einfacher Umrandung, während doppelt umrandete Knoten die Instanzen sind.
 
-Persistenz zeigt vor allem bei Baumstrukturen ihre Vorteile, bei der Kopie der Daten eines persistenten Baums können je nach Tiefe und Balance des Baumes Großteile des Baumes geteilt werden.
-Ähnlich wie bei persistenten einfach verketteten Listen, werden bei Schreibzugriffen auf persistente Bäume nur die Knoten des Baumes kopiert, welche zwischen Wurzel (Instanz) und dem veränderten Knoten in den Daten liegen.
+Persistenz zeigt vor allem bei Baumstrukturen ihre Vorteile.
+Bei der Kopie der Daten eines persistenten Baums können je nach Tiefe und Balance des Baums große Teile des Baums geteilt werden.
+Ähnlich wie bei persistenten einfach verketteten Listen, werden bei Schreibzugriffen auf persistente Bäume nur die Knoten des Baums kopiert, welche zwischen Wurzel (Instanz) und dem veränderten Knoten in den Daten liegen.
 Das nennt sich eine Pfadkopie (_engl._ path copying).
 Betrachten wir partielle Persistenz von Bäumen am Beispiel eines Binärbaums, sprich eines Baums mit Zweigfaktoren (ausgehendem Knotengrad) zwischen $0$ und $2$.
 @fig:tree-sharing illustriert, wie am Binärbaum `t` ein Knoten `X` angefügt werden kann, ohne dessen partielle Persistenz aufzugeben.
@@ -101,7 +102,7 @@ Durch die Teilung on `B` werden auch alle Kindknoten unter `B` geteilt.
 )
 
 Für unbalancierte Bäume lässt sich dabei aber noch keine besonders gute Zeitkomplexität garantieren.
-Bei einem Binärbaum mit $n$ Kindern, welcher maximal unbalanciert ist (equivalent einer verketten Liste), degeneriert die Zeitkomplexität zu $Theta(n)$ für Veränderungen am Blatt des Baumes.
+Bei einem Binärbaum mit $n$ Kindern, welcher maximal unbalanciert ist (equivalent einer verketten Liste), degeneriert die Zeitkomplexität zu $Theta(n)$ für Veränderungen am Blatt des Baums.
 Ein perfekt balancierter Binärbaum hat eine Tiefe $d = log_2 n$, sodass jeder Schreibzugriff auf einem persistenten Binärbaum maximal $d$ Knoten (Pfad zwischen Wurzel und Blattknoten) kopieren muss.
 Je besser ein persistenter Baum balanciert ist, desto geringer ist die Anzahl der Knoten, welche bei Pfadkopien unnötig kopiert werden müssen.
 Die Implementierung von T4gl-Arrays durch persistente Bäume könnte demnach die Komplexität von Kopien drastisch verbessern.
@@ -131,21 +132,22 @@ Da die Schlüsselverteilung in T4gl-Arrays nicht dicht ist, können die Schlüss
 Etwas fundamentaler sind B-Bäume @bib:bm-70 @bib:bay-71, bei persistenten B-Bäumen haben die meisten Operationen eine worst- und average-case Zeitkomplexität von $Theta(log n)$.
 Eine Verbesserung der average-case Zeitkomplexität für bestimmte Sequenzoperationen (_Push_, _Pop_) bieten 2-3-Fingerbäume @bib:hp-06.
 Diese bieten sowohl theoretisch exzellentes Zeitverhalten, als auch keine Enschränkung auf die Schlüsselverteilung.
-Im folgenden werden unter anderem B-Bäume, sowie 2-3-Fingerbäume als alternative Storage-Datenstrukturen für T4gl-Arrays untersucht.
+Im Folgenden werden unter anderem B-Bäume, sowie 2-3-Fingerbäume als alternative Storage-Datenstrukturen für T4gl-Arrays untersucht.
 
 = B-Bäume <sec:b-tree>
 Eine für die Persistenz besonders gut geeignete Datenstruktur sind B-Bäume @bib:bm-70 @bib:bay-71, da diese durch ihren Aufbau und Operationen generell balanciert sind.
 Schreiboperationen auf persistenten B-Bäumen müssen lediglich $Theta(log n)$ Knoten kopieren.
 B-Bäume können vollständig durch ihre Zweigfaktoren beschreiben werden, sprich, die Anzahl der Kindknoten, welche ein interner Knoten haben kann bzw. muss.
-Ein B-Baum ist wiefolgt definiert @bib:knu-98[S. 483]:
+Ein B-Baum ist wie folgt definiert @bib:knu-98[S. 483]:
 + Jeder Knoten hat maximal $k_max$ Kindknoten.
 + Jeder interne Knoten, außer dem Wurzelknoten, hat mindestens $k_min = ceil(k_max \/ 2)$ Knoten.
 + Der Wurzelknoten hat mindestens 2 Kindknoten, es sei denn, er ist selbst ein Blattknoten.
 + Alle Blattknoten haben die gleiche Entfernung zum Wurzelknoten.
 + Ein interner Knoten mit $k$ Kindknoten enthält $k - 1$ Schlüssel.
 
-Die Schlüssel innerhalb eines internen Knoten dienen als Suchhilfe, sie sind Typen mit fester Ordnungsrelation und treten aufsteigend geordnet auf.
-@fig:b-tree zeigt einen internen Knoten eins B-Baumes mit $k_min = 2$ und $k_max = 4$, ein sogannter 2-4-Baum.
+Die Schlüssel innerhalb eines internen Knoten dienen als Suchhilfe.
+Sie sind Typen mit fester Ordnungsrelation und treten aufsteigend geordnet auf.
+@fig:b-tree zeigt einen internen Knoten eines B-Baums mit $k_min = 2$ und $k_max = 4$, ein sogannter 2-4-Baum.
 Jeder Schlüssel $s_i$ mit $1 <= i <= k - 1$ dient als Trennwert zwischen den Unterbäumen in den Kindknoten $k_j$ mit $1 <= j <= k$.
 Sei $x$ ein Schlüssel im Unterbaum mit der Wurzel $k_i$, so gilt
 
@@ -160,14 +162,14 @@ Die simpelste Form von B-Bäumen sind sogenannte 2-3-Bäume (B-Bäume mit $k_min
 
 #figure(
   figures.b-tree.node,
-  caption: [Ein interner B-Baum-Knoten eines 2-4-Baumes.],
+  caption: [Ein interner B-Baum-Knoten eines 2-4-Baums.],
 ) <fig:b-tree>
 
 Da die Schlüssel in B-Bäumen anhand ihrer Ordnungsrelation sortiert sind und demnach auch nicht auf Ganzzahlwerte beschrängt sind, können diese in persistenter Form durchaus eine gute Alternative zu QMaps darstellen.
 
 = 2-3-Fingerbäume
 2-3-Fingerbäume wurden von !Hinze und !Paterson @bib:hp-06 eingeführt und sind eine Erweiterung von 2-3-Bäumen, welche für verschiedene Sequenzoperationen optimiert wurden.
-Die Authoren führen dabei folgende Begriffe im Verlauf des Texts ein:
+Die Autoren führen dabei folgende Begriffe im Verlauf des Texts ein:
 / Spine:
   Die Wirbelsäule eines Fingerbaums, sie beschreibt die Kette der zentralen Knoten, welche die sogenannten _Digits_ enthalten.
 / Digit:
@@ -177,12 +179,12 @@ Die Authoren führen dabei folgende Begriffe im Verlauf des Texts ein:
   Demnach wird im Folgenden Digits verwendet, um die linken und rechten Kindknoten der Wirbelknoten zu beschreiben.
 / Measure:
   Wert, welcher aus den Elementen errechnet und kombiniert werden kann.
-  Dient als Suchhilfe innerhalb des Baumes, durch welchen identifiziert wird, wo ein Element im Baum zu finden ist, ähnlich den Schlüssel in @fig:b-tree.
+  Dieser dient als Suchhilfe innerhalb des Baums, durch welchen identifiziert wird, wo ein Element im Baum zu finden ist, ähnlich den Schlüsseln in @fig:b-tree.
 / Safe:
   Sichere Ebenen sind Ebenen mit 2 oder 3 Digits, ein Digit kann ohne Probleme entnommen oder hinzugefügt werden.
   Zu beachten ist dabei, dass die Sicherheit einer Ebene sich auf eine Seite bezieht, eine Ebene kann links sicher und rechts unsicher sein.
 / Unsafe:
-  Unsichere Ebenen sind Ebenen mit 1 oder 4 Digits, ein Digit zu entnehmen oder hinzuzufügen kann Über- bzw. Unterlauf verursachen (Wechsel von Digits zwischen Ebenen des Baumes, um die Zweigfaktoren zu bewahren).
+  Unsichere Ebenen sind Ebenen mit 1 oder 4 Digits, ein Digit zu entnehmen oder hinzuzufügen kann Über- bzw. Unterlauf verursachen (Wechsel von Digits zwischen Ebenen des Baums, um die Zweigfaktoren zu bewahren).
 
 Der Name Fingerbäume rührt daher, dass imaginär zwei Finger an die beiden Enden der Sequenz gesetzt werden.
 Diese Finger ermöglichen den schnellen Zugriff an den Enden der Sequenz.
@@ -280,7 +282,7 @@ Für die Implementierung in T4gl werden andere Measure ignoriert, da diese nicht
 
 = Generische Fingerbäume <sec:finger-tree:generic>
 Im Folgenden wird betrachtet, inwiefern die Zweigfaktoren von Fingerbäumen generalisierbar sind, ohne die in @tbl:finger-tree-complex beschriebenen Komplexitäten zu verschlechtern.
-Höhere Zweigfaktoren der Teilbäume eines Fingerbaums reduzieren die Tiefe des Baumes und können die Cache-Effizienz erhöhen.
+Höhere Zweigfaktoren der Teilbäume eines Fingerbaums reduzieren die Tiefe des Baums und können die Cache-Effizienz erhöhen.
 
 Wir beschreiben die Struktur eines Fingerbaums durch die Minima und Maxima seiner Zweigfaktoren $k$ (Zweigfaktor der internen Knoten) und $d$ (Anzahl der Digits auf jeder Seite einer Ebene)
 
@@ -348,7 +350,7 @@ $
   n'_max (t) &= n_max (t) + n_max (t - 1) + dots.c + n_max (1) &= sum_(i = 1)^t n_min (i) \
 $
 
-Das wirkliche Minimum eines Baumes der Tiefe $t$ ist daher $n'_min (t) = n'_"lmin"$, da es immer einen letzten nicht internen Wirbelknoten auf Tiefe $t$ gibt.
+Das wirkliche Minimum eines Baums der Tiefe $t$ ist daher $n'_min (t) = n'_"lmin"$, da es immer einen letzten nicht internen Wirbelknoten auf Tiefe $t$ gibt.
 @fig:cum-depth zeigt die Minima und Maxima von $n$ für die Baumtiefen $t in [1, 8]$ für 2-3-Fingerbäume.
 Dabei zeigen die horizontalen Linien das kumulative Minimum $n'_min$ und Maximum $n'_max$ pro Ebene.
 
@@ -463,7 +465,7 @@ Bevor aber $dsearch$ angewendet werden kann, muss der richtige Wirbelknoten gefu
   caption: [Die _Search_ Operation auf einem Fingerbaum.],
 ) <alg:finger-tree:search>
 
-Das Zeitverhalten von @alg:finger-tree:search hängt von der Tiefe des Baumes ab, da im worst-case der gesuchte Schlüssel im letzten Wirbelknoten vorzufinden ist.
+Das Zeitverhalten von @alg:finger-tree:search hängt von der Tiefe des Baums ab, da im worst-case der gesuchte Schlüssel im letzten Wirbelknoten vorzufinden ist.
 Die Baumtiefe steigt logarithmisch mit der Anzahl der Elemente in Abhängigkeit von den Zweigfaktoren (siehe @sec:finger-tree:depth).
 Je weiter ein Schlüssel von den beiden Enden entfernt ist, desto tiefer muss die Suche in den Baum vordringen.
 Dabei ist ein Schlüssel, welcher $d$ Positionen vom nächsten Ende entfernt ist $Theta(log d)$ Ebenen tief im Baum vorzufinden @bib:hp-06[S. 5], also effektiv $Theta(log n)$.
@@ -575,7 +577,7 @@ $ <eq:nodes>
 dabei ist $k_t$ die Summe der Knoten links und rechts und $m_(t - 1)$ die Größe der Sequenz aus der vorherigen Tiefe.
 Beim initialen Aufruf ist die Sequenz leer, daher gilt $m_0 = 0$.
 
-Für 2-3-Fingerbäume verhält sich die Sequenz wiefolgt, auf jeder Ebene können zwischen $2d_min = 2$ und $2d_max = 8$ Elemente zu den verpackten Elementen der vorherigen Ebene hinzukommen.
+Für 2-3-Fingerbäume verhält sich die Sequenz wie folgt, auf jeder Ebene können zwischen $2d_min = 2$ und $2d_max = 8$ Elemente zu den verpackten Elementen der vorherigen Ebene hinzukommen.
 #figure(
   table(columns: 3, align: right,
     table.header[$t$][$min n_t => min m_t$][$max n_t => max m_t$],

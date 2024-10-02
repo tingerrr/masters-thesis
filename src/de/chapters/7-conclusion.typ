@@ -77,7 +77,7 @@ Da Bäume lediglich Sonderformen von Graphen sind kann das auch auf die meisten 
 Das bedeutet aber auch das alle Knoten kopiert werden müssten welche von einem Graph erwaltet werden wenn dieser kopiert wird.
 Das steht gegen das Konzept der Pfadkopie in persistenten Bäumen.
 
-Eine Alternative, welche die Knoten eines Baumes nah bei einander im Speicher anelgen könnten ohne die Struktur der Bäume zu zerstören sind Allokatoren welche einen kleinen Speicherbereich für die Knoten der Bäume verwalten.
+Eine Alternative, welche die Knoten eines Baums nah bei einander im Speicher anelgen könnten ohne die Struktur der Bäume zu zerstören sind Allokatoren welche einen kleinen Speicherbereich für die Knoten der Bäume verwalten.
 Somit könnte die Cache-Effizienz von 2-3-Fingerbäumen erhöht werden ohne besonders große Änderungen an deren Implementierung vorzunehmen.
 
 == Unsichtbare Persistenz <sec:invis-pers>

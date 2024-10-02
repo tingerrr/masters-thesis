@@ -6,7 +6,7 @@ In den folgenden Abschnitten werden diese kurz umrissen, warum diese für das Pr
 
 = Move-Semantik <sec:move>
 Eine der möglichen Lösungen zur Reduzierung von Array-Kopien in T4gl ist die Einführung einer Move-Semantik ähnlich derer in Rust oder `std::move` in C++.
-Durch explizite oder implizite _Moves_ reduziert man die Anzahl an Kopien von Daten, in den Fällen, wo Daten explizit übergeben und nicht Kopiert werden sollen.
+Durch explizite oder implizite _Moves_ reduziert man die Anzahl an Kopien von Daten, in den Fällen, wo Daten explizit übergeben und nicht kopiert werden sollen.
 Soll zum Beispiel ein Array an eine Funktion übergeben und danach nicht außerhalb dieser Funktion verwendet werden, kann statt einer Kopie ein _Move_ durchgeführt werden.
 @lst:cpp-move zeigt die Initialisierung dreier Vektoren.
 Zuerst wird der Vektor `foo` angelegt.
@@ -24,8 +24,8 @@ Im Anschluss sind `foo` und `baz` mit der Sequenz `[0, 1, 2]` belegt, während `
 ) <lst:cpp-move>
 
 In C++ wird durch den Aufruf von `std::move` ein _MoveConstructor_ aufgerufen, dessen Aufgabe es ist, aus einer alten Instanz eines Typs Daten in die neue Instanz zu übertragen, ähnlich wie bei einer Kopie.
-Im Gegensatz zu einer Kopie, wird die alter Instanz aber in einen uninitialisierten aber validen Zustand gesetzt, dieser ist Implementierungsdefiniert, aber meistens der Standardwert eines Typs.
-Im Falles des Vektors wird, beim _Move_ der Daten von `bar` zu `baz` die Instanz `bar` deinitialisiert.
+Im Gegensatz zu einer Kopie, wird die alter Instanz aber in einen uninitialisierten aber validen Zustand gesetzt, dieser ist implementierungsdefiniert, aber meistens der Standardwert eines Typs.
+Im Falle des Vektors wird, beim _Move_ der Daten von `bar` zu `baz` die Instanz `bar` deinitialisiert.
 
 #figure(
   ```rust
@@ -37,7 +37,7 @@ Im Falles des Vektors wird, beim _Move_ der Daten von `bar` zu `baz` die Instanz
 ) <lst:rust-move>
 
 In @lst:rust-move ist die Rust-Variante von @lst:cpp-move zu sehen.
-Der Unterschied liegt darin, dass `bar` danach nicht leer ist, sondern invalide.
+Der Unterschied liegt darin, dass `bar` danach nicht leer ist, sondern für die weitere Referenzierung ungütlig.
 Zugriffe auf die Variable `bar` sind nach der dritten Zeile nicht mehr erlaubt und werden zur Kompilierzeit geprüft.
 
 Beide Varianten ermöglichen es, potentiell teure Kopien zu vermeiden, indem die Verantwortung über Daten des Programms von einem Punkt zum anderem übertragen wird.

@@ -3,8 +3,8 @@
 
 = Motivation
 In der Automobilindustrie gibt es verschiedene Systeme, welche die Automation von Prüfständen erleichtern oder ganz übernehmen.
-Eines dieser Systeme ist T4gl, eine Programmiersprache und gleichnamiges Laufzeitsystem zur Interpretation von Testskripten in Reifenprüfständen.
-Bei diesen Reifenprüfständen werden verschiedene Tests und Messvorgänge durchgeführt, welche bestimmte Zeitanforderungen aufweisen.
+Eines dieser Systeme ist T4gl, eine Programmiersprache und gleichnamiges Laufzeitsystem zur Interpretation von Testskripten in Industrieprüfanlagen wie End of Line- aber auch Versuchsprüfständen.
+Bei diesen Anlagen werden verschiedene Tests und Messvorgänge durchgeführt, welche bestimmte Zeitanforderungen aufweisen.
 Können diese Zeitanforderungen nicht eingehalten werden, müssen Testvorgänge verworfen und wiederholt werden.
 Daher ist es essentiell, dass das T4gl-Laufzeitsystem in der Lage ist, die erwarteten Testvorgänge innerhalb einer festgelgeten Zeit abzuarbeiten, ungeachtet der anfallenden Testdatenmengen.
 T4gl is eine Hochlevel-Programmiersprache, Speicherverwaltung oder Synchronization werden vom Laufzeitsystem übernommen und müssen in den meisten Fällen nicht vom Programmierer beachtet werden.
@@ -17,7 +17,7 @@ Bei diese Kopien kann es sich um T4gl-Arrays mit fünfzig Elementen oder T4gl-Ar
 Durch diese unzureichende Flexibilität bei der Wahl der Datenstruktur ist es dem T4gl-Programmierer nicht möglich, die Nutzung der Datenstruktur hinreichend auf die jeweiligen Anwendungsfälle zu optimieren.
 Das Laufzeitsystem kann die gestellten Zeitanforderungen nicht garantiert einhalten, da die Anzahl der Elemente in T4gl-Arrays erst zur Laufzeit bekannt ist.
 
-Das Endziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsystems durch Analyse und gezielte Verbesserung der Datenverwaltung von T4gl-Arrays.
+Das Hauptziel dieser Arbeit ist die Verbesserung der Latenzen des T4gl-Laufzeitsystems durch Analyse und gezielte Verbesserung der Datenverwaltung von T4gl-Arrays.
 Dabei werden verschiedene Lösungsansätze evaluiert, teilweise implementiert, getestet und verglichen.
 
 = Aufbau der Arbeit
@@ -43,7 +43,7 @@ Dabei sind folgende Begriffe relevant:
   Der Speicherbedarf eines Algorithmus zur Bewältigung eines Problems @bib:clrs-09[S. 44] im Bezug auf die Problemgröße.
   Wird auch für den Speicherbedarf von Datenstrukturen verwendet.
 / Amortisierte Komplexität:
-  Bezüglich einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzigen Operation an @bib:clrs-09[S. 451].
+  Bezüglich einer Sequenz von $n$ Operationen mit einer Dauer von $T(n)$, gibt die amortisierte Komplexität den Durchschnitt $T(n)\/n$ einer einzelnen Operation an @bib:clrs-09[S. 451].
 
 !Landau-Symbole umfassen Symbole zur Klassifizierung der asymptotischen Komplexität von Funktionen und Algorithmen.
 Im folgenden werden Variationen der !Knuth'schen Definitionen verwendet @bib:knu-76[S. 19] @bib:clrs-09[S. 44-48], sprich:
