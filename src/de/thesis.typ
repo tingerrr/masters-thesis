@@ -41,6 +41,17 @@
   ),
   outlines-position: start,
   bibliography: bibliography("/src/bib.yaml", title: "Literatur"),
+  acknowledgement: [
+    Ich bedanke mich bei Kay Gürtzig für die wissenschaftliche Genauigkeit seines Feedbacks und die viele Zeit die er trotz vieler andere Pflichten in zahllose Rücksprachetermine investiert hat.
+    Durch sein genaues Hinsehen wurden viele Fehler gefunden, welche gerade bei Änderungen schnell vergessen werden.
+    Gleichermaßen bedanke ich mich bei Peter Brückner und Ralf Müller für deren Betreuung von seiten der Firma Brückner und Jarosch Ingeneugesellschaft mbH (BJ-IG).
+    Ihre Unterstüzung, Zeit und Vorschläge haben dann geholfen venn Ergebnisse unrealistisch oder Beweise unmöglich erschienen.
+    Desweiteren bedanke ich mich bei allen Problelesern, welche mir die Fehler gezeigt haben, welche man als Autor nach dem 30. mal Lesen des eigenen Texts nicht mehr sieht.
+    Ohne die Unterstütung meiner Kollegen bei BJ-IG, meine probelesenden Freunde und Betreuer wäre ich nicht so weit gekommen.
+    Ich bedanke mich bei allen Freunden und Familienmitgliedern, welche einfach nur da waren, wenn ich an etwas anderes denken wollte als der herannahende Abgabe Termin.
+
+    In der Hoffnung, dass ich schon morgen anderen so helfen kann wie sie mir geholfen haben, danke!
+  ],
 )
 
 #set grid.cell(breakable: false)
