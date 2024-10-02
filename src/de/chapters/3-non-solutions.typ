@@ -24,8 +24,8 @@ Im Anschluss sind `foo` und `baz` mit der Sequenz `[0, 1, 2]` belegt, während `
 ) <lst:cpp-move>
 
 In C++ wird durch den Aufruf von `std::move` ein _MoveConstructor_ aufgerufen, dessen Aufgabe es ist, aus einer alten Instanz eines Typs Daten in die neue Instanz zu übertragen, ähnlich wie bei einer Kopie.
-Im Gegensatz zu einer Kopie, wird die alter Instanz aber in einen uninitialisierten aber validen Zustand gesetzt, dieser ist implementierungsdefiniert, aber meistens der Standardwert eines Typs.
-Im Falle des Vektors wird, beim _Move_ der Daten von `bar` zu `baz` die Instanz `bar` deinitialisiert.
+Im Gegensatz zu einer Kopie, wird die alte Instanz aber in einen undeterminierten aber validen Zustand gesetzt, dieser ist implementierungsdefiniert, aber meistens der Standardwert eines Typs.
+Bei Klassen wie `shared_ptr` oder `unique_ptr` ist das das Äquivalent zu ```cpp nullptr```, im Falle des Vektors wird beim _Move_ der Daten von `bar` zu `baz` die Instanz `bar` zum leeren Vektor ohne das die eigentlichen Elemente im Vektor verschoben werden.
 
 #figure(
   ```rust
@@ -73,8 +73,9 @@ Es gibt verschiedene Möglichkeiten, solche Annotationen zu implementieren:
   Überschreitung der Maximallänge würde einen Laufzeitfehler hervorrufen.
 
 Das Verhalten von statischen Arrays ist verhältnismäßig simpel, die Funktionen `insert` oder `remove` können zu Kompilizerzeit schon nicht aufgerufen werden und Elemente sind durchgängig initialisiert.
-Um die Überschreitung der Maximallänge zur Analyse-Stufe zu überprüfen, müsste der Kompiler zur Analyse-Stufe Annahmen über unbekannte Größen treffen von welchen die Anzahl der Elemente abhingen.
-Hängen diese von Laufzeitwerten wie _I/O_ ab, dann ist die Analyse in den meisten Fällen zur unmöglich.
+Bie Dynamischen Arrays ist das anders.
+Um die Überschreitung der Maximallänge zur Analyse-Stufe zu überprüfen, müsste der Kompiler zur Analyse-Stufe Annahmen über unbekannte Größen treffen, von welchen die Anzahl der Elemente abhingen.
+Hängen diese von Laufzeitwerten wie _I/O_ ab, dann ist die Analyse in den meisten Fällen unmöglich.
 Es ist auch nicht trivial zu überprüfen, wann ein T4gl-Array durch ein anderes intialisiert wurde, welches eine solche Annotation hat.
 Die Zuweisung von verschiedenen T4gl-Instanzen kann ebenfalls von Laufzeitvariablen abhängen.
 
@@ -82,5 +83,5 @@ Bei Überprüfung zur Laufzeit wird zwar verhindert, dass T4gl-Arrays eine Maxim
 Wird ein Laufzeitfehler nicht verarbeitet, beendet dieser das Programm.
 
 Ähnlich der Move-Semantik in @sec:move müssen Annotationen explizit zu alten Projekten hinzugefügt werden, um von diesen zu profitieren.
-Analyse ist beinahe unmöglich und Laufzeitfehler sind in den meisten Fällen schlimmer als Verzögerungen.
-Desweiteren verhindern diese nur Kopien von Arrays mit mehr Elementen als die Annotation angibt, wird eine Annotation aber mit einem Wert wie $2^64$ verwendet, ist diese nutzlos.
+Eine Analyse ist beinahe unmöglich und Laufzeitfehler sind in den meisten Fällen schlimmer als Verzögerungen.
+Des Weiteren verhindern diese nur Kopien von Arrays mit mehr Elementen als die Annotation angibt, wird eine Annotation aber mit einem Wert wie $2^64$ verwendet, ist diese nutzlos.

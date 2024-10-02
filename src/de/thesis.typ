@@ -24,13 +24,13 @@
     (title: [Kurzfassung], body: [
       Die Verwendung dynamischer Datenstrukturen unter Echtzeitbedingungen muss genau geprüft werden um sicher zustellen, dass ein Echtzeitsystem dessen vorgegebene Aufgaben in der erwarteten Zeit erfüllen kann.
       Ein solches Echtzeitsystem ist das Laufzeitsystem der T4gl-Progrmmiersprache, eine Domänenspezifische Sprache für Industrieprüfmaschinen.
-      In dieser Arbeit wird untersucht, auf welche Weise die in T4gl verwendeten Datenstrukturen optimiert oder ausgetauscht werden können um das Zeitverhalten unter Schlimmstbedingungen zu verbessern.
+      In dieser Arbeit wird untersucht, auf welche Weise die in T4gl verwendeten Datenstrukturen optimiert oder ausgetauscht werden können, um das Zeitverhalten unter Worst Case Bedingungen zu verbessern.
       Dabei werden vorallem persistente Datenstrukturen implementiert, getestet und verglichen.
     ]),
     (title: [Abstract], body: [
-      The usage of dynamic data strucutres under real time constraints must be analyzed precisely in order to ensure that a real time system can execute its tasks in the expected time.
+      The usage of dynamic data structures under real time constraints must be analyzed precisely in order to ensure that a real time system can execute its tasks in the expected time.
       Such a real time system is the runtime of the T4gl programming language, a domain-specific language for industrial measurement machines.
-      This thesis is concerned with the analysis, optimization and re-implementation of T4gl's data structures, in order to improve thier worst-case time complexity.
+      This thesis is concerned with the analysis, optimization and re-implementation of T4gl's data structures, in order to improve their worst-case time complexity.
       For this, various, but foremost persistent data structures are implemented, benchmarked and compared.
     ]),
   ),

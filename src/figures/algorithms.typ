@@ -57,7 +57,7 @@
   numbered-title: $ftsearch(t, m): (FingerTree, Key) -> Node$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $m <= t."digits"."key"$
+    + *if* $m <= t."key"$
       + *return* $dsearch(t."digits", m)$
     + *else*
       #comment[key not in this subtree]
@@ -85,10 +85,10 @@
       #comment[no split]
       + *return* $Shallow("digits")$
     + *else*
-      + *let* $"left", "right" := split("digits", d_min)$
+      + *let* $"left", "right" := split("digits"."children", d_min)$
     + *return* $Deep("left", None, "right")$
   + *else*
-    + *let* $"left" := pushl(t."left", e)$
+    + *let* $"left" := pushl(t."left"."children", e)$
     + *if* $abs("left") <= d_max$
       #comment[no overflow]
       + *return* $Deep("left", t."middle", t."right")$
@@ -103,16 +103,16 @@
   numbered-title: $ftpopl(t): FingerTree -> (Node, FingerTree)$,
 )[
   + *if* $t$ *is* $Shallow$
-    + *if* $abs(t."digits")$
+    + *if* $abs(t."digits") = 0$
       + *return* $(None, t)$
     + *else*
       + *let* $e, "rest" := popl(t."digits")$
       + *return* $(e, Shallow("rest"))$
   + *else*
-    + *let* $e, "rest"_l := popl(t."left")$
+    + *let* $e, "rest"_l := popl(t."left"."digits")$
     + *if* $abs("rest"_l) >= d_min$
       #comment[no underflow]
-      + *return* $(e, Deep("rest", t."middle", t."right"))$
+      + *return* $(e, Deep("rest"_l, t."middle", t."right"))$
     + *else if* $abs(t."middle") = 0$
       #comment[underflow by left+right merge]
       + *let* $"middle" = concat(t."left", t."right")$
@@ -163,9 +163,9 @@
     + *let* $n' := nothing$
     + *while* $abs(n) - k_max >= k_min$
       #comment[push max size nodes as long as it goes]
-      + *let* $k, "rest" = split(n, k_max)$
+      + *let* $"children", "rest" = split(n, k_max)$
       + $n = "rest"$
-      + $n' = pushr(n', Node(k))$
+      + $n' = pushr(n', Node("children"))$
     + *if* $abs(n) - k_min >= k_min$
       #comment[push the remaining 1 or 2 nodes]
       + *let* $a, b = split(n, k_min)$
@@ -197,15 +197,15 @@
     + *return* $(Shallow(l), v, Shallow(r))$
   + *else*
     + *if* $k <= t."left"."key"$
-      + *let* $l, v, r := dsplit(t."left", k)$
+      + *let* $l, v, r := dsplit(t."left"."children", k)$
       + *return* $(Shallow(l), v, Deep(r, t."middle", t."right"))$
     + *else if* $k <= t."middle"."key"$
       + *let* $l, v, r := ftsplit(t."middle", k)$
         #comment[descend and unpack]
-      + *let* $l', v', r' := dsplit(v, k)$
+      + *let* $l', v', r' := dsplit(v."children", k)$
       + *return* $(Deep(t."left", l, l'), v', Deep(r', r, t."right"))$
     + *else if* $k <= t."right"."key"$
-      + *let* $l, v, r := dsplit(t."right", k)$
+      + *let* $l, v, r := dsplit(t."right"."children", k)$
       + *return* $(Deep(t."left", t."middle", l), v, Shallow(r))$
     + *else*
       + *return* $(t, Shallow(nothing))$
@@ -217,13 +217,13 @@
   + *let* $l, v, r := ftsplit(t, e."key")$
   + *if* $v$ *is* $None$
     #comment[$e."key"$ not in $t$]
+    + *let* $l' := ftpushr(l, e)$
+    + *return* $ftconcat(l', r)$
+  + *else*
+    #comment[$k$ in $t$]
     + *let* $l' := ftpushr(l, v)$
     + *let* $l'' := ftpushr(l', e)$
     + *return* $ftconcat(l'', r)$
-  + *else*
-    #comment[$k$ in $t$]
-    + *let* $l' := ftpushr(l, e)$
-    + *return* $ftconcat(l', r)$
 ]
 
 #let finger-tree-alg-remove = algorithm(

@@ -422,3 +422,38 @@ bib:fk-03:
     parent:
       type: conference
       title: Twelfth Annual ACM-SIAM Symposium on Discrete Algorithms
+
+bib:bm-98:
+  type: article
+  title: Nested datatypes
+  author:
+    - Bird, Richard
+    - Meertens, Lambert
+  page-range: 52-67
+  date: 1998
+  volume: 1422
+  url:
+    value: https://link.springer.com/chapter/10.1007/BFb0054285
+    date: 2024-10-08
+  serial:
+    doi: 10.1007/BFb0054285
+  parent:
+    type: proceedings
+    title: Mathematics of Program Construction
+    editor: Jeuring, Johan
+    publisher: Springer Berlin Heidelberg
+    address: Berlin, Heidelberg
+    serial:
+      isbn: 978-3-540-69345-1
+      doi: 10.1007/BFb0054279
+    parent:
+      - type: conference
+        title: 4th International Conference, MPC'98
+        location: Marstrand, Sweden
+        # 1998-06-15 - 1998-06-17
+        date: 1998-06-15
+      - type: anthology
+        title: Lecture Notes in Computer Science
+        serial:
+          issn: 0302-9743
+          e-issn: 1611-3349

@@ -52,11 +52,11 @@ using T = ...;
 using M = ...;
 
 class Node {};
-class Internal : public Node {
+class NodeDeep : public Node<M, T> {
   M measure;
   std::array<Node*, 3> children; // 2..3 children
 };
-class Leaf : public Node {
+class NodeLeaf : public Node<M, T> {
   T value;
 };
 
@@ -68,13 +68,13 @@ class Digits {
 class FingerTree {
   M measure;
 };
-class Shallow : public FingerTree {
+class Shallow : public FingerTree<M, T> {
   Node* digit; // 0..1 digits
 };
-class Deep : public FingerTree {
-  Digits left;  // 1..4 digits
-  FingerTree* middle;
-  Digits right; // 1..4 digits
+class Deep : public FingerTree<M, T> {
+  Digits<M, T> left;  // 1..4 digits
+  FingerTree<M, T>* middle;
+  Digits<M, T> right; // 1..4 digits
 };
 ```
 
@@ -82,46 +82,63 @@ class Deep : public FingerTree {
 using V = ...;
 using K = ...;
 
-class Node {};
-class Internal : public Node {
+class Node {
   K key;
+};
+class Internal : public Node<K, V> {
   std::vector<Node*> children; // k_min..k_max children
 };
-class Leaf : public Node {
-  K key;
+class Leaf : public Node<K, V> {
   V val;
 };
 
 class Digits {
   K key;
-  std::vector<Node*> children;
+  std::vector<Node<K, V>*> children;
 };
 
 class FingerTree {
   K key;
 };
-class Shallow : public FingerTree {
+class Shallow : public FingerTree<K, V> {
   std::vector<Node*> digits; // 0..2d_min digits
 };
-class Deep : public FingerTree {
-  Digits left;  // d_min..d_max digits
-  FingerTree* middle;
-  Digits right; // d_min..d_max digits
+class Deep : public FingerTree<K, V> {
+  Digits<K, V> left;  // d_min..d_max digits
+  FingerTre<K, V>* middle;
+  Digits<K, V> right; // d_min..d_max digits
 };
 ```
 
 #let finger-tree-def-illegal = ```cpp
 template <typename T>
-class Node2 : public Node { T* a; T* b; };
+class Node {};
 
 template <typename T>
-class Node3 : public Node { T* a; T* b; T* c; };
+class Node2 : public Node<T> { T a; T b; };
 
-// ...
+template <typename T>
+class Node3 : public Node<T> { T a; T b; T c; };
+
+template <typename T>
+class Digits : { std::vector<T> digits; };
+
+template <typename T>
+class FingerTree {};
+
+template <typename T>
+class Empty : public FingerTree<T> {};
+
+template <typename T>
+class Single : public FingerTree<T> {
+  T node;
+};
 
 template <typename T>
 class Deep : public FingerTree {
+  Digits<T> left;
   FingerTree<Node<T>> middle;
+  Digits<T> right;
 };
 ```
 
@@ -132,19 +149,19 @@ class Node {
   Kind _kind;
   std::shared_ptr<NodeBase<K, V>> _repr;
 };
-class NodeDeep: public NodeBase {
+class NodeDeep : public NodeBase<K, V> {
   uint _size;
   K _key;
   std::vector<Node<K, V>> _children;
 };
-class NodeLeaf : public NodeBase { K _key; V _val; };
+class NodeLeaf : public NodeBase<K, V> { K _key; V _val; };
 ```
 
 #let finger-tree-def-digits = ```cpp
 class DigitsBase {
   uint _size;
   K _key;
-  std::vector<SharedNode<K, V>> _digits;
+  std::vector<Node<K, V>> _digits;
 };
 class Digits {
   std::shared_ptr<DigitsBase<K, V>> _repr;
@@ -158,11 +175,11 @@ class FingerTree {
   Kind _kind;
   std::shared_ptr<FingerTreeBase<K, V>> _repr;
 };
-class FingerTreeEmpty : public FingerTreeBase {};
-class FingerTreeSingle : public FingerTreeBase {
+class FingerTreeEmpty : public FingerTreeBase<K, V> {};
+class FingerTreeSingle : public FingerTreeBase<K, V> {
   Node<K, V> _node;
 };
-class FingerTreeDeep : public FingerTreeBase {
+class FingerTreeDeep : public FingerTreeBase<K, V> {
   Digits<K, V> _left;
   FingerTree<K, V> _middle;
   Digits<K, V> _right;

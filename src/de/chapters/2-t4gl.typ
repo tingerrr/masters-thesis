@@ -1,7 +1,7 @@
 #import "/src/util.typ": *
 #import "/src/figures.typ"
 
-T4gl (_engl._ #strong[T]esting #strong[4]th #strong[G]eneration #strong[L]anguage) ist ein proprietäres Softwareprodukt zur Entwicklung von Testsoftware für Industrieprüfanlagen wie die LUB (#strong[L]ow Speed #strong[U]niformity and #strong[B]alance) oder HSU (#strong[H]igh #strong[S]peed #strong[U]niformity and Balance).
+T4gl (_engl._ #strong[T]esting #strong[4]th #strong[G]eneration #strong[L]anguage) ist ein proprietäres Softwareprodukt zur Entwicklung von Testsoftware für Industrieprüfanlagen wie die LUB (#strong[L]ow Speed #strong[U]niformity and #strong[B]alance), HSU (#strong[H]igh #strong[S]peed #strong[U]niformity and Balance) oder vielen Weiteren.
 T4gl steht bei der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) unter Entwicklung und umfasst die folgenden Komponenten:
 - Programmiersprache
   - Anwendungsspezifische Features
@@ -11,11 +11,11 @@ T4gl steht bei der Brückner und Jarosch Ingenieurgesellschaft mbH (BJ-IG) unter
 - Laufzeitsystem
   - Ausführen der Instruktionen
   - Scheduling von Green Threads
-  - Bereitstellung von Maschinen- oder protokollspezifischen Schnittstellen
+  - Bereitstellung von maschinen- oder protokollspezifischen Schnittstellen
 
 Wird ein T4gl-Script dem Compiler übergeben, startet dieser zunächst mit der statischen Analyse.
 Bei der Analyse der Skripte werden bestimmte Invarianzen geprüft, wie die statische Länge bestimmter Arrays, die Typsicherheit und die syntaktische Korrektheit des Scripts.
-Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ (Atomare Instruktionen) kompiliert.
+Nach der Analyse wird das Script in eine Sequenz von _Microsteps_ (atomare Instruktionen) kompiliert.
 Im Anschluss führt des Laufzeitsystem die kompilierten _Microsteps_ aus, verwaltet Speicher und Kontextwechsel der _Microsteps_ und stellt die benötigten Systemschnittstellen zur Verfügung.
 
 = Echtzeitanforderungen <sec:realtime>
@@ -37,8 +37,8 @@ Je nach Strenge der Anforderungen lassen sich Echtzeitsysteme in drei verschiede
 / Hartes Echtzeitsystem:
   Eine einzige Verletzung der Echtzeitbedingungen hat katastrophale Folgen für das Echtzeitsystem @bib:lo-11[S. 6].
 
-Für Anwendungsfälle, in denen Echtzeitanforderungen an T4gl gestellt werden, gibt es bei Nichteinhaltung keine katastrophalen Folgen, es müssen lediglich Testergebnisse verworfen werden.
-T4gl ist demnach nur für weiche Echtzeitsysteme einsetzbar.
+T4gl ist ein weiches Echtzeitsystem. Für Anwendungsfälle, bei denen Echtzeitanforderungen an T4gl gestellt werden, darf die Nichteinhaltung dieser Anforderungen keine katastrophalen Folgen haben (Personensicherheit, Prüfstandssicherheit, Prüflingssicherheit).
+In diesem Fall sind im schlimmsten Fall nur die Testergebnisse ungültig und müssen verworfen werden.
 
 = T4gl-Arrays <sec:t4gl:arrays>
 Bei T4gl-Arrays handelt es sich um mehrdimensionale assoziative Arrays mit Schlüsseln, welche eine voll definierte Ordnungsrelation haben.
@@ -59,7 +59,7 @@ Für ein solches Array können keine Schlüssel hinzugefügt oder entnommen werd
 
 Bei den in @lst:t4gl-ex gegebenen Deklarationen werden, je nach den angegebenen Typen, verschiedene Datenstrukturen vom Laufzeitsystem gewählt.
 Diese ähneln den C++-Varianten in @tbl:t4gl-array-analogies, wobei `T` und `U` Typen sind und `N` eine Zahl aus $NN^+$.
-Die Deklaration von `staticArray` weißt den Compiler an ein T4gl-Array mit 10 Standardwerten für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9 anzulegen.
+Die Deklaration von `staticArray` weist den Compiler an, ein T4gl-Array mit 10 Standardwerten für den `String` Typ (die leere Zeichenkette `""`) für die Schlüssel 0 bis einschließlich 9 anzulegen.
 Es handelt sich um eine Sonderform des T4gl-Arrays, welches eine dichte festgelegte Schlüsselverteilung hat (es entspricht einem gewöhnlichen Array).
 
 #figure(
@@ -80,8 +80,7 @@ Schreibzugriffe in einer Instanz sind auch in der anderen lesbar (demonstiert in
 ) <lst:t4gl-ref>
 
 Im Gegensatz zu dem Referenzverhalten der Arrays aus Sicht des T4gl-Programmierers steht die Implementierug durch QMaps.
-Bei diesen handelt es sich um Copy-On-Write (CoW) Datenstrukturen.
-Mehrere Instanzen teilen sich die gleichen Daten und erlauben zunächst nur Lesezugriffe darauf.
+Bei diesen handelt es sich um Copy-On-Write (CoW) Datenstrukturen, mehrere Instanzen teilen sich die gleichen Daten und erlauben zunächst nur Lesezugriffe darauf.
 Muss eine Instanz einen Schreibzugriff durchführen, wird vorher sichergestellt, dass diese Instanz der einzige Referent der Daten ist, wenn nötig durch eine Kopie der gesamten Daten.
 Dadurch sind Kopien von QMaps initial sehr effizient, es muss lediglich die Referenzzahl der Daten erhöht werden.
 Die Kosten der Kopie zeigt sich erst dann, wenn ein Scheibzugriff nötig ist.
@@ -97,8 +96,8 @@ Zwischen den Ebenen 1 und 2 kommt geteilte Schreibfähigkeit durch Referenzzähl
 Zwischen den Ebenen 2 und 3 kommt CoW + Referenzzählung zum Einsatz, mehrere Qt-Instanz teilen sich die gleichen Daten, Schreibzugriffe auf die Daten sorgen vorher dafür, dass die Qt-Instanz der einzige Referent ist, wenn nötig durch eine Kopie.
 Wir definieren je nach Tiefe drei Typen von Kopien:
 / Typ-1 (flache Kopie):
-  Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleichen Qt-Instanz zeigt.
-  Wird in T4gl durch Initialisierung von Arrays durch existierende Instanzen oder die Übergabe von Arrays an normale Funktionen hervorgerufen.
+  Eine Kopie der T4gl-Instanz erstellt lediglich eine neue Instanz, welche auf die gleiche Qt-Instanz zeigt.
+  Dies wird in T4gl durch Initialisierung von Arrays durch existierende Instanzen oder die Übergabe von Arrays an normale Funktionen hervorgerufen.
   Eine flache Kopie ist immer eine $Theta(1)$-Operation.
 / Typ-2:
   Eine Kopie der T4gl-Instanz *und* der Qt-Instanz, welche beide auf die gleichen Daten zeigen.
@@ -137,8 +136,8 @@ Bei korrektem Betrieb des Laufzeitsystems sind Typ-2-Kopien kurzlebig und immer 
   label: <fig:t4gl-indirection>,
 )
 
-Ein kritischer Anwendungsfall für T4gl-Arrays ist die Ausgabe einer rollenden Historie von Werten einer Variable.
-Wenn diese vom Laufzeitsystem erfassten Werte vom T4gl-Programmierer ausgelesen werden, wird eine Typ-2-Kopie erstellt.
+Ein kritischer Anwendungsfall für T4gl-Arrays ist die Übergabe einer rollenden Historie von Werten einer Variable.
+Wenn diese vom Laufzeitsystem erfassten Werte an den T4gl-Programmierer übergeben werden, wird eine Typ-2-Kopie erstellt.
 Die T4gl-Instanz, welche an den Programmierer übergeben wird, sowie die interne Qt-Instanz teilen sich Daten, welche vom Laufzeitsystem zwangsläufig beim nächsten Schreibzugriff kopiert werden müssen.
 Es kommt zur Typ-3-Kopie, und, daraus folgend, zu einem nicht-trivialem zeitlichem Aufwand von $Theta(n)$.
 Das gilt für jeden ersten Schreibzugriff, welcher nach einer Übergabe der Daten an den T4gl-Programmierer erfolgt.
