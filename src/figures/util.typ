@@ -48,11 +48,12 @@
   )
 }
 
-#let instance = node.with(extrude: (-2, 0))
+#let node = node.with(radius: 0.68em)
+#let instance = node.with(radius: 0.75em, extrude: (-2, 0))
 
 #let fdiag = fletcher.diagram.with(
   node-stroke: 0.075em,
-  spacing: 4em,
+  spacing: 2.5em,
 )
 
 #let dstroke(color, ..args) = (dash: "dashed", paint: color, ..args.named())

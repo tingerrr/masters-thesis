@@ -329,9 +329,9 @@
 ]
 
 #let finger-tree = fdiag({
-  let elem = node.with(radius: 7.5pt)
-  let spine = node.with(radius: 7.5pt, fill: blue.lighten(75%))
-  let node = node.with(radius: 5pt, fill: gray.lighten(50%))
+  let elem = node.with(radius: 0.68em)
+  let spine = node.with(radius: 0.68em, fill: blue.lighten(75%))
+  let node = node.with(radius: 0.45em, fill: gray.lighten(50%))
 
   let elems(coord, data, parent: none, ..args) = {
     let parent = if parent != none { parent } else {
