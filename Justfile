@@ -1,44 +1,51 @@
-lang := 'de'
 root := justfile_directory()
 
-# typst variables
+# typst environment variables
 export TYPST_ROOT := root
 export TYPST_FONT_PATHS := root / 'assets' / 'fonts'
+
+# overridable variables
+lang := 'de'
+target := 'thesis'
+
+# compound file paths
+main_file := 'src' / lang / target + '.typ'
+build_file := 'build' / target + '-' + lang + '.pdf'
+persist_file := 'out' / target + '-' + lang + '.pdf'
 
 # list recipes by default
 [private]
 default:
 	@just --list --unsorted
 
-# invoke typst with the given command and output type
+# print a help message
+help:
+	# There are three targets available for building, which correspond to the three
+	# entry points, they can be set by running just with `target=<target> build`:
+	# - thesis (default)
+	# - poster
+	# - presentation
+	#
+	# Running typst itself with the right root and font directories can be done by
+	# simply running `just typst <args...>`.
+
+# invoke typst with some pre-set environment variables
 typst *args:
 	typst {{ args }}
 
-# create the temporary and gitignored directories or files
+# create temporary directories and files
 [private]
-prep:
-	mkdir -p out
+prepare:
+	mkdir -p build
 
-# watch the notes and supplementary material
-notes: prep
-	typst watch {{ 'etc' / 'notes.typ' }} {{ 'out' / 'notes.pdf' }}
+# compile once
+build *args:
+	typst compile {{ main_file }} {{ build_file }} {{ args }}
 
-# invoke typst for building with the given command and output type
-build cmd type *args: prep
-	typst {{ cmd }} {{ 'src' / lang / type + '.typ' }} {{ 'out' / type + '-' + lang + '.pdf' }} {{ args }}
+# compile incrementally
+watch *args:
+	typst watch {{ main_file }} {{ build_file }} {{ args }}
 
-# invoke typst compile for the given output type
-compile type: (build 'compile' type)
-
-#invoke typst watch for the given output type
-watch type: (build 'watch' type)
-
-# invoke typst-preview with the given output type
-preview type *args: (build 'compile' type) && (build 'watch' type)
-	# see: https://github.com/Enter-tainer/typst-preview/issues/289
-	# typst-preview --root {{ root }} {{ 'src' / lang / type + '.typ' }} {{ args }}
-	xdg-open {{ 'out' / type + '-' + lang + '.pdf' }} &
-
-# query the document for todos
-lint type:
-	typst query {{ 'src' / lang / type + '.typ' }} '<todo>'
+# compile once and persist this version in the repo
+update *args: prepare (build args)
+	cp -u {{ build_file }} {{ persist_file }}
