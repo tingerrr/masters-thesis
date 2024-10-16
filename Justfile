@@ -49,3 +49,8 @@ watch *args:
 # compile once and persist this version in the repo
 update *args: prepare (build args)
 	cp -u {{ build_file }} {{ persist_file }}
+
+# export the pdfpc file
+pdfpc: prepare
+	#! /usr/bin/env nu
+	typst query {{ 'src' / lang / 'presentation.typ' }} --field value --one <pdfpc-file> | from json | to json | save -f {{ 'build' / 'presentation-' + lang + ".pdfpc" }}
